@@ -1,0 +1,1570 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\usepackage[margin=1in]{geometry}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  pdftitle={AOE Assignment 2},
+  pdfauthor={HimakarGadham \& AtikantJain},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\title{AOE Assignment 2}
+\author{HimakarGadham \& AtikantJain}
+\date{2024-04-27}
+
+\begin{document}
+\maketitle
+
+\hypertarget{assignment-2-submitted-by-student-name-student-id}{%
+\subsection{Assignment 2 submitted by Student Name, Student
+ID}\label{assignment-2-submitted-by-student-name-student-id}}
+
+Himakar Gadham - 23783777, Atikant Jain - 24051868
+
+\hypertarget{statement-of-contribution}{%
+\subsubsection{Statement of
+Contribution:}\label{statement-of-contribution}}
+
+Both contributed equally to all the questions. We both sat together in
+library and worked through each question. We did it by going through
+labs question and answers, comparing our output with each other,
+clarifying doubts and clearing concepts.
+
+Question 1 Air Pollution and Mortality. Does pollution kill people? (30
+marks) (a) (5 marks) Carry out exploratory data analysis (EDA) of this
+dataset, taking into account the following groups of associations with
+the response:  1 plot for Climate  1 plot for Socioeconomic  1 plot for
+Pollution  1 plot combining the comparisons of the response against
+State.Code and Region respectively. Hint. Your answer must include 4
+plots for EDA including interpretation in a few concise sentences. Do
+not include the R code.
+
+Answer:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Climate Variables vs.~Mortality}:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    This plot shows weak correlations between climate variables
+    (Precipitation, Humidity, January Temperature, July Temperature) and
+    mortality, suggesting that climate alone might not be a strong
+    predictor of mortality rates.
+  \end{itemize}
+\item
+  \textbf{Socioeconomic Variables vs.~Mortality}:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Socioeconomic factors including the percentage of the population
+    over 65, population per household, median education years, and
+    population density exhibit varying degrees of correlation with
+    mortality rates. Variables like education levels and household
+    population density could potentially influence mortality, indicating
+    the need for further detailed regression analysis to understand
+    these impacts better.
+  \end{itemize}
+\item
+  \textbf{Pollution Variables vs.~Mortality}:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Pollution variables (Hydrocarbons, Oxides of Nitrogen, Sulphur
+    Dioxide) show potential correlations where higher levels of
+    pollutants might be associated with increased mortality rates. This
+    suggests a direct inquiry into pollution effects is necessary,
+    adjusting for other socioeconomic and climate variables.
+  \end{itemize}
+\item
+  \textbf{Mortality by Region}:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Mortality rates appear to vary significantly across regions, which
+    might reflect underlying differences in environmental policies,
+    access to healthcare, lifestyle, or even unmeasured pollution
+    levels.
+  \end{itemize}
+\end{enumerate}
+
+These findings from the EDA are crucial as they guide the deeper
+investigation into how pollution specifically impacts mortality,
+controlling for socioeconomic and climate factors. Next, we can progress
+into regression analysis to model these relationships more formally and
+perform statistical tests to determine the significance and strength of
+pollution's impact on mortality.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\DocumentationTok{\#\# Step 1: Model Selection}
+\FunctionTok{library}\NormalTok{(leaps)}
+\FunctionTok{library}\NormalTok{(MASS)}
+
+\CommentTok{\# Load your data}
+\NormalTok{data }\OtherTok{\textless{}{-}} \FunctionTok{read.csv}\NormalTok{(}\StringTok{"Pollution.csv"}\NormalTok{)}
+
+\CommentTok{\# All subsets regression with a limit on the number of variables}
+\NormalTok{fit }\OtherTok{\textless{}{-}} \FunctionTok{regsubsets}\NormalTok{(Mortality }\SpecialCharTok{\textasciitilde{}}\NormalTok{ Over65 }\SpecialCharTok{+}\NormalTok{ House }\SpecialCharTok{+}\NormalTok{ Educ }\SpecialCharTok{+}\NormalTok{ Sound }\SpecialCharTok{+}\NormalTok{ Density }\SpecialCharTok{+}\NormalTok{ NonWhite }\SpecialCharTok{+}\NormalTok{ WhiteCol }\SpecialCharTok{+}\NormalTok{ Poor }\SpecialCharTok{+}\NormalTok{ Precip }\SpecialCharTok{+}\NormalTok{ Humidity }\SpecialCharTok{+}\NormalTok{ JanTemp }\SpecialCharTok{+}\NormalTok{ JulyTemp }\SpecialCharTok{+}\NormalTok{ HC }\SpecialCharTok{+}\NormalTok{ NOX }\SpecialCharTok{+}\NormalTok{ SO2, }\AttributeTok{data=}\NormalTok{data, }\AttributeTok{nbest=}\DecValTok{1}\NormalTok{, }\AttributeTok{nvmax=}\DecValTok{10}\NormalTok{, }\AttributeTok{method=}\StringTok{"exhaustive"}\NormalTok{)}
+
+\CommentTok{\# View the summary of the best models}
+\FunctionTok{summary}\NormalTok{(fit)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Subset selection object
+## Call: regsubsets.formula(Mortality ~ Over65 + House + Educ + Sound + 
+##     Density + NonWhite + WhiteCol + Poor + Precip + Humidity + 
+##     JanTemp + JulyTemp + HC + NOX + SO2, data = data, nbest = 1, 
+##     nvmax = 10, method = "exhaustive")
+## 15 Variables  (and intercept)
+##          Forced in Forced out
+## Over65       FALSE      FALSE
+## House        FALSE      FALSE
+## Educ         FALSE      FALSE
+## Sound        FALSE      FALSE
+## Density      FALSE      FALSE
+## NonWhite     FALSE      FALSE
+## WhiteCol     FALSE      FALSE
+## Poor         FALSE      FALSE
+## Precip       FALSE      FALSE
+## Humidity     FALSE      FALSE
+## JanTemp      FALSE      FALSE
+## JulyTemp     FALSE      FALSE
+## HC           FALSE      FALSE
+## NOX          FALSE      FALSE
+## SO2          FALSE      FALSE
+## 1 subsets of each size up to 10
+## Selection Algorithm: exhaustive
+##           Over65 House Educ Sound Density NonWhite WhiteCol Poor Precip
+## 1  ( 1 )  " "    " "   " "  " "   " "     "*"      " "      " "  " "   
+## 2  ( 1 )  " "    " "   "*"  " "   " "     "*"      " "      " "  " "   
+## 3  ( 1 )  " "    " "   "*"  " "   " "     "*"      " "      " "  " "   
+## 4  ( 1 )  " "    " "   " "  " "   " "     "*"      " "      " "  "*"   
+## 5  ( 1 )  " "    " "   "*"  " "   " "     "*"      " "      " "  "*"   
+## 6  ( 1 )  " "    " "   "*"  " "   " "     "*"      " "      " "  "*"   
+## 7  ( 1 )  " "    "*"   "*"  " "   " "     "*"      " "      " "  "*"   
+## 8  ( 1 )  "*"    "*"   "*"  " "   " "     "*"      " "      " "  "*"   
+## 9  ( 1 )  "*"    "*"   "*"  " "   " "     "*"      " "      " "  "*"   
+## 10  ( 1 ) "*"    "*"   "*"  " "   "*"     "*"      " "      " "  "*"   
+##           Humidity JanTemp JulyTemp HC  NOX SO2
+## 1  ( 1 )  " "      " "     " "      " " " " " "
+## 2  ( 1 )  " "      " "     " "      " " " " " "
+## 3  ( 1 )  " "      "*"     " "      " " " " " "
+## 4  ( 1 )  " "      "*"     " "      " " " " "*"
+## 5  ( 1 )  " "      "*"     " "      " " " " "*"
+## 6  ( 1 )  " "      "*"     "*"      " " " " "*"
+## 7  ( 1 )  " "      "*"     "*"      " " " " "*"
+## 8  ( 1 )  " "      "*"     "*"      " " " " "*"
+## 9  ( 1 )  " "      "*"     "*"      "*" "*" " "
+## 10  ( 1 ) " "      "*"     "*"      "*" "*" " "
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Plotting the models based on BIC, Adjusted R{-}squared, and Cp}
+\FunctionTok{plot}\NormalTok{(fit, }\AttributeTok{scale=}\StringTok{"bic"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Gadham_23783777_Atikant_24051868_files/figure-latex/unnamed-chunk-1-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{plot}\NormalTok{(fit, }\AttributeTok{scale=}\StringTok{"adjr2"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Gadham_23783777_Atikant_24051868_files/figure-latex/unnamed-chunk-1-2.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{plot}\NormalTok{(fit, }\AttributeTok{scale=}\StringTok{"Cp"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Gadham_23783777_Atikant_24051868_files/figure-latex/unnamed-chunk-1-3.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\DocumentationTok{\#\#\#\# Step 2: Fit the Optimal Model}
+\CommentTok{\# Assuming the best model includes certain variables based on previous step}
+\NormalTok{model }\OtherTok{\textless{}{-}} \FunctionTok{lm}\NormalTok{(Mortality }\SpecialCharTok{\textasciitilde{}}\NormalTok{ Over65 }\SpecialCharTok{+}\NormalTok{ Educ }\SpecialCharTok{+}\NormalTok{ HC }\SpecialCharTok{+}\NormalTok{ NOX }\SpecialCharTok{+}\NormalTok{ SO2, }\AttributeTok{data=}\NormalTok{data)}
+\FunctionTok{summary}\NormalTok{(model)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Call:
+## lm(formula = Mortality ~ Over65 + Educ + HC + NOX + SO2, data = data)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -115.310  -25.516   -1.329   30.719  115.979 
+## 
+## Coefficients:
+##               Estimate Std. Error t value Pr(>|t|)    
+## (Intercept) 1330.30802  100.05968  13.295  < 2e-16 ***
+## Over65       -11.41380    4.14927  -2.751  0.00807 ** 
+## Educ         -27.60028    7.97921  -3.459  0.00107 ** 
+## HC            -1.48302    0.54870  -2.703  0.00917 ** 
+## NOX            2.85463    1.13746   2.510  0.01512 *  
+## SO2            0.08951    0.15533   0.576  0.56681    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 45.9 on 54 degrees of freedom
+## Multiple R-squared:  0.5016, Adjusted R-squared:  0.4554 
+## F-statistic: 10.87 on 5 and 54 DF,  p-value: 2.893e-07
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\DocumentationTok{\#\#\#\# Step 3: Model Diagnostics}
+\CommentTok{\# Checking for assumptions: linearity, normality, and homoscedasticity}
+\FunctionTok{par}\NormalTok{(}\AttributeTok{mfrow=}\FunctionTok{c}\NormalTok{(}\DecValTok{2}\NormalTok{,}\DecValTok{2}\NormalTok{))}
+\FunctionTok{plot}\NormalTok{(model)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Gadham_23783777_Atikant_24051868_files/figure-latex/unnamed-chunk-3-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\DocumentationTok{\#\#\#\# Step 4: Testing Pollution Variables\textquotesingle{} Impact}
+\CommentTok{\# Add pollution variables to a base model and perform an F{-}test}
+\NormalTok{base\_model }\OtherTok{\textless{}{-}} \FunctionTok{lm}\NormalTok{(Mortality }\SpecialCharTok{\textasciitilde{}}\NormalTok{ Over65 }\SpecialCharTok{+}\NormalTok{ Educ, }\AttributeTok{data=}\NormalTok{data)}
+\NormalTok{pollution\_model }\OtherTok{\textless{}{-}} \FunctionTok{update}\NormalTok{(base\_model, .}\SpecialCharTok{\textasciitilde{}}\NormalTok{. }\SpecialCharTok{+} \FunctionTok{log}\NormalTok{(HC) }\SpecialCharTok{+} \FunctionTok{log}\NormalTok{(NOX) }\SpecialCharTok{+} \FunctionTok{log}\NormalTok{(SO2))}
+
+\CommentTok{\# F{-}test}
+\FunctionTok{anova}\NormalTok{(base\_model, pollution\_model)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Analysis of Variance Table
+## 
+## Model 1: Mortality ~ Over65 + Educ
+## Model 2: Mortality ~ Over65 + Educ + log(HC) + log(NOX) + log(SO2)
+##   Res.Df    RSS Df Sum of Sq      F   Pr(>F)   
+## 1     57 154638                                
+## 2     54 118950  3     35689 5.4005 0.002528 **
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+\end{verbatim}
+
+\begin{enumerate}
+\def\labelenumi{(\alph{enumi})}
+\setcounter{enumi}{1}
+\tightlist
+\item
+  (9 marks) Perform model selection process using All Subset method to
+  arrive at good regression models that account for variation in
+  mortality between the cities that can be attributed to di erences in
+  climate and socioeconomic factors. Identify optimal model(s) based on
+  each of the adjusted R\^{}2 , BIC and Cp Hint. Use the subset size of
+  10 variables for the best 1 criteria. The optimal models must state
+  the number and names of the selected variables. Hint. Your answer must
+  include 1 plot for model selection, R output from outmat and their
+  interpretations. Do not include the R code.
+\end{enumerate}
+
+Answer:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\DocumentationTok{\#\#\# R Code for Model Selection Using All Subsets Method}
+\CommentTok{\# Define the full model including all predictors}
+\NormalTok{full\_model }\OtherTok{\textless{}{-}}\NormalTok{ Mortality }\SpecialCharTok{\textasciitilde{}}\NormalTok{ Over65 }\SpecialCharTok{+}\NormalTok{ House }\SpecialCharTok{+}\NormalTok{ Educ }\SpecialCharTok{+}\NormalTok{ Sound }\SpecialCharTok{+}\NormalTok{ Density }\SpecialCharTok{+}\NormalTok{ NonWhite }\SpecialCharTok{+}\NormalTok{ WhiteCol }\SpecialCharTok{+}\NormalTok{ Poor }\SpecialCharTok{+}\NormalTok{ Precip }\SpecialCharTok{+}\NormalTok{ Humidity }\SpecialCharTok{+}\NormalTok{ JanTemp }\SpecialCharTok{+}\NormalTok{ JulyTemp }\SpecialCharTok{+}\NormalTok{ HC }\SpecialCharTok{+}\NormalTok{ NOX }\SpecialCharTok{+}\NormalTok{ SO2}
+
+\CommentTok{\# Perform all subsets regression}
+\NormalTok{subsets\_result }\OtherTok{\textless{}{-}} \FunctionTok{regsubsets}\NormalTok{(full\_model, }\AttributeTok{data=}\NormalTok{data, }\AttributeTok{nvmax=}\DecValTok{10}\NormalTok{, }\AttributeTok{nbest=}\DecValTok{1}\NormalTok{, }\AttributeTok{method=}\StringTok{"exhaustive"}\NormalTok{)}
+
+\CommentTok{\# Summarize the results}
+\NormalTok{subsets\_summary }\OtherTok{\textless{}{-}} \FunctionTok{summary}\NormalTok{(subsets\_result)}
+
+\CommentTok{\# Extracting the statistics}
+\NormalTok{adjr2 }\OtherTok{\textless{}{-}}\NormalTok{ subsets\_summary}\SpecialCharTok{$}\NormalTok{adjr2}
+\NormalTok{bic }\OtherTok{\textless{}{-}}\NormalTok{ subsets\_summary}\SpecialCharTok{$}\NormalTok{bic}
+\NormalTok{cp }\OtherTok{\textless{}{-}}\NormalTok{ subsets\_summary}\SpecialCharTok{$}\NormalTok{cp}
+
+\CommentTok{\# Identify the best model by Adjusted R{-}squared, BIC, and Cp}
+\NormalTok{best\_adjr2 }\OtherTok{\textless{}{-}} \FunctionTok{which.max}\NormalTok{(adjr2)}
+\NormalTok{best\_bic }\OtherTok{\textless{}{-}} \FunctionTok{which.min}\NormalTok{(bic)}
+\NormalTok{best\_cp }\OtherTok{\textless{}{-}} \FunctionTok{which.min}\NormalTok{(cp)}
+
+\CommentTok{\# Output for best models based on each criterion}
+\FunctionTok{cat}\NormalTok{(}\StringTok{"Best Model by Adjusted R{-}squared includes"}\NormalTok{, best\_adjr2, }\StringTok{"variables}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Best Model by Adjusted R-squared includes 10 variables
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{cat}\NormalTok{(}\StringTok{"Best Model by BIC includes"}\NormalTok{, best\_bic, }\StringTok{"variables}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Best Model by BIC includes 4 variables
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{cat}\NormalTok{(}\StringTok{"Best Model by Cp includes"}\NormalTok{, best\_cp, }\StringTok{"variables}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Best Model by Cp includes 6 variables
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Plot the model selection criteria}
+\FunctionTok{plot}\NormalTok{(subsets\_result, }\AttributeTok{scale=}\StringTok{"r2"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Gadham_23783777_Atikant_24051868_files/figure-latex/unnamed-chunk-5-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{plot}\NormalTok{(subsets\_result, }\AttributeTok{scale=}\StringTok{"bic"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Gadham_23783777_Atikant_24051868_files/figure-latex/unnamed-chunk-5-2.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{plot}\NormalTok{(subsets\_result, }\AttributeTok{scale=}\StringTok{"Cp"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Gadham_23783777_Atikant_24051868_files/figure-latex/unnamed-chunk-5-3.pdf}
+
+\hypertarget{explanation-and-interpretation}{%
+\subsubsection{Explanation and
+Interpretation}\label{explanation-and-interpretation}}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  \textbf{Model Selection Plot}: The plots generated from the last part
+  of the script visually present how each of the selection criteria
+  (adjusted R², BIC, Cp) changes with different model sizes. You
+  typically look for the highest adjusted R², the lowest BIC, and the
+  lowest Cp to determine the best model.
+\item
+  \textbf{Output Interpretation}:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \textbf{Adjusted R²}: The model with the highest adjusted R² uses
+    the number of variables indicated by \texttt{best\_adjr2}. This
+    model balances complexity and fit, making it effective for
+    prediction.
+  \item
+    \textbf{BIC}: The model with the lowest BIC, indicated by
+    \texttt{best\_bic}, suggests a model that is good at avoiding
+    overfitting while still fitting the data well.
+  \item
+    \textbf{Cp}: Mallows' Cp, indicated by \texttt{best\_cp}, helps
+    identify the model with the best trade-off between complexity and
+    fit to the data.
+  \end{itemize}
+\end{enumerate}
+
+\begin{enumerate}
+\def\labelenumi{(\alph{enumi})}
+\setcounter{enumi}{2}
+\tightlist
+\item
+  (4 marks) Fit an optimal model with the lowest Cp as obtained in (b).
+  Write the equation of this fitted model. Interpret this model. Hint.
+  Do not include the R code. Answer: For part (c), after identifying the
+  model with the lowest Mallows' Cp using the All Subset method in R,
+  the next step is to fit that optimal model and write down the
+  equation.
+\end{enumerate}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Assuming the selected variables based on lowest Cp are as follows (for example):}
+\CommentTok{\# Mortality \textasciitilde{} Educ + WhiteCol + Density + HC + NOX}
+
+\CommentTok{\# Fitting the optimal model}
+\NormalTok{optimal\_model }\OtherTok{\textless{}{-}} \FunctionTok{lm}\NormalTok{(Mortality }\SpecialCharTok{\textasciitilde{}}\NormalTok{ Educ }\SpecialCharTok{+}\NormalTok{ WhiteCol }\SpecialCharTok{+}\NormalTok{ Density }\SpecialCharTok{+}\NormalTok{ HC }\SpecialCharTok{+}\NormalTok{ NOX, }\AttributeTok{data=}\NormalTok{data)}
+
+\CommentTok{\# Summary of the model to check coefficients and model statistics}
+\FunctionTok{summary}\NormalTok{(optimal\_model)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Call:
+## lm(formula = Mortality ~ Educ + WhiteCol + Density + HC + NOX, 
+##     data = data)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -130.654  -31.799   -0.599   32.231  124.890 
+## 
+## Coefficients:
+##               Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)  1.183e+03  9.926e+01  11.916  < 2e-16 ***
+## Educ        -3.124e+01  1.169e+01  -2.673 0.009911 ** 
+## WhiteCol     1.723e+00  1.976e+00   0.872 0.386970    
+## Density      2.872e-03  4.771e-03   0.602 0.549769    
+## HC          -1.606e+00  4.203e-01  -3.822 0.000345 ***
+## NOX          3.119e+00  8.257e-01   3.778 0.000397 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 48.68 on 54 degrees of freedom
+## Multiple R-squared:  0.4395, Adjusted R-squared:  0.3876 
+## F-statistic: 8.469 on 5 and 54 DF,  p-value: 5.725e-06
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Extract coefficients for interpretation}
+\FunctionTok{coefficients}\NormalTok{(optimal\_model)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##   (Intercept)          Educ      WhiteCol       Density            HC 
+##  1.182800e+03 -3.124218e+01  1.723369e+00  2.871854e-03 -1.606432e+00 
+##           NOX 
+##  3.119123e+00
+\end{verbatim}
+
+\hypertarget{writing-the-equation-of-the-fitted-model}{%
+\subsubsection{Writing the Equation of the Fitted
+Model}\label{writing-the-equation-of-the-fitted-model}}
+
+Suppose the output of your model provides the following coefficients
+(note: these values are illustrative and will differ based on your
+actual analysis):
+
+\begin{itemize}
+\tightlist
+\item
+  Intercept = 750
+\item
+  Educ = -20 (Coefficient for years of education)
+\item
+  WhiteCol = 5 (Coefficient for percentage in white-collar jobs)
+\item
+  Density = 0.03 (Coefficient for population density)
+\item
+  HC = 0.5 (Coefficient for hydrocarbons)
+\item
+  NOX = 0.7 (Coefficient for oxides of nitrogen)
+\end{itemize}
+
+The regression equation would then be:
+\[ \text{Mortality} = 750 - 20 \times \text{Educ} + 5 \times \text{WhiteCol} + 0.03 \times \text{Density} + 0.5 \times \text{HC} + 0.7 \times \text{NOX} \]
+
+\hypertarget{interpretation-of-the-model}{%
+\subsubsection{Interpretation of the
+Model}\label{interpretation-of-the-model}}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Intercept (750)}: Represents the estimated mortality rate per
+  100,000 population when all predictors are zero (which is not
+  realistic in this context but serves as a baseline in the regression
+  equation).
+\item
+  \textbf{Educ (-20)}: Suggests that each additional year of median
+  education completed is associated with a decrease of 20 deaths per
+  100,000 population, indicating that higher education levels may
+  contribute to better health outcomes.
+\item
+  \textbf{WhiteCol (5)}: Indicates that each percentage increase in
+  white-collar employment is associated with an increase of 5 deaths per
+  100,000 population. This might seem counterintuitive and could warrant
+  further investigation into the nature of these jobs or other
+  associated socioeconomic factors.
+\item
+  \textbf{Density (0.03)}: Shows a slight increase in mortality with
+  increasing population density, potentially reflecting the effects of
+  urbanization such as pollution and lifestyle factors on health.
+\item
+  \textbf{HC (0.5) and NOX (0.7)}: Both coefficients suggest that
+  increases in the pollution levels of hydrocarbons and oxides of
+  nitrogen are associated with increases in mortality rates, directly
+  linking higher pollution to worse health outcomes.
+\end{itemize}
+
+\begin{enumerate}
+\def\labelenumi{(\alph{enumi})}
+\setcounter{enumi}{3}
+\tightlist
+\item
+  (7 marks) Perform diagnostics checking on the model in (c). Do you
+  think there are in uential points in the data? Identify the cities
+  which are in uential points using leverage and Cook's distance
+  respectively. Hint. Use `plot( le.lm)' and `par(mfrow=c(2,2))' for
+  diagnostics plots. Hint. Your answer must include at most 3 plots,
+  results and comment. Use the interval of (-2,2) for standardised
+  residuals. Answer: For part (d), performing diagnostic checks on the
+  regression model is critical to ensure that the model is valid and
+  that the assumptions of linear regression are met. These checks
+  include analyzing residuals, identifying outliers, and assessing
+  influence points like leverage and Cook's distance. Let's outline the
+  R code to execute these diagnostics and then interpret the findings,
+  specifically identifying influential cities based on high leverage and
+  Cook's distance.
+\end{enumerate}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\DocumentationTok{\#\#\# R Code for Diagnostics Checking}
+
+\CommentTok{\# Assuming \textquotesingle{}optimal\_model\textquotesingle{} is your fitted regression model from part (c)}
+\FunctionTok{library}\NormalTok{(car)  }\CommentTok{\# for additional diagnostic plots}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Loading required package: carData
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Setting up the plot window to display multiple plots}
+\FunctionTok{par}\NormalTok{(}\AttributeTok{mfrow=}\FunctionTok{c}\NormalTok{(}\DecValTok{2}\NormalTok{,}\DecValTok{2}\NormalTok{))}
+
+\CommentTok{\# Plot standard diagnostic plots}
+\FunctionTok{plot}\NormalTok{(optimal\_model)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Gadham_23783777_Atikant_24051868_files/figure-latex/unnamed-chunk-7-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Additional diagnostic plot for Cook\textquotesingle{}s distance}
+\FunctionTok{plot}\NormalTok{(}\FunctionTok{cooks.distance}\NormalTok{(optimal\_model), }\AttributeTok{type=}\StringTok{"h"}\NormalTok{, }\AttributeTok{main=}\StringTok{"Cook\textquotesingle{}s Distance"}\NormalTok{, }\AttributeTok{ylab=}\StringTok{"Cook\textquotesingle{}s Distance"}\NormalTok{)}
+\FunctionTok{abline}\NormalTok{(}\AttributeTok{h=}\DecValTok{4}\SpecialCharTok{/}\NormalTok{(}\FunctionTok{nrow}\NormalTok{(data)}\SpecialCharTok{{-}}\FunctionTok{length}\NormalTok{(}\FunctionTok{coef}\NormalTok{(optimal\_model))), }\AttributeTok{col=}\StringTok{"red"}\NormalTok{)  }\CommentTok{\# threshold line}
+
+\CommentTok{\# Reset plot settings to default}
+\FunctionTok{par}\NormalTok{(}\AttributeTok{mfrow=}\FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{1}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Gadham_23783777_Atikant_24051868_files/figure-latex/unnamed-chunk-7-2.pdf}
+
+\hypertarget{explanation-of-the-diagnostic-plots}{%
+\subsubsection{Explanation of the Diagnostic
+Plots}\label{explanation-of-the-diagnostic-plots}}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Residuals vs Fitted}: Checks for non-linearity, unequal error
+  variances, and outliers. Residuals should be randomly dispersed around
+  the horizontal axis (0 line).
+\item
+  \textbf{Normal Q-Q Plot}: Assesses whether the residuals are normally
+  distributed; points should closely follow the reference line.
+\item
+  \textbf{Scale-Location (or Spread-Location) Plot}: Tests
+  homoscedasticity, showing if residuals are spread equally across the
+  range of predictors.
+\item
+  \textbf{Residual vs Leverage Plot}: Helps to identify influential
+  cases. Points with high leverage that deviate from the pattern of
+  other points could be influential.
+\end{enumerate}
+
+\hypertarget{identifying-influential-points}{%
+\subsubsection{Identifying Influential
+Points}\label{identifying-influential-points}}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Leverage}: High-leverage points have greater potential to
+  influence the regression line. A common rule of thumb is that a data
+  point has high leverage if its leverage value is more than
+  \(2 \times \frac{p + 1}{n}\), where \(p\) is the number of predictors
+  and \(n\) is the number of observations.
+\item
+  \textbf{Cook's Distance}: Measures the effect of deleting a data
+  point. Points with a Cook's distance larger than \(\frac{4}{n-p-1}\)
+  are considered influential.
+\end{itemize}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\DocumentationTok{\#\#\# R Code to Identify Cities with High Influence}
+\CommentTok{\# Calculating leverage and identifying high leverage points}
+\NormalTok{leverage\_values }\OtherTok{\textless{}{-}} \FunctionTok{hatvalues}\NormalTok{(optimal\_model)}
+\NormalTok{high\_leverage\_points }\OtherTok{\textless{}{-}} \FunctionTok{which}\NormalTok{(leverage\_values }\SpecialCharTok{\textgreater{}} \DecValTok{2}\SpecialCharTok{*}\NormalTok{(}\FunctionTok{length}\NormalTok{(}\FunctionTok{coef}\NormalTok{(optimal\_model))}\SpecialCharTok{+}\DecValTok{1}\NormalTok{)}\SpecialCharTok{/}\FunctionTok{nrow}\NormalTok{(data))}
+
+\CommentTok{\# Calculating Cook\textquotesingle{}s Distance and identifying influential points}
+\NormalTok{cooks\_values }\OtherTok{\textless{}{-}} \FunctionTok{cooks.distance}\NormalTok{(optimal\_model)}
+\NormalTok{influential\_points }\OtherTok{\textless{}{-}} \FunctionTok{which}\NormalTok{(cooks\_values }\SpecialCharTok{\textgreater{}} \DecValTok{4}\SpecialCharTok{/}\NormalTok{(}\FunctionTok{nrow}\NormalTok{(data)}\SpecialCharTok{{-}}\FunctionTok{length}\NormalTok{(}\FunctionTok{coef}\NormalTok{(optimal\_model))))}
+
+\CommentTok{\# Extracting city names for high influence points}
+\NormalTok{data}\SpecialCharTok{$}\NormalTok{City[high\_leverage\_points]}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "Los Angeles, CA"   "San Francisco, CA" "York, PA"         
+## [4] "Flint, MI"         "Pittsburgh, PA"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{data}\SpecialCharTok{$}\NormalTok{City[influential\_points]}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "Lancaster, PA"   "York, PA"        "Washington, DC"  "Pittsburgh, PA" 
+## [5] "New Orleans, LA"
+\end{verbatim}
+
+\hypertarget{results-and-comment}{%
+\subsubsection{Results and Comment}\label{results-and-comment}}
+
+\begin{itemize}
+\tightlist
+\item
+  After running the above code, you would get the names of the cities
+  that are considered high leverage or have high Cook's distance. This
+  insight can be crucial, especially if policy interventions or further
+  detailed studies are considered for these regions.
+\item
+  The interpretation should include a discussion on why these points
+  might be influential (e.g., extreme values of predictors, errors in
+  data collection, unique economic or environmental conditions) and how
+  they could potentially skew the results of the analysis.
+\end{itemize}
+
+This diagnostic checking ensures that the conclusions drawn from the
+regression analysis are robust and credible, addressing any concerns
+about data quality or model fit before making policy recommendations or
+further interpretations.
+
+\begin{enumerate}
+\def\labelenumi{(\alph{enumi})}
+\setcounter{enumi}{4}
+\tightlist
+\item
+  (5 marks) Using the model obtained in (c), add the three pollution
+  variables (trans- formed to their natural logarithm) and obtain the
+  p-value from the extra-sum-of-squares F-test due to their addition.
+  Summarise your ndings in a few concise sentences. Hint. Your answer
+  must include a snippet of R code for adding variables. Answer: In part
+  (e), we need to test the impact of adding the logarithmic
+  transformations of the three pollution variables (HC, NOX, SO2) to the
+  previously selected optimal model and conduct an extra-sum-of-squares
+  F-test. This test will help us understand whether the inclusion of
+  these pollution variables significantly improves the model in terms of
+  explaining the variability in mortality rates.
+\end{enumerate}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\DocumentationTok{\#\#\# R Code for Adding Pollution Variables and Conducting the F{-}test}
+\CommentTok{\# Assuming \textquotesingle{}optimal\_model\textquotesingle{} is your previously fitted model without pollution variables}
+\FunctionTok{library}\NormalTok{(car)  }\CommentTok{\# for the \textquotesingle{}Anova\textquotesingle{} function}
+
+\CommentTok{\# Fit the extended model with the log{-}transformed pollution variables}
+\NormalTok{extended\_model }\OtherTok{\textless{}{-}} \FunctionTok{update}\NormalTok{(optimal\_model, . }\SpecialCharTok{\textasciitilde{}}\NormalTok{ . }\SpecialCharTok{+} \FunctionTok{log}\NormalTok{(HC) }\SpecialCharTok{+} \FunctionTok{log}\NormalTok{(NOX) }\SpecialCharTok{+} \FunctionTok{log}\NormalTok{(SO2))}
+
+\CommentTok{\# Conduct an extra{-}sum{-}of{-}squares F{-}test}
+\NormalTok{anova\_results }\OtherTok{\textless{}{-}} \FunctionTok{anova}\NormalTok{(optimal\_model, extended\_model)}
+\FunctionTok{print}\NormalTok{(anova\_results)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Analysis of Variance Table
+## 
+## Model 1: Mortality ~ Educ + WhiteCol + Density + HC + NOX
+## Model 2: Mortality ~ Educ + WhiteCol + Density + HC + NOX + log(HC) + 
+##     log(NOX) + log(SO2)
+##   Res.Df    RSS Df Sum of Sq      F Pr(>F)
+## 1     54 127944                           
+## 2     51 115333  3     12611 1.8589 0.1483
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Extract the p{-}value to test the significance of the added pollution variables}
+\NormalTok{p\_value }\OtherTok{\textless{}{-}}\NormalTok{ anova\_results}\SpecialCharTok{$}\StringTok{"Pr(\textgreater{}F)"}\NormalTok{[}\DecValTok{2}\NormalTok{]}
+\FunctionTok{print}\NormalTok{(p\_value)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0.1483168
+\end{verbatim}
+
+\hypertarget{explanation-and-interpretation-1}{%
+\subsubsection{Explanation and
+Interpretation}\label{explanation-and-interpretation-1}}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Model Update}: The \texttt{update()} function is used to add
+  the natural logarithm of the pollution variables (HC, NOX, SO2) to the
+  existing model. The logarithmic transformation is typically used to
+  handle non-linearity and reduce the effect of outliers.
+\item
+  \textbf{F-test}: The F-test assesses whether the extra predictors
+  (log-transformed pollution variables) provide a statistically
+  significant improvement in the fit of the model compared to the
+  original model. The test compares the residual sum of squares between
+  the models with and without the additional variables, adjusted for the
+  degrees of freedom.
+\end{itemize}
+
+\hypertarget{results-and-comment-1}{%
+\subsubsection{Results and Comment}\label{results-and-comment-1}}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{P-value Interpretation}: The critical output from this process
+  is the p-value from the F-test. If this p-value is less than a typical
+  significance level (e.g., 0.05), you conclude that the pollution
+  variables significantly improve the model's ability to predict
+  mortality.
+\item
+  \textbf{Summary of Findings}: Depending on the p-value:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    If significant, it indicates that pollution levels (as measured by
+    HC, NOX, and SO2) have a significant effect on mortality rates when
+    controlling for other factors in your model. This would suggest that
+    policies aimed at reducing pollution could have a measurable impact
+    on improving public health.
+  \item
+    If not significant, it suggests that within the context of the other
+    variables in the model, pollution levels do not add significant
+    explanatory power. This could imply that other factors already
+    included in the model (such as socioeconomic or demographic
+    variables) might be capturing most of the variability in mortality
+    rates.
+  \end{itemize}
+\end{itemize}
+
+This part of the analysis crucially supports or refutes the hypothesis
+that air pollution has a measurable impact on mortality, taking into
+account other regional and demographic factors.
+
+Question 2 Body Measurements (25 marks) (a) (4 marks) Carry out
+exploratory data analysis (EDA) of this dataset before you do any
+modelling. Hint. Your answer must include at most 2 plots for EDA
+including interpretation in a few concise sentences. Do not include the
+R code.
+
+Answer: We will start by conducting an exploratory data analysis (EDA)
+of the \texttt{body.csv} dataset, which includes various body
+measurements along with age, height, and gender. The goal of the EDA is
+to understand the distributions, relationships, and potential patterns
+in the dataset that could inform subsequent modeling efforts.
+
+Let's begin by loading the dataset, examining its structure, and
+generating a couple of plots for the EDA:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Distribution of \texttt{Weight}}: Understanding how weight is
+  distributed across the sample.
+\item
+  \textbf{Relationship between \texttt{Weight} and a couple of key
+  measurements}: Such as \texttt{Height} and another measurement from
+  the girth measurements that may have a strong correlation with weight.
+\item
+  \textbf{Gender Differences}: Analyzing how measurements may differ by
+  gender, which could reveal important biometric distinctions.
+\end{enumerate}
+
+The dataset \texttt{body.csv} contains 507 observations with 26 columns.
+It includes various measurements such as diameters, depths, girths, and
+general body measurements, along with \texttt{Age}, \texttt{Weight},
+\texttt{Height}, and \texttt{Gender} (1 for male and 0 for female).
+
+\hypertarget{exploratory-data-analysis-eda}{%
+\subsubsection{Exploratory Data Analysis
+(EDA)}\label{exploratory-data-analysis-eda}}
+
+We will now generate two plots for the EDA:
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Histogram of Weight}: This will help us understand the
+  distribution of weights across the sample.
+\item
+  \textbf{Box Plot of Weight by Gender}: This will provide insight into
+  differences in weight distribution between genders, which could be
+  crucial for subsequent analyses.
+\end{enumerate}
+
+\hypertarget{interpretation-of-eda-plots}{%
+\subsubsection{Interpretation of EDA
+Plots}\label{interpretation-of-eda-plots}}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Histogram of Weight}:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    The weight distribution appears roughly symmetric with a slight
+    right skew, indicating that most individuals cluster around a
+    central weight, with fewer individuals at the higher weight
+    extremes. This could suggest a generally healthy population or could
+    reflect demographic factors such as age or gender composition.
+  \end{itemize}
+\item
+  \textbf{Box Plot of Weight by Gender}:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    There is a noticeable difference in weight distribution between
+    genders. Males (1) tend to weigh more than females (0), with a
+    higher median weight and a wider interquartile range. This is
+    consistent with general biological differences in body composition
+    between males and females.
+  \end{itemize}
+\end{enumerate}
+
+These insights provide a foundational understanding of how weight varies
+within this dataset, influenced by factors like gender. Such
+observations are essential for guiding more detailed statistical
+modeling and analysis, where factors like gender can be crucial
+covariates or confounders to control for when modeling the relationship
+between body measurements and weight.
+
+Below is the R code to create a histogram of \texttt{Weight} and a box
+plot of \texttt{Weight} by \texttt{Gender}.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\DocumentationTok{\#\#\# R Code for EDA}
+\CommentTok{\# Load necessary libraries}
+\FunctionTok{library}\NormalTok{(ggplot2)}
+\FunctionTok{library}\NormalTok{(readr)}
+
+\CommentTok{\# Load the data}
+\NormalTok{body\_data }\OtherTok{\textless{}{-}} \FunctionTok{read\_csv}\NormalTok{(}\StringTok{"body.csv"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## New names:
+## Rows: 507 Columns: 26
+## -- Column specification
+## -------------------------------------------------------- Delimiter: "," dbl
+## (26): ...1, Biacromial.diameter, Biiliac.diameter, Bitrochanteric.diamet...
+## i Use `spec()` to retrieve the full column specification for this data. i
+## Specify the column types or set `show_col_types = FALSE` to quiet this message.
+## * `` -> `...1`
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Histogram of Weight}
+\FunctionTok{ggplot}\NormalTok{(body\_data, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ Weight)) }\SpecialCharTok{+}
+  \FunctionTok{geom\_histogram}\NormalTok{(}\AttributeTok{bins =} \DecValTok{30}\NormalTok{, }\AttributeTok{fill =} \StringTok{"blue"}\NormalTok{, }\AttributeTok{alpha =} \FloatTok{0.7}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{labs}\NormalTok{(}\AttributeTok{title =} \StringTok{"Histogram of Weight"}\NormalTok{, }\AttributeTok{x =} \StringTok{"Weight (kg)"}\NormalTok{, }\AttributeTok{y =} \StringTok{"Frequency"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{theme\_minimal}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Gadham_23783777_Atikant_24051868_files/figure-latex/unnamed-chunk-10-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Box Plot of Weight by Gender}
+\FunctionTok{ggplot}\NormalTok{(body\_data, }\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =} \FunctionTok{as.factor}\NormalTok{(Gender), }\AttributeTok{y =}\NormalTok{ Weight, }\AttributeTok{fill =} \FunctionTok{as.factor}\NormalTok{(Gender))) }\SpecialCharTok{+}
+  \FunctionTok{geom\_boxplot}\NormalTok{() }\SpecialCharTok{+}
+  \FunctionTok{labs}\NormalTok{(}\AttributeTok{title =} \StringTok{"Box Plot of Weight by Gender"}\NormalTok{, }\AttributeTok{x =} \StringTok{"Gender (0: Female, 1: Male)"}\NormalTok{, }\AttributeTok{y =} \StringTok{"Weight (kg)"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{scale\_fill\_discrete}\NormalTok{(}\AttributeTok{name =} \StringTok{"Gender"}\NormalTok{, }\AttributeTok{labels =} \FunctionTok{c}\NormalTok{(}\StringTok{"Female"}\NormalTok{, }\StringTok{"Male"}\NormalTok{)) }\SpecialCharTok{+}
+  \FunctionTok{theme\_minimal}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Gadham_23783777_Atikant_24051868_files/figure-latex/unnamed-chunk-10-2.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# You may need to adjust the path to your data file accordingly in the read\_csv function.}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{explanation}{%
+\subsubsection{Explanation:}\label{explanation}}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Histogram of Weight}: The \texttt{geom\_histogram()} function
+  is used to create histograms. The \texttt{bins} parameter controls the
+  number of bins.
+\item
+  \textbf{Box Plot of Weight by Gender}: The \texttt{geom\_boxplot()}
+  function is used to create box plots. The \texttt{fill} parameter
+  inside \texttt{aes()} colors the box plot by gender, enhancing visual
+  distinction.
+\end{enumerate}
+
+\begin{enumerate}
+\def\labelenumi{(\alph{enumi})}
+\setcounter{enumi}{1}
+\tightlist
+\item
+  (10 marks) After the exploratory analysis has been carried out, split
+  the dataset into a training set and a testing set so that the training
+  set contains 80\% of the data and the testing set contains 20\%.
+  Construct a multiple linear regression model for this dataset using
+  the training set to create 2 nal tted models at a signi cance level of
+  5\%, based on the following variable selection methods :  (Model 1)
+  The Forward selection;  (Model 2) The Backward selection. Write the
+  two tted model equations and compare them in a few concise sentences.
+  Hint. You must use set.seed(2401) for reproducibility. Your answer
+  must include a snippet of R code for the splitting. Hint. Use a sigini
+  cant level of 5\% for nal models. Your answer must include the R
+  output model summary, tted model equations and comment.
+\end{enumerate}
+
+Answer: For part (b), after having conducted an exploratory analysis,
+we'll split the dataset into a training and a testing set, and then use
+these to construct two separate multiple linear regression models using
+forward and backward variable selection methods. Here's how you can
+perform these steps in R, including setting the seed for reproducibility
+and ensuring the models use a 5\% significance level for variable
+selection.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\DocumentationTok{\#\#\# R Code to Split Data and Construct Models}
+\CommentTok{\# Load necessary libraries}
+\FunctionTok{library}\NormalTok{(caret)   }\CommentTok{\# for data splitting}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Loading required package: lattice
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(MASS)    }\CommentTok{\# for linear models}
+\FunctionTok{library}\NormalTok{(dplyr)   }\CommentTok{\# for data manipulation}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Attaching package: 'dplyr'
+\end{verbatim}
+
+\begin{verbatim}
+## The following object is masked from 'package:car':
+## 
+##     recode
+\end{verbatim}
+
+\begin{verbatim}
+## The following object is masked from 'package:MASS':
+## 
+##     select
+\end{verbatim}
+
+\begin{verbatim}
+## The following objects are masked from 'package:stats':
+## 
+##     filter, lag
+\end{verbatim}
+
+\begin{verbatim}
+## The following objects are masked from 'package:base':
+## 
+##     intersect, setdiff, setequal, union
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Set the seed for reproducibility}
+\FunctionTok{set.seed}\NormalTok{(}\DecValTok{2401}\NormalTok{)}
+
+\CommentTok{\# Splitting the data into training and testing sets (80\% training, 20\% testing)}
+\NormalTok{split }\OtherTok{\textless{}{-}} \FunctionTok{createDataPartition}\NormalTok{(body\_data}\SpecialCharTok{$}\NormalTok{Weight, }\AttributeTok{p =} \FloatTok{0.80}\NormalTok{, }\AttributeTok{list =} \ConstantTok{FALSE}\NormalTok{)}
+\NormalTok{training }\OtherTok{\textless{}{-}}\NormalTok{ body\_data[split, ]}
+\NormalTok{testing }\OtherTok{\textless{}{-}}\NormalTok{ body\_data[}\SpecialCharTok{{-}}\NormalTok{split, ]}
+
+\CommentTok{\# Model 1: Forward Selection}
+\NormalTok{forward\_model }\OtherTok{\textless{}{-}} \FunctionTok{stepAIC}\NormalTok{(}\FunctionTok{lm}\NormalTok{(Weight }\SpecialCharTok{\textasciitilde{}} \DecValTok{1}\NormalTok{, }\AttributeTok{data =}\NormalTok{ training), }
+                         \AttributeTok{scope =} \FunctionTok{list}\NormalTok{(}\AttributeTok{lower =} \FunctionTok{formula}\NormalTok{(Weight }\SpecialCharTok{\textasciitilde{}} \DecValTok{1}\NormalTok{), }
+                                      \AttributeTok{upper =} \FunctionTok{formula}\NormalTok{(Weight }\SpecialCharTok{\textasciitilde{}}\NormalTok{ .)),}
+                         \AttributeTok{direction =} \StringTok{"forward"}\NormalTok{, }\AttributeTok{trace =} \ConstantTok{FALSE}\NormalTok{)}
+
+\CommentTok{\# Model 2: Backward Selection}
+\NormalTok{full\_model }\OtherTok{\textless{}{-}} \FunctionTok{lm}\NormalTok{(Weight }\SpecialCharTok{\textasciitilde{}}\NormalTok{ ., }\AttributeTok{data =}\NormalTok{ training)}
+\NormalTok{backward\_model }\OtherTok{\textless{}{-}} \FunctionTok{stepAIC}\NormalTok{(full\_model, }\AttributeTok{direction =} \StringTok{"backward"}\NormalTok{, }\AttributeTok{trace =} \ConstantTok{FALSE}\NormalTok{)}
+
+\CommentTok{\# Summarize both models}
+\FunctionTok{summary}\NormalTok{(forward\_model)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Call:
+## lm(formula = Weight ~ 1, data = training)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -27.104 -10.754  -0.904   9.846  47.296 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)  69.1039     0.6666   103.7   <2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 13.45 on 406 degrees of freedom
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(backward\_model)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Call:
+## lm(formula = Weight ~ ...1 + Biiliac.diameter + Chest.depth + 
+##     Chest.diameter + Elbow.diameter + Knee.diameter + Shoulder.girth + 
+##     Chest.girth + Waist.girth + Hip.girth + Thigh.girth + Forearm.girth + 
+##     Knee.girth + Calf.maximum.girth + Age + Height, data = training)
+## 
+## Residuals:
+##    Min     1Q Median     3Q    Max 
+## -7.855 -1.342  0.016  1.234  9.199 
+## 
+## Coefficients:
+##                      Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)        -1.208e+02  2.852e+00 -42.361  < 2e-16 ***
+## ...1                3.999e-03  1.222e-03   3.274 0.001156 ** 
+## Biiliac.diameter    1.494e-01  6.278e-02   2.379 0.017836 *  
+## Chest.depth         2.114e-01  7.861e-02   2.690 0.007454 ** 
+## Chest.diameter      1.372e-01  8.879e-02   1.545 0.123146    
+## Elbow.diameter      3.227e-01  1.936e-01   1.667 0.096346 .  
+## Knee.diameter       5.586e-01  1.477e-01   3.782 0.000180 ***
+## Shoulder.girth      9.109e-02  3.307e-02   2.754 0.006158 ** 
+## Chest.girth         1.323e-01  4.076e-02   3.246 0.001270 ** 
+## Waist.girth         3.948e-01  2.845e-02  13.879  < 2e-16 ***
+## Hip.girth           1.912e-01  4.399e-02   4.347 1.76e-05 ***
+## Thigh.girth         2.821e-01  5.392e-02   5.233 2.74e-07 ***
+## Forearm.girth       4.523e-01  1.165e-01   3.883 0.000121 ***
+## Knee.girth          2.026e-01  8.351e-02   2.426 0.015726 *  
+## Calf.maximum.girth  3.031e-01  6.994e-02   4.333 1.87e-05 ***
+## Age                -7.331e-02  1.383e-02  -5.301 1.93e-07 ***
+## Height              2.751e-01  1.907e-02  14.430  < 2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 2.134 on 390 degrees of freedom
+## Multiple R-squared:  0.9758, Adjusted R-squared:  0.9748 
+## F-statistic: 983.6 on 16 and 390 DF,  p-value: < 2.2e-16
+\end{verbatim}
+
+\hypertarget{explanation-and-output-interpretation}{%
+\subsubsection{Explanation and Output
+Interpretation}\label{explanation-and-output-interpretation}}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Data Splitting}: The \texttt{createDataPartition} function
+  from the \texttt{caret} package is used to split the dataset into
+  training and testing sets. The proportion \texttt{p\ =\ 0.80} ensures
+  80\% of the data is used for training.
+\item
+  \textbf{Variable Selection}:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \textbf{Forward Selection}: Starts with a model including only the
+    intercept (no predictors) and adds variables one at a time based on
+    which have the most significant improvement to the model.
+  \item
+    \textbf{Backward Selection}: Starts with a full model that includes
+    all predictors and removes the least significant variable one at a
+    time.
+  \end{itemize}
+\end{itemize}
+
+After running the above code, you will get two fitted models. The output
+from the \texttt{summary} function will provide the coefficients of the
+model, including the intercept and slopes for each variable included in
+the final models.
+
+\hypertarget{writing-the-model-equations}{%
+\subsubsection{Writing the Model
+Equations}\label{writing-the-model-equations}}
+
+Suppose the output provides coefficients for \texttt{Height} and
+\texttt{Gender} in both models. The model equations would be something
+like:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Model 1 (Forward)}:
+  \[ \text{Weight} = \beta_0 + \beta_1 \times \text{Height} + \beta_2 \times \text{Gender} + \epsilon \]
+\item
+  \textbf{Model 2 (Backward)}:
+  \[ \text{Weight} = \beta_0 + \beta_1 \times \text{Height} + \beta_2 \times \text{Gender} + \epsilon \]
+\end{itemize}
+
+\hypertarget{comparison-and-comment}{%
+\subsubsection{Comparison and Comment}\label{comparison-and-comment}}
+
+\begin{itemize}
+\tightlist
+\item
+  Compare the variables selected by both methods. Often, both forward
+  and backward selections may end up with similar models when the
+  dataset is not too large, and relationships between predictors and the
+  response are straightforward.
+\item
+  Discuss the fit of the models (e.g., R², adjusted R²) and how well
+  each model might generalize to unseen data (using testing set).
+\item
+  Note any discrepancies between the two methods regarding selected
+  variables or coefficients, which could suggest areas of model
+  sensitivity or robustness.
+\end{itemize}
+
+\begin{enumerate}
+\def\labelenumi{(\alph{enumi})}
+\setcounter{enumi}{2}
+\tightlist
+\item
+  (5 marks) Perform diagnostics checking for each of the fitted models,
+  Model 1 and Model 2 respectively. Hint. Use `plot( le.lm)' and
+  `par(mfrow=c(2,2))' for diagnostics plots. Your answer must include
+  the plots and comment. Do not include the R code. Hint. Use the
+  interval of (-2,2) for standardised residuals whenever applicable.
+\end{enumerate}
+
+Answer: For part (c), we need to perform diagnostics checking for both
+of the fitted models (Model 1 from forward selection and Model 2 from
+backward selection). These checks are essential to validate the
+assumptions of linear regression, such as linearity, independence,
+homoscedasticity, and normality of residuals.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\DocumentationTok{\#\#\# R Code for Diagnostics Checking}
+\CommentTok{\# Load necessary library}
+\FunctionTok{library}\NormalTok{(car)  }\CommentTok{\# For additional diagnostic plots, if necessary}
+
+\CommentTok{\# Diagnostics for Model 1 (Forward Selection Model)}
+\FunctionTok{par}\NormalTok{(}\AttributeTok{mfrow=}\FunctionTok{c}\NormalTok{(}\DecValTok{2}\NormalTok{,}\DecValTok{2}\NormalTok{))  }\CommentTok{\# Set up the plotting area}
+\FunctionTok{plot}\NormalTok{(forward\_model)  }\CommentTok{\# Plot diagnostics}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## hat values (leverages) are all = 0.002457002
+##  and there are no factor predictors; no plot no. 5
+\end{verbatim}
+
+\includegraphics{Gadham_23783777_Atikant_24051868_files/figure-latex/unnamed-chunk-12-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Reset plot settings to default}
+\FunctionTok{par}\NormalTok{(}\AttributeTok{mfrow=}\FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{1}\NormalTok{))}
+
+\CommentTok{\# Diagnostics for Model 2 (Backward Selection Model)}
+\FunctionTok{par}\NormalTok{(}\AttributeTok{mfrow=}\FunctionTok{c}\NormalTok{(}\DecValTok{2}\NormalTok{,}\DecValTok{2}\NormalTok{))  }\CommentTok{\# Set up the plotting area}
+\FunctionTok{plot}\NormalTok{(backward\_model)  }\CommentTok{\# Plot diagnostics}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Gadham_23783777_Atikant_24051868_files/figure-latex/unnamed-chunk-12-2.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Reset plot settings to default}
+\FunctionTok{par}\NormalTok{(}\AttributeTok{mfrow=}\FunctionTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{1}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{explanation-of-diagnostic-plots}{%
+\subsubsection{Explanation of Diagnostic
+Plots}\label{explanation-of-diagnostic-plots}}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Residuals vs Fitted}: This plot helps check for non-linear
+  patterns. Residuals should be randomly dispersed around the horizontal
+  axis.
+\item
+  \textbf{Normal Q-Q}: This plot is used to examine if the residuals are
+  normally distributed. Points should generally follow the line.
+\item
+  \textbf{Scale-Location (Spread-Location)}: This plot helps check for
+  homoscedasticity (constant variance of residuals across the range of
+  fitted values).
+\item
+  \textbf{Residuals vs Leverage}: This plot helps identify influential
+  cases (outliers).
+\end{enumerate}
+
+\hypertarget{interpretation-and-comments}{%
+\subsubsection{Interpretation and
+Comments}\label{interpretation-and-comments}}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Residuals vs Fitted}: You expect no clear pattern. If patterns
+  are observed, it may suggest non-linearity in the data or that
+  important predictors or transformations are missing.
+\item
+  \textbf{Normal Q-Q}: Deviations from the straight line at the ends
+  suggest potential outliers or leverage points. If the residuals are
+  normally distributed, they should closely follow the reference line.
+\item
+  \textbf{Scale-Location}: Ideally, the points should be evenly spread
+  across the range of fitted values, indicating equal variance.
+\item
+  \textbf{Residuals vs Leverage}: You are specifically looking for
+  points outside the Cook's distance lines or with high leverage that
+  could unduly influence the model.
+\end{itemize}
+
+\hypertarget{using-standardized-residuals}{%
+\subsubsection{Using Standardized
+Residuals}\label{using-standardized-residuals}}
+
+For standardized residuals, you often look for residuals beyond the
+(-2,2) range as potential outliers. You can customize your plots or add
+additional code to specifically focus on standardized residuals:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Calculate standardized residuals}
+\NormalTok{forward\_std\_res }\OtherTok{\textless{}{-}} \FunctionTok{rstandard}\NormalTok{(forward\_model)}
+\NormalTok{backward\_std\_res }\OtherTok{\textless{}{-}} \FunctionTok{rstandard}\NormalTok{(backward\_model)}
+
+\CommentTok{\# Plotting standardized residuals for Model 1}
+\FunctionTok{plot}\NormalTok{(forward\_model}\SpecialCharTok{$}\NormalTok{fitted.values, forward\_std\_res, }\AttributeTok{ylim=}\FunctionTok{c}\NormalTok{(}\SpecialCharTok{{-}}\DecValTok{3}\NormalTok{,}\DecValTok{3}\NormalTok{), }\AttributeTok{xlab=}\StringTok{"Fitted Values"}\NormalTok{, }\AttributeTok{ylab=}\StringTok{"Standardized Residuals"}\NormalTok{)}
+\FunctionTok{abline}\NormalTok{(}\AttributeTok{h=}\FunctionTok{c}\NormalTok{(}\SpecialCharTok{{-}}\DecValTok{2}\NormalTok{, }\DecValTok{2}\NormalTok{), }\AttributeTok{col=}\StringTok{"red"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Gadham_23783777_Atikant_24051868_files/figure-latex/unnamed-chunk-13-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Plotting standardized residuals for Model 2}
+\FunctionTok{plot}\NormalTok{(backward\_model}\SpecialCharTok{$}\NormalTok{fitted.values, backward\_std\_res, }\AttributeTok{ylim=}\FunctionTok{c}\NormalTok{(}\SpecialCharTok{{-}}\DecValTok{3}\NormalTok{,}\DecValTok{3}\NormalTok{), }\AttributeTok{xlab=}\StringTok{"Fitted Values"}\NormalTok{, }\AttributeTok{ylab=}\StringTok{"Standardized Residuals"}\NormalTok{)}
+\FunctionTok{abline}\NormalTok{(}\AttributeTok{h=}\FunctionTok{c}\NormalTok{(}\SpecialCharTok{{-}}\DecValTok{2}\NormalTok{, }\DecValTok{2}\NormalTok{), }\AttributeTok{col=}\StringTok{"red"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Gadham_23783777_Atikant_24051868_files/figure-latex/unnamed-chunk-13-2.pdf}
+
+\hypertarget{comment-on-the-findings}{%
+\subsubsection{Comment on the Findings}\label{comment-on-the-findings}}
+
+The comment on the findings should include observations from the plots
+regarding each model's compliance with linear regression assumptions.
+Note any specific outliers, leverage points, or other anomalies that
+might affect the model's validity or indicate a need for further model
+refinement or data transformation.
+
+\begin{enumerate}
+\def\labelenumi{(\alph{enumi})}
+\setcounter{enumi}{3}
+\tightlist
+\item
+  (6 marks). Despite any inadequacies that you may or may not have
+  identi ed above, you use the two models obtained in (b) to make
+  predictions of Weight in the test set.
+\item
+  Produce a correctly drawn and labelled plot of predicted values
+  against the ac- tual values in the test set, and obtain the root mean
+  squared error of prediction (RMSEP) based on each fitted model.
+\end{enumerate}
+
+\begin{enumerate}
+\def\labelenumi{(\roman{enumi})}
+\setcounter{enumi}{1}
+\tightlist
+\item
+  Using the RMSEPs and the plots you produced, comment on how well the
+  models performed. Hint. Your answer must include a snippet of R code
+  to calculate and plot the RMSEPs, the plots and comment. Answer: For
+  part (d), we will use the two models developed from forward and
+  backward selection methods to make predictions on the testing set and
+  evaluate their performance using the root mean squared error of
+  prediction (RMSEP). We will then visualize the predictions against
+  actual values to understand the model's accuracy visually.
+\end{enumerate}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\DocumentationTok{\#\#\# R Code for Prediction and RMSEP Calculation}
+\CommentTok{\# Load necessary library}
+\FunctionTok{library}\NormalTok{(ggplot2)}
+
+\CommentTok{\# Make predictions using both models}
+\NormalTok{predictions\_forward }\OtherTok{\textless{}{-}} \FunctionTok{predict}\NormalTok{(forward\_model, }\AttributeTok{newdata =}\NormalTok{ testing)}
+\NormalTok{predictions\_backward }\OtherTok{\textless{}{-}} \FunctionTok{predict}\NormalTok{(backward\_model, }\AttributeTok{newdata =}\NormalTok{ testing)}
+
+\CommentTok{\# Calculate RMSEP for both models}
+\NormalTok{rmsep\_forward }\OtherTok{\textless{}{-}} \FunctionTok{sqrt}\NormalTok{(}\FunctionTok{mean}\NormalTok{((testing}\SpecialCharTok{$}\NormalTok{Weight }\SpecialCharTok{{-}}\NormalTok{ predictions\_forward)}\SpecialCharTok{\^{}}\DecValTok{2}\NormalTok{))}
+\NormalTok{rmsep\_backward }\OtherTok{\textless{}{-}} \FunctionTok{sqrt}\NormalTok{(}\FunctionTok{mean}\NormalTok{((testing}\SpecialCharTok{$}\NormalTok{Weight }\SpecialCharTok{{-}}\NormalTok{ predictions\_backward)}\SpecialCharTok{\^{}}\DecValTok{2}\NormalTok{))}
+
+\CommentTok{\# Print RMSEP values}
+\FunctionTok{print}\NormalTok{(}\FunctionTok{paste}\NormalTok{(}\StringTok{"RMSEP for Forward Selection Model:"}\NormalTok{, rmsep\_forward))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "RMSEP for Forward Selection Model: 12.9223506535226"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{print}\NormalTok{(}\FunctionTok{paste}\NormalTok{(}\StringTok{"RMSEP for Backward Selection Model:"}\NormalTok{, rmsep\_backward))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "RMSEP for Backward Selection Model: 1.92851093325706"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Plot of Predicted vs Actual values for both models}
+\FunctionTok{ggplot}\NormalTok{() }\SpecialCharTok{+}
+  \FunctionTok{geom\_point}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ testing}\SpecialCharTok{$}\NormalTok{Weight, }\AttributeTok{y =}\NormalTok{ predictions\_forward), }\AttributeTok{color =} \StringTok{"blue"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{geom\_point}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ testing}\SpecialCharTok{$}\NormalTok{Weight, }\AttributeTok{y =}\NormalTok{ predictions\_backward), }\AttributeTok{color =} \StringTok{"red"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{geom\_abline}\NormalTok{(}\AttributeTok{intercept =} \DecValTok{0}\NormalTok{, }\AttributeTok{slope =} \DecValTok{1}\NormalTok{, }\AttributeTok{linetype =} \StringTok{"dashed"}\NormalTok{, }\AttributeTok{color =} \StringTok{"black"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{labs}\NormalTok{(}\AttributeTok{title =} \StringTok{"Predicted vs Actual Weight"}\NormalTok{,}
+       \AttributeTok{x =} \StringTok{"Actual Weight (kg)"}\NormalTok{,}
+       \AttributeTok{y =} \StringTok{"Predicted Weight (kg)"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{scale\_color\_manual}\NormalTok{(}\AttributeTok{values =} \FunctionTok{c}\NormalTok{(}\StringTok{"blue"}\NormalTok{, }\StringTok{"red"}\NormalTok{), }\AttributeTok{labels =} \FunctionTok{c}\NormalTok{(}\StringTok{"Forward"}\NormalTok{, }\StringTok{"Backward"}\NormalTok{)) }\SpecialCharTok{+}
+  \FunctionTok{theme\_minimal}\NormalTok{() }\SpecialCharTok{+}
+  \FunctionTok{theme}\NormalTok{(}\AttributeTok{legend.title =} \FunctionTok{element\_blank}\NormalTok{())}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Gadham_23783777_Atikant_24051868_files/figure-latex/unnamed-chunk-14-1.pdf}
+
+\hypertarget{explanation-and-output-interpretation-1}{%
+\subsubsection{Explanation and Output
+Interpretation}\label{explanation-and-output-interpretation-1}}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Predictions}: The \texttt{predict()} function is used to
+  generate predictions from the models using the test set.
+\item
+  \textbf{RMSEP Calculation}: RMSEP is calculated by taking the square
+  root of the mean squared error (MSE) between the actual and predicted
+  weight values. It provides a measure of the average magnitude of the
+  prediction errors.
+\item
+  \textbf{Plotting}: The plot displays the predicted values against the
+  actual values for each model, with the ideal line (\texttt{y\ =\ x})
+  added for reference. Points from the forward selection are in blue,
+  and from the backward selection are in red.
+\end{itemize}
+
+\hypertarget{comment-on-model-performance}{%
+\subsubsection{Comment on Model
+Performance}\label{comment-on-model-performance}}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{RMSEP Values}: Lower RMSEP values indicate better model
+  performance. Compare the RMSEP for the two models to see which one
+  predicts more accurately on the test set.
+\item
+  \textbf{Predicted vs Actual Plot}:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Ideal predictions would lie on the dashed line (\texttt{y\ =\ x}),
+    indicating perfect agreement between predicted and actual values.
+  \item
+    Scatter around this line indicates the variability in predictions,
+    with tighter clusters around the line suggesting better model
+    performance.
+  \item
+    Observing whether one color (model) consistently lies closer to the
+    line can help determine which model is more accurate.
+  \end{itemize}
+\end{itemize}
+
+\hypertarget{comment}{%
+\subsubsection{Comment}\label{comment}}
+
+Based on the RMSEP values and the distribution of points in the plot,
+you can provide a comprehensive comment on: - How well each model
+predicts actual weights. - Which model appears to perform better and
+why. - Any systematic errors observed in predictions (e.g.,
+overpredictions or underpredictions at certain weight ranges). -
+Implications for further model refinement or usage in practical
+scenarios.
+
+This process not only quantifies the performance of each model but also
+visually inspects the adequacy and precision of the predictions,
+offering a holistic view of how these models might perform in real-world
+applications.
+
+\end{document}

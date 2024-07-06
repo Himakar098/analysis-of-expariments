@@ -1,0 +1,185 @@
+---
+title: "stat2401"
+author: "krish"
+date: "2024-03-07"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+# Exercise 1: Normal Distribution
+
+## 1.1 Standard Normal 
+
+```{r }
+y = seq(-5,5,0.01)
+plot(y,dnorm(y,0,1),type="l",lwd=2,main="Standard Normal Density")
+```
+or
+```{r }
+plot(y,dnorm(y),type="l",lwd=2,main="Standard Normal Density")
+
+# Calculate ϕ(0), ϕ(1), and ϕ(2) using dnorm function
+phi_0 <- dnorm(0)
+phi_1 <- dnorm(1)
+phi_2 <- dnorm(2)
+
+# Print the results
+cat("ϕ(0) =", phi_0, "\n")
+cat("ϕ(1) =", phi_1, "\n")
+cat("ϕ(2) =", phi_2, "\n")
+```
+```{r }
+y = seq(-5,5,0.01)
+plot(y,pnorm(y,0,1),type="l",lwd=2,main="Standard Normal cumulative distribution function")
+```
+
+or
+
+```{r }
+plot(y,pnorm(y),type="l",lwd=2,main="Standard Normal cumulative distribution function")
+```
+To determine the values P(Z > 0), P(Z > 1), and P(Z > 2) using R, we can use the `pnorm` function, which calculates the cumulative distribution function (CDF) of the standard normal distribution. Here's the R code:
+
+```{r}
+# Calculate P(Z > 0), P(Z > 1), and P(Z > 2) using pnorm function
+prob_Z_gt_0 <- 1 - pnorm(0)
+prob_Z_gt_1 <- 1 - pnorm(1)
+prob_Z_gt_2 <- 1 - pnorm(2)
+
+# Print the results
+cat("P(Z > 0) =", prob_Z_gt_0, "\n")
+cat("P(Z > 1) =", prob_Z_gt_1, "\n")
+cat("P(Z > 2) =", prob_Z_gt_2, "\n")
+```
+
+In this code:
+- `pnorm(0)` calculates the cumulative probability up to 0 for the standard normal distribution. Since we're interested in the probability that Z is greater than 0, we subtract this probability from 1 to get P(Z > 0).
+- Similarly, `pnorm(1)` and `pnorm(2)` calculate the cumulative probabilities up to 1 and 2, respectively, and then we subtract these probabilities from 1 to get P(Z > 1) and P(Z > 2), respectively.
+
+These values represent the probabilities of getting a value greater than 0, 1, and 2 from a standard normal distribution.
+
+---- Determine the values $P(Z>0)$, $P(Z>1)$, and $P(Z>2)$.
+
+The normal distribution is *bell-shaped* and symmetrically distributed about $\mu$,
+which is also this distribution's median and mode. Almost all of the probability is
+concentrated in the interval $\mu \pm 3\sigma$. For example
+$X\sim N(1,2^2)$, the probability $P(\mu - 3\sigma\leq X\leq\mu + 3\sigma)$ is given by
+
+```{r }
+mu = 1
+sigma = 2
+pnorm(mu+3*sigma,mu,sigma)-pnorm(mu-3*sigma,mu,sigma)
+```
+
+Determine also the probabilities $P(\mu - 2\sigma\leq X\leq\mu + 2\sigma)$ and $P(\mu - \sigma\leq X\leq\mu + \sigma)$.
+```{r }
+pnorm(mu+2*sigma,mu,sigma)-pnorm(mu-2*sigma,mu,sigma)
+pnorm(mu+sigma,mu,sigma)-pnorm(mu-sigma,mu,sigma)
+```
+
+We use $z_\alpha$ to be the solution to the equation
+$P(Z > z_\alpha) = \alpha$. This is the value on the horizontal axis that has area $\alpha$ under the
+curve and to its right. For example, $z_{0.05} = 1.645$. Approximately,
+
+```{r }
+1-pnorm(1.645)
+```
+or we could find $z_{0.05}$ directly by 
+
+```{r }
+qnorm(1-0.05)
+```
+
+
+Here we show the normal density function for a $N(100,5^2)$ distribution
+
+```{r }
+y = seq(80,120,0.1)
+plot(y,dnorm(y,100,5),type="l",lwd=2)
+```
+
+
+If $X$ has this distribution, the left
+shaded area of the following figure represents 95\% of the area under the density function.
+
+```{r }
+y = seq(80,120,0.1)
+plot(y,dnorm(y,100,5),type="l",lwd=2)
+yy = seq(80,qnorm(1-0.05,100,5),0.1)
+polygon(c(yy,rev(yy)),c(dnorm(yy,100,5),rep(0,length(yy))),col='skyblue')
+```
+
+That is, 
+
+$$
+P(Z\leq 1.645) = 0.95 \rightarrow P(\frac{X-\mu}{\sigma}\leq 1.645) = P(X\leq \mu+1.645\sigma)
+= P(X\leq 108.2243)= 0.95
+$$
+
+that the value $x$ such that $P(X\leq x)= 0.95$ could be also determined by 
+
+```{r }
+qnorm(1-0.05,100,5)
+```
+or
+```{r }
+100+5*qnorm(1-0.05)
+```
+
+One could also do the checking by computing 
+
+```{r }
+pnorm(108.2243,100,5)
+```
+
+or
+```{r }
+pnorm((108.2243-100)/5)
+```
+
+Now, Let $X$ be a $N(20,4^2)$ random variable. Determine $x$ that $P(X>x)=0.025$. 
+
+```{r }
+y = seq(0,40,0.1)
+plot(y,dnorm(y,20,4),type="l",lwd=2)
+yy = seq(0,qnorm(1-0.025,20,4),0.1)
+polygon(c(yy,rev(yy)),c(dnorm(yy,20,4),rep(0,length(yy))),col='skyblue')
+```
+```{r }
+qnorm(1-0.025,20,4)
+```
+```{r }
+pnorm(27.83986,20,4)
+```
+---- Further, compute the probability $P(19\leq X\leq 21)$.
+To compute the probability \( P(19 \leq X \leq 21) \) for a normal distribution with mean \( \mu = 20 \) and standard deviation \( \sigma = 4 \), we can use the cumulative distribution function (CDF) of the normal distribution. In R, we can use the `pnorm` function to calculate this probability. 
+
+Here's how we can do it:
+
+```{r}
+# Define mean and standard deviation
+mu <- 20
+sigma <- 4
+
+# Calculate the probability P(19 ≤ X ≤ 21)
+prob <- pnorm(21, mean = mu, sd = sigma) - pnorm(19, mean = mu, sd = sigma)
+
+# Print the result
+cat("The probability P(19 ≤ X ≤ 21) is:", prob, "\n")
+```
+
+
+
+
+In this code:
+
+- We define the mean (\( \mu = 20 \)) and the standard deviation (\( \sigma = 4 \)).
+- We use the `pnorm` function to calculate the cumulative probability up to 21 and up to 19, respectively, and then subtract the cumulative probability up to 19 from the cumulative probability up to 21. This gives us the probability of \( P(19 \leq X \leq 21) \).
+- Finally, we print out the result.

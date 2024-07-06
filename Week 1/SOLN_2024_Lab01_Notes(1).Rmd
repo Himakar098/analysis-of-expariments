@@ -1,0 +1,654 @@
+---
+title: "STAT2401 Analysis of Experiments"
+author: '**Practical 1: SOLUTION**'
+# date: "Computer Laboratory 1"
+output:
+  html_document:
+    highlight: haddock
+    number_sections: yes
+    theme: flatly
+    toc: yes
+  html_notebook:
+    highlight: haddock
+    number_sections: yes
+    theme: flatly
+  pdf_document:
+    toc: yes
+  word_document:
+    highlight: tango
+    toc: yes
+---
+
+```{r echo=TRUE, include=FALSE}
+knitr::opts_chunk$set(prompt=FALSE, comment=NA, message=FALSE, tidy=TRUE, error=TRUE)
+```
+
+**Aims of this session**
+
+This practical session has the following objectives:
+
+1. to introduce you to R/RStudio/Rmarkdown using Computer Lab 0 documentation
+
+2. to introduce you to do loading, exploring and visualising data
+
+3. to review standard normal and t distributions
+
+4. to perform statistical inference (hypothesis testing and confidence intervals) using _2 sample t-test_
+
+     - Introduction to Rmarkdown is provided under Practical 0. Please complete the exercises or questions within before this Practical 1.
+
+     - Partial solutions are provided for Exercises 3-6 only, which will be available after the session. Please independently attempt the questions during the session, by consulting to the faciltators. 
+
+
+# Introduction
+
+## An Important Note
+
+This document contains some notes on the exercises in the first computer lab.  When reading the data into _R_, we assume that the relevant files are stored in a subdirectory, and that you have set the working directory to that in _R_.  This can be done with the *setwd()* command.  I.e.~ you may have to modify the commands with which the data is read in, but all other commands should work as shown, and they should produce the shown output.
+  
+Some general notes: When typing in _R_ commands you can use the arrow keys to speed things up. The `up' arrow gives you the previous command that you typed. The usual prompt sign for _R_ is $>$. If you get a + prompt sign instead, it means that _R_ is awaiting the completion of the previous command that you typed in. This can happen because you have forgotten to close parentheses, for instance. Just type in the remainder of the command. Note also that _R_ is case sensitive.
+
+Introduction to Rmarkdown is provided under Computer Lab 0. Please complete the exercises or questions within before this Lab 1.
+
+## Required Software
+
+For the purposes of this unit you will need to make sure you have three things on your computer: 
+
+   -  _R_: All of the labs and other assessed tasks in this unit will make use of 
+the [statistical computing language _R_ ((https://www.r-project.org/)). You will 
+need _R_ installed on your computer, which can be achieved by downloading it from 
+the following link: (https://cran.ms.unimelb.edu.au/).
+
+   - _Rstudio_: We will also use the [_RStudio_ IDE] ((https://rstudio.com/)). Please download the open source (free) 
+edition of _RStudio_ Desktop from the following link: (https://rstudio.com/products/RStudio/)
+
+   -  All required packages installed OR administrator privileges to install them: Additionally, some of the labs there may be some packages you will need installed. For these purposes you will either need to make sure you 
+have administrator privileges on your computer or that these packages have 
+been previously installed on your computer by an administrator user.
+
+Take this time to make sure you have access to and are familiar with the basics of how to use this software.
+
+## Reading Data
+
+For those familiar with working in the command line, the _R_ working directory is 
+the same concept. This is a key concept for interacting with files outside of 
+the _R_ instance as it determines the location in the filesystem for relative 
+paths. This is important when reading in data from a file, for example. The 
+working directory can be checked and changed using *getwd()* and *setwd()*
+respectively. 
+
+However, we suggest that when you do some work that you start a new project in 
+*RStudio* in a folder for that chunk of work (for example you might choose to make
+a separate project (i.e. directory) for each lab, assignment, etc. ). This 
+essentially will tell {RStudio{ to set the working directory to the directory 
+associated to that bit of work when you open that project, and avoids a lot of 
+"file not found" errors beginners often run into.
+
+
+## Help
+
+It will be crucial that you learn to read _R_ documentation. You may be asked to use an 
+_R_ function and in order to be able to do so you will need to be able to read and
+at least partly understand the documentation. For example, if you are told to 
+use the function {mean(){, you would type:
+
+```{r eval=FALSE}
+?mean
+```
+
+into your _R_ command line (in *RStudio* this appears in the Console tab), and this 
+will bring up the documentation for that function (in *RStudio* this 
+documentation will appear in the Help tab). Try reading the documentation for 
+the function *mean()* right now as an exercise and see if you can figure out 
+what it's optional arguments would be used for. If you can't yet, come back to 
+this exercise at the end of the lab once you've had a bit more of a play and 
+it might make more sense.
+
+
+# Exercise 1: Loading, Exploring, and Visualising Data
+
+
+We will use the *njgolf* data to illustrate some basic functions in _R_.
+The data was used to study the impacts of golf course proximity
+on home prices, from Asabere and Huffman (1996) [Asabere, P.K. and Huffman, F.E. (1996) Negative and positive impacts of golf course proximity on home prices. Appraisal Journal 64(4), 351-355.]. 
+
+The data *njgolf* contains some of the variables for our illustration, they are:
+
+          - selling price (*sprice*). 
+          - lot size (*lotsize*)
+          - Number of bed rooms (*beds*), 
+          - Dining Room Area (*drarea*),
+          - Kitchen Area (*kitarea*), and 
+          - type of the property (*lotsizef*, condominium (*con*), house (*house*), townhouse (*th*)).
+
+for 105 single-family homes in Mount Laurel, New Jersey, from March 1992 through September 1994.
+
+For our information,  we note that the variable labeled *lotsize* is actually a conflation of two distinct concepts.
+If the property is a condominium (a form of ownership of an apartment that
+combines single ownership of the residence unit with joint ownership of the building
+and associated grounds), the variable *lotsize* was arbitrarily coded to 0. If the
+property is a single-family house, then the variable *lotsize* contains the actual lot
+size in square feet. This explains the numerous observations having *lotsize=0* in the data.
+
+In some of practicals, we will use the following packages.  If any of these packages are 
+missing on your computer, please install them (and their dependencies) using the 
+_install.packages()_ command or the _Install_ option in the _Packages_ tab of 
+_RStudio_. Once these packages are installed
+
+```{r message=FALSE,warning=FALSE}
+# For making pretty graphs, part of tidyverse
+#install.packages("tidyverse")
+library("ggplot2")
+```
+
+
+```{r message=FALSE,warning=FALSE}
+# For combining ggplot2 objects in intuitive (and magical) ways
+library("patchwork")
+```
+
+
+## Loading Data
+
+We will demonstrate how to read it in from a CSV (comma separated values) file, 
+which is available for download from LMS. Then so long as you have set up your "Working Directory" and put the file *njgolf.csv* in the  directory, the following line of code will read the 
+data into _R_ as a {data.frame{ object named *njgolf*.
+
+```{r}
+njgolf = read.csv("njgolf.csv",header=TRUE)
+View(njgolf) # to view the dataset
+dim(njgolf) # how many rows and columns
+```
+
+## data.frames in _R_
+
+In the previous section we read in the *njgolf* data from a CSV file into a global
+environment variable named *njgolf* of type *data.frame*. Check out the 
+documentation for *?data.frame* as this is the standard way to store data in _R_.
+
+*head()* is a useful command for taking a look at a data.frame: 
+
+```{r}
+head(njgolf)
+```
+
+Try using _tail()_ in the same way as _head()_, what does it do? By reading the 
+documentation and/ or trying it, what does providing the optional argument {n{
+to these functions do? _head(df)_ prints the first *n* (default 6) lines of *df*, while *tail(df)* prints the last *n*. Individual and ranges of entries of a data.frame can be accessed by their indices and columns can be identified by their headers. See some examples: 
+
+```{r}
+njgolf[3, 2]
+```
+
+```{r}
+njgolf[2:4, 3]
+```
+
+```{r}
+njgolf[3, 2:4]
+```
+
+```{r}
+njgolf[3, "sprice"]
+```
+
+```{r}
+njgolf[c(2:4, 90:92), c("sprice", "beds")]
+```
+
+Columns of a *data.frame* can also be accessed with the *\$* operator, in which 
+case the column name needs to not be quoted, or as a list in which case it does,
+and entries from these vectors can then also be returned:
+
+```{r}
+njgolf$sprice[2:4]
+```
+
+```{r}
+njgolf[['sprice']][2:4]
+```
+
+Note the single square braces for accessing entries in vectors/matrices and the
+double square braces for accessing entries in lists, this is _R_ syntax and 
+because *data.frame* objects share properties of both matrices and lists they 
+can be manipulated in both ways.
+
+## Exploring and Visualising
+
+*str()* and *summary()* are useful functions for exploring an object: 
+
+```{r}
+str(njgolf)
+```
+
+```{r}
+summary(njgolf)
+```
+
+
+For visualisation, some important plotting functions are *plot()*, 
+*hist()*, and *boxplot()*. *plot()* is a generic function, similar to 
+*summary()* and will have very different behaviour for different inputs, for 
+example you can provide the variables you want plotted in *x* and *y* axes: 
+
+```{r}
+plot(njgolf$lotsize, njgolf$sprice)
+```
+
+
+We can add a distinguishing feature like this:
+
+```{r}
+plot(njgolf$lotsize, njgolf$sprice, pch = as.numeric(factor(njgolf$lotsizef)))
+```
+
+More detail on methods for modifying plots can be found on the very 
+helpful *?par* page. 
+
+
+Another interesting feature of *plot()* is that if you 
+simply give it an entire *data.frame* the default behaviour is to make what is
+called a *pairs* plot, however it needs all the variables to be numeric. So we 
+can just give it the first three variables and differentiate the types of the properties like 
+this:
+
+```{r}
+plot(njgolf[,1:3], pch = as.numeric(factor(njgolf$lotsizef)))
+```
+
+*hist()* and *boxplot* are also useful for making histograms and boxplots, see
+for example: 
+
+```{r}
+hist(njgolf$sprice)
+```
+
+```{r}
+hist(njgolf$sprice, 50)
+```
+
+```{r}
+boxplot(sprice ~ lotsizef, data = njgolf)
+```
+
+Try producing some boxplots and histograms for the dataset.
+
+     - What are some of the key decisions you need to make when doing so? 
+
+Hint: compare the two histograms above. How might you go about making these decisions, and 
+what impact do you think they could have on your conclusions?
+
+    - What information can you get from a boxplot that is not available in a histogram?
+
+    - What information can you get from a histogram that is not available in a boxplot?
+
+Note that the *~* in the boxplot command, this is _R_ syntax for defining 
+formula's --- see the documentation *?formula*. These will be important later
+as they are the most common way to define models (such as linear regression 
+models for example) in _R_. 
+
+# Exercise 2 Getting to know the data from R package - Gapminder data
+
+The dataset we'll use is a subset of the demographic, health, employment, and economic data available for many countries on the [Gapminder](http://www.gapminder.org) website. It is contained in the *R* package `gapminder`, that you *may* be able to install on the PC you're using in the computer lab. You can do so from either the *RStudio* menu (`Tools -> Install Packages`), or by invoking the following command in the console:
+
+```{r eval=FALSE}
+# Do not write this in a chunk! You don't want to install a package every
+# time you process an R Markdown file!
+install.packages("gapminder", repos = "https://cran.curtin.edu.au")
+```
+
+Then, to load this package, invoke the command
+```{r eval=TRUE}
+library(gapminder)
+```
+
+
+## Getting to know the data
+
+There is, in fact, quite a sophisticated set of packages for manipulating (or 'wrangling') data known as the [tidyverse](http://tidyverse.org/), but we'll be using a much simpler set of built-in commands in *R*. Keep in mind that there are many ways to get to the same result in *R*!
+
+Imagine that you have been asked to explore the impact of demographic and economic variables over time on life expectancy in many different countries. One of the first activities of a data scientist is to get to know the data *before* trying to construct any statistical models. 
+
+The questions you ask in order to get to know the data are specific to the dataset itself, but finding out basic characteristics of the dataset will be common to all analyses: how big, how many variables, which variables, and so on.
+
+
+## Questions
+
+**Keep in mind that there are several ways of doing the same thing in *R*.**
+
+1. How big is the dataset?
+
+```{r}
+# In RStudio, you can have a look at the 'Environment' tab, which will give you information 
+# about objects in the workspace, but you could also use the following function:
+
+dim(gapminder) # gives number of rows and columns of a data frame
+```
+
+2. How many variables are in the dataset? What are they?
+
+```{r}
+# There are six, as we saw above. The function 'colnames' will give us the variable names:
+
+colnames(gapminder)
+```
+
+3. How would you examine the first and last few rows of the dataset?
+
+```{r}
+# You could look a them using the viewer from the 'Environment' tab, or you could try this:
+
+head(gapminder)
+
+tail(gapminder)
+```
+
+4. What is the class of each of the variables? In other words, what types of variables are they?
+
+```{r}
+# The function 'str` (short for structure) is very useful! It'll tell you variable types: numeric, either continuous or integer, categorical variables, or factors, etc.
+
+str(gapminder)
+```
+
+5. How many countries are represented?
+
+```{r}
+# From above, there are 142 countries. Or else we could work out the number of unique elements
+# of the vector gapminder$country:
+
+length(unique(gapminder$country))
+```
+
+6. How many continents are represented?
+
+```{r}
+# Same as above
+
+length(unique(gapminder$continent))
+```
+
+7. Create a new dataset containing only the data for Australia.
+
+```{r}
+# It is essential to know how to subset a larger data structure. The subset command is very useful!
+# Note that the value of the argument 'subset' has to be a logical vector
+
+Oz <- subset(gapminder, subset = (country == "Australia"))
+Oz
+```
+
+
+8. Calculate the increase in average life expectancy for Australians over the time period in the dataset.
+
+```{r}
+# Clearly, the data is organized in time order, so we need only subtract the first from the last element of the vector Oz$lifeExp. (Try it!) More generally, however, if the rows weren't in time order, you could do something like this (again, work it out):
+
+Oz$lifeExp[which.max(Oz$year)] - Oz$lifeExp[which.min(Oz$year)]
+```
+
+9. Produce pairwise scatterplots of the three numerical variables for Australia. 
+
+```{r}
+# We need to extract the variables lifeExp, pop, and gdpPercap from the data for Australia, and 
+# then use the function 'plot'. Lot's of ways to do it; here's one (what would happen if I didn't add the 'labels' argument?)
+
+plot(subset(Oz, select = c(lifeExp, pop, gdpPercap)), labels = c("life expectancy", "population", "GDP per capita"))
+```
+
+10. What is the increase in life expectancy for Burundi?
+
+```{r}
+# You could do the same thing we did for Australia
+
+Burundi <- subset(gapminder, subset = (country == "Burundi"))
+Burundi$lifeExp[which.max(Burundi$year)] - Burundi$lifeExp[which.min(Burundi$year)]
+```
+
+11. In which rows of the dataset does Swaziland occur?
+
+```{r}
+which(gapminder$country == "Burundi")
+```
+
+12. How would you create a dataset that contains only the data for 2007 for all countries?
+
+```{r}
+# Again, we could use the function 'subset':
+Data2007 <- subset(gapminder, subset = (year == 2007))
+```
+
+13. Which country had the lowest life expectancy in 2007? Which had the highest?
+
+```{r}
+# Here, we simply find the row corresponding to the min/max life expectancy, and 
+# then use that index to select and display the corresponding row of the data object
+# for 2007
+Data2007[which.min(Data2007$lifeExp), ]
+Data2007[which.max(Data2007$lifeExp), ]
+```
+
+14. What is the mean GDP per capita in each country?
+
+```{r}
+# Hint: use the function 'tapply' on the vector gapminder$gdpPercap
+MeanGDP <- tapply(gapminder$gdpPercap, gapminder$country, mean)
+head(MeanGDP)
+```
+
+
+# Exercise 3 Calculating Standard Normal probabilities
+
+Hint: use ?pnorm, ?qnorm
+
+1. Let $Z$ be a standard normal random variable.
+
+
+         -  What is the probability that $Z>2$? Compute this probability using {pnorm} in {R}.
+
+```{r size="scriptsize"}
+1-pnorm(2) ## or 1-pnorm(2,0,1)
+```
+
+         -  Determine $c$ that $P(Z>c)=0.05$. Compute $c$ using  {qnorm} in {R}.
+
+```{r size="scriptsize"}
+c = qnorm(1-0.05) ## or qnorm(1-0.05,0,1)
+c
+```
+
+         -  What is the probability that $Z$ is dropped in the interval $(-c,c)$, $P(-c<Z<c)$? ($c$ is the constant in part (b))
+
+```{r size="scriptsize"}
+pnorm(c)-pnorm(-c)
+```
+
+
+2. Let $Y_1,\ldots,Y_n$ be a random sample of size $n$. All $Y_i$s are independent and have finite mean $\mu$ and variance $\sigma^2$.
+
+
+- Which law or theorem says that the sample mean $\frac{1}{n}\sum_{i=1}^n Y_i$ would converge to $\mu$ when $n$ is large?
+
+Answer: Law of large number
+
+
+- Take $\mu=0$ and $\sigma^2=1$. Which law or theorem says that  $\frac{1}{\sqrt{n}}\sum_{i=1}^n Y_i$ would closely follow normal distribution when $n$ is large?
+
+Answer: Central Limit Theorem
+
+3. Let $Y_1,\ldots,Y_n$ be a normal random sample of size $n$. All $Y_i$s are independent normal variables and have finite mean $\mu$ and variance $\sigma^2$.
+
+- What distribution this term $\frac{\bar Y-\mu}{\sqrt{\frac{\sigma^2}{n}}}$ would follow? ($\bar Y=\frac{1}{n}\sum_{i=1}^n Y_i$ is the sample mean)
+
+Answer: Normal distribution, because it is the linear combination of normal random variables
+
+-  What distribution this term $\frac{\bar Y-\mu}{\sqrt{\frac{S^2}{n}}}$ would follow? ($S^2=\frac{1}{n-1}\sum_{i=1}^n (Y_i-\bar Y)^2$ is the sample variance)
+
+Answer: $t$ distribution with degree of freedom $n-1$
+
+
+# Exercise 4 T- distribution
+
+Let $T_\nu$ be a $t$ random variable with $\nu$ degree of freedom.
+
+Hint. Use ?pt, ?qt
+
+
+1. What is the probability that $T_5>2$? Compute this probability using {pt} in {R}.
+
+
+```{r size="scriptsize"}
+1-pt(2,5)
+```
+
+
+2. Determine $c$ that $P(T_5>c)=0.05$. Compute $c$ using  {qt} in {R}.
+
+
+```{r size="scriptsize"}
+c = qt(1-0.05,5)
+c
+```
+
+
+3. What is the probability that $T_5$ is dropped in the interval $(-c,c)$, $P(-c<T_5<c)$? ($c$ is the constant in part (b))
+
+
+```{r size="scriptsize"}
+pt(c,5)-pt(-c,5)
+```
+
+
+# Exercise 5: Matrix computation using R
+
+The function _matrix_ creates matrices in R: 
+
+_matrix(data, nrow, ncol, byrow)_
+
+1. Create two matrices ( _mat1_ and _mat2_ ) of size 5x5 of 25 random numbers from a standard normal distribution.
+
+```{r}
+set.seed(1234)
+mat1=matrix(data=rnorm(25,0,1),nrow=5, ncol=5)
+mat2=matrix(data=rnorm(25,0,1),nrow=5, ncol=5)
+mat1
+mat2
+```
+
+
+2. Determine the dimensions of _mat1_ 
+
+```{r}
+dim(mat1)
+```
+
+
+3. Find _mat3_= _mat1_ + _mat2_ (addition)
+
+```{r}
+mat3=mat1+mat2
+mat3
+```
+
+
+4. Find _mat4_= _mat1_*_mat2_ (multiplication)
+
+```{r}
+mat4= mat1%*%mat2
+mat4
+```
+
+
+5. Find the inverse of _mat4_ (mat5)
+```{r}
+mat5 <- solve(mat4)
+mat5
+```
+
+6. Find the trace and eigenvalues of _mat6_ = mat4%*%mat5
+```{r}
+mat6 <- mat4 %*% mat5
+trA <- sum(diag(mat6))  # Trace
+ei <- eigen(mat6)       # Eigenvalues and eigenvectors
+mat6
+trA
+ei
+```
+
+7. Compute the determinant of _mat4_
+
+```{r}
+mat5=solve(mat4)  ### inverse of mat4
+mat5
+mat6=mat4%*%mat5  ## to check if AA-1=I (mat6)
+mat6
+trA=sum(diag(mat6))
+trA ## trace
+ei <- eigen(mat6) ## to calculate eigenvalues and vectors
+ei$val
+ei$vec
+det(mat6)  ## determinant
+```
+
+# Exercise 6 Two sample $t$-test simulation
+
+
+Consider an {R}-output of the two sample $t$-test.
+
+In order to be reproducible, set.seed(2401) will be used. 
+
+
+```{r echo=FALSE,size="scriptsize"}
+set.seed(2401)
+group1 = rnorm(100,1,2)
+group2 = rnorm(100,1.1,2.1)
+t.test(group1,group2,var.equal=TRUE)
+```
+
+
+Perform 6 steps hypothesis testing to test whether the population means are the same.
+
+
+    - Step 1: $H_0: \mu_1 = \mu_2$  versus  $H_1: \mu_1 \not= \mu_2$
+
+    - Step 2 The test statistic is $t=0.45356$ and 
+
+    - Step 3 The sampling distribution is $t_{df=198}.$
+
+    - Step 4 The p-value is 0.6506
+    
+    - Step 5 As $p$-value~$= 0.6506> 0.05$. we do not reject $H_0$ at the 5\% significance level.  We conclude that the population means are the same.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

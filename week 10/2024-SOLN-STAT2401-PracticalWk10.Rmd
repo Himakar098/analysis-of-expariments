@@ -1,0 +1,686 @@
+---
+title: 'STAT2401 Analysis of Experiments'
+author: 'Practical Week 10: Solution'
+output:
+  html_document:
+    highlight: haddock
+    theme: flatly
+  html_notebook:
+    theme: flatly
+  word_document: default
+  pdf_document: default
+---
+
+## Learning Check
+
+When you complete this session, you will be able:
+
+1. to understand about variable selection in multiple linear regression (MLR);
+
+2. to understand how to be dividing a dataset into a *training and test set* so that we can construct models using the former, and then test their *predictive ability* using the latter.
+
+3. to understand how to calculating internal measures of predictive ability such as *PRESS (predicted residual sum of squares)*;
+
+4. to understand about multicollinearity.
+
+
+```{r include=TRUE, echo=FALSE, message=FALSE}
+knitr::opts_chunk$set(prompt=FALSE, comment=NA, tidy=TRUE, message=FALSE, warning=FALSE)
+```
+
+
+```{r eval=FALSE, include=FALSE}
+# Load data
+print(load("S2_2019_STAT1000_Lab_Week9.RData"))
+```
+
+```{r}
+# Load these libraries that are included in later code; install them on your computer if they aren't already there.
+library(leaps)
+library(knitr)
+library(corrplot)
+```
+
+
+```{r eval=FALSE, include=FALSE}
+## You can also install it by using Packages then Install at the bottom right fourth pane.
+ install.packages("MASS")  ## for dataset Boston
+ install.packages("dplyr") ## if needed
+ install.packages("ggplot2") ## if needed
+ install.packages("leaps") ## for All Subsets
+ install.packages("PerformanceAnalytics") ## if needed
+ install.packages("datarium") ## for dataset marketing
+```
+
+
+```{r include=FALSE}
+library(MASS)
+library(dplyr)
+library(ggplot2)
+library(leaps)
+library(PerformanceAnalytics)
+library(datarium)
+```
+
+
+## Question 1 Boston data
+
+
+The Boston data frame has 506 rows and 14 columns, about housing values in 
+suburbs of Boston. This dataset is available within MASS R package.
+
+The aim is to predict housing values in suburbs of Boston based on 13 explanatory variables in the dataset.
+
+This data frame contains the following columns:
+
+     - crim: per capita crime rate by town.
+     - zn: proportion of residential land zoned for lots over 25,000 sq.ft.
+     - indus: proportion of non-retail business acres per town.
+     - chas: Charles River dummy variable (= 1 if tract bounds river; 0 otherwise).
+     - nox: nitrogen oxides concentration (parts per 10 million).
+     - rm: average number of rooms per dwelling.
+     - age: proportion of owner-occupied units built prior to 1940.
+     - dis: weighted mean of distances to five Boston employment centres.
+     - rad: index of accessibility to radial highways.
+     - tax: full-value property-tax rate per $10,000.
+     - ptratio: pupil-teacher ratio by town.
+     - black: 1000(Bk - 0.63)^2 where Bk is the proportion of blacks by town.
+     - lstat: lower status of the population (percent).
+     - medv: median value of owner-occupied homes in $1000s.
+
+
+Answer the following 8 tasks.
+
+
+*Hint.* Use R to retrieve the data as follows. This dataset is available within MASS R package, you must install this package and then use the following.
+
+
+```{r}
+library(MASS) 
+attach(Boston)
+
+head(Boston) # to view the first 6 rows
+#View(Boston) # uncomment to view the dataset
+#str(Boston)  # uncomment to see the structure
+```
+
+
+1. Based on the description in the above, what is the response 
+variable? 
+
+The response variable is *medv* 
+
+
+2. Consider the subset of the dataset that consists of numerical variables only (call this Boston1).Provide a scatterplot matrix using all numerical variables. Briefly comment about the output, by stating two predictors with the highest correlations (either positive or negative) to the response.
+
+We know that _chas_ and _rad_ are categorical.
+
+```{r}
+Boston1 <-subset(Boston,select= c(-chas, -rad))
+dim(Boston1)
+```
+
+     
+```{r warning=FALSE}
+library(PerformanceAnalytics)
+chart.Correlation(Boston1)  # excluding categorical variable
+```
+
+
+The variables rm (+0.70) and lstat (-0.74) are with the highest correlations.
+
+3. Before you carry out any model-building, you split the dataset
+`Boston1` into a training set and a test set so that the training set contains 
+80% of the data in `Boston1` and the test set contains 20%. Show how you would 
+do that. Call your training and test set `Train.Boston1` and `Test.Boston1`, 
+respectively.
+
+
+```{r}
+set.seed(2401)
+TestIndex <- sample(nrow(Boston1), floor(0.2*nrow(Boston1)))  
+Test.Boston1 <- Boston1[TestIndex, ] 
+Train.Boston1 <- Boston1[-TestIndex, ]
+```
+
+4. Based on your (partial) exploratory analysis above in Task 2
+(and perhaps additional analysis), you choose only one explanatory variable with 
+which to build a simple linear regression using `Train.Boston1`. 
+    
+    i. Which one did you choose and why?  
+
+The variable rm. It has a positive +0.70 correlation with medv 
+  
+    
+    ii. Fit a simple linear regression using this variable using the `training set`. Output a summary of the linear model. What is the value of the estimated slope? 
+  
+    
+```{r}
+model.slr <- lm(medv ~ rm, data = Train.Boston1)
+summary(model.slr)
+```
+
+The value of the estimated slope is 8.4858    
+
+    
+    iii. Output diagnostic plots and comment on whether you think they indicate 
+    any inadequacies in your linear model. You only need to comment on the first 
+    three of these 'standard' diagnostic plots. 
+
+
+```{r}
+par(mfrow=c(2,2))
+plot(model.slr)
+```
+
+This is an example of interpretation, depends on the training set.
+
+- Linearity: This is not satisfied as the smoothing curve looks nonlinear 
+
+- Normality: Many upper and lower points off the normal reference line, normality is not satisfied 
+
+- Constant variance: There is a non-constant variance from the 3rd plot, as the variance decreases for fitted values less than 20, but then increasing for greater than 20. 
+
+- Some possible outliers outside (-4,4) and many leverage points (good or bad).
+
+
+5. Use _forward stepwise regression_ to construct a multiple linear regression model for this dataset (Boston2) using the training data (`Train.Boston2`). 
+Comment about the fitted model, specifically about which predictors are significant at a 
+5\% significance level. 
+
+```{r}
+model.all <- lm(medv~., data=Train.Boston1)
+summary(model.all)
+```
+
+```{r}
+model.1 <- lm(medv~1, data=Train.Boston1)
+summary(model.1)
+```
+
+
+```{r}
+# Forward selection with intermediate output
+model.f<-step(model.1, scope = formula(model.all), direction = "forward", trace = 0)
+```
+
+The final model using Forward is
+
+```{r}
+summary(model.f)
+```
+
+
+*The predictors which are significant are: lstat; rm; ptratio; dis; nox; black*
+
+6. Output diagnostic plots based on the Forward method in 5
+and comment on whether you think they indicate any inadequacies in your linear 
+model. You only need to comment on the first three of these 'standard' diagnostic plots. 
+
+
+```{r}
+par(mfrow=c(2,2))
+plot(model.f)
+```
+
+This is an example of interpretation, depends on the training set.
+
+- Linearity: This is not satisfied as the smoothing curve looks like a curve 
+
+- Normality: Some upper  points off the normal reference line, normality may or may not be satisfied 
+
+- Constant variance: There is a non-constant variance from the 3rd plot, as the variance decreases for fitted values less than 20, but then increasing for greater than 20. 
+
+- Some possible outliers outside (-4,4) and many leverage points (good or bad).
+
+7. Despite any inadequacies that you may or may not have identified above, 
+you use the model to make predictions of yield in the **test set (Test.Boston)**.
+Calculate the RMSEP and the PRESS.
+
+```{r}
+# Predictions for forward selection
+pred.fwd <- predict(model.f, newdata = Test.Boston1)  ## yhat_i
+```
+
+```{r}
+# Extract actual values from test set
+Actual <- Test.Boston1$medv  ## y_i  
+```
+
+```{r}
+# Calculate RMSEP 
+M <- length(Actual)
+RMSEP <- sqrt(sum((Actual - pred.fwd)^2)/M)
+RMSEP
+```
+
+
+```{r}
+library(DAAG)
+press(model.f)
+```
+
+
+## Question 2 Variable Selection: Body Fat Data
+
+1. Load the data file `BodyFat.RData`
+
+```{r}
+print(load("BodyFat.RData"))
+View(TrainBodyFat1)
+View(TestBodyFat1)
+```
+
+```{r}
+dim(TrainBodyFat1)
+dim(TestBodyFat1)
+```
+
+
+
+2. What objects does it contain?
+
+A training set and a test set!
+
+3. Construct a scatterplot matrix of the training **and** test data. Compare them and comment.
+
+Note that because there are `r ncol(TrainBodyFat1)` variables in the dataset, we need to make the scatterplot matrix a bit bigger than the default size, and we can do so by using the chunk options `fig.width` and `fig.height`. Note these are `knitr/Rmarkdown` options, not `R` code.</span>
+
+```{r fig.height=10, fig.width=10}
+# Training set
+pairs(TrainBodyFat1)
+```
+```{r fig.height=7, fig.width=7}
+library(PerformanceAnalytics)
+chart.Correlation(TrainBodyFat1)
+```
+
+
+
+
+
+```{r fig.height=10, fig.width=10}
+pairs(TestBodyFat1)
+```
+
+It's a good idea to plot the **test** set as well, because we want to make sure that 
+there aren't any outliers that might inflate prediction error. 
+
+In the training set, it's 
+clear that all of the variables are highly correlated - not surprising considering that 
+body measurements tend to go up and down together. 
+
+We can see that in the training set 
+there are a couple of individuals who have very large ankle measurements relative to 
+other body measurements. No such outliers appear to exist in the test set.
+
+4. Remove the two obvious outliers from the training set.
+
+There are lots of ways of removing the two individuals outlined above, but a convenient way is to use the function `subset`. See the help file for more details on how to use it. The two individuals to remove have ankle measurements of greater than 30 cm, and we will use this information to keep only those individuals whose ankle measurements are less than 30 cm.
+
+```{r}
+dim(TrainBodyFat1) # dimension of original training set
+```
+
+```{r}
+TrainBodyFat1 <- subset(TrainBodyFat1, Ankle < 30)
+```
+
+```{r}
+dim(TrainBodyFat1) # dimension of training set with two observations removed
+```
+
+
+5. Using the training set, construct a model with only an intercept and a model with all the variables.
+
+The reason we're going to construct the simplest model possible, and the model with the 
+most number of variables, is so that 
+we can use them in the simplest of all sequential selection methods, forward stepwise 
+regression. Have a look at the lecture 
+notes for a fuller explanation of how it works.
+
+```{r}
+# Model with only intercept
+lm0 <- lm(bodyfat ~ 1, data = TrainBodyFat1)
+```
+
+```{r}
+# Model with all variables
+lmall <- lm(bodyfat ~ ., data = TrainBodyFat1)
+```
+
+```{r}
+summary(lmall)
+```
+
+
+6. Use forward stepwise regression to select a subset of the variables.
+
+Once we have constructed the models above, we can use them in the function for running 
+forward stepwise selection. The 
+argument `trace = 0` suppresses intermediate output.</span>
+
+```{r}
+lmfwd <- step(lm0, scope = formula(lmall), direction = "forward", trace = 1)
+```
+
+```{r}
+summary(lmfwd)
+```
+
+Remarkably, only four measurements are selected by the procedure. But let's see how well it predicts body fat.
+
+7. Generate predictions from the forward model and the model with all variables, and compare their RMSEP.
+
+```{r}
+# Predictions from the model with all varaibles
+allpred <- predict(lmall, newdata = TestBodyFat1)
+
+# Predictions from the model selected by forward selection
+fwdpred <- predict(lmfwd, newdata = TestBodyFat1)
+```
+
+```{r}
+Actual <- TestBodyFat1$bodyfat
+RMSEP.all <- sqrt(sum((Actual - allpred)^2)/length(Actual)); RMSEP.all
+RMSEP.fwd <- sqrt(sum((Actual - fwdpred)^2)/length(Actual)); RMSEP.fwd
+```
+
+The key message here is that more variables in a model don't lead to better predictions: a model with four variables yields a smaller RMSEP than a model with many more variables.
+
+
+
+## Question 3  Prostate cancer data (Hastie, et al, 2009, Chapter 1).
+
+The data _Prostate Cancer_ (Stamey et al. (1989)) examined the correlation between the 
+level of prostate specific antigen 
+(PSA) and a number of clinical measures, in 97 men who were about to receive a radical 
+prostatectomy.The dataset is _prostate.txt_
+
+The goal is to predict the log of PSA _lpsa_  from a number of measurements including log cancer volume _lcavol_, log 
+prostate weight _lweight_, age, log of benign prostatic hyperplasia amount _lbph_, seminal vesicle invasion
+_svi_, log of capsular penetration _lcp_, Gleason score _gleason_, and
+percent of Gleason scores 4 or 5 _pgg45_.
+
+1. _Import step_: Read the data set in R and check the data structure.
+
+```{r}
+library(dplyr)
+```
+
+Loading the dataset.
+
+```{r}
+options(digits=3) ## output
+
+prostate_data=read.table(file='prostate.txt',header=TRUE) # Read the data in.
+```
+
+
+```{r, Echo=FALSE}
+head(prostate_data)
+str(prostate_data)
+```
+```{r}
+View(prostate_data)
+```
+
+
+
+2. _Wrangling step_: we don't need ID variable (Men) and we define train and test subsets data.
+
+```{r}
+prostate_data=prostate_data%>%  #  Remove ID variable 
+  dplyr::select(-(Men)) 
+
+prostate_data_train=prostate_data%>%  # We only wish to keep the training data to model.
+  filter(train==TRUE)
+
+prostate_data_test=prostate_data%>%  # We only wish to keep the testing data to model.
+  filter(train==FALSE)
+```
+
+```{r}
+dim(prostate_data_train)
+dim(prostate_data_test)
+```
+
+
+```{r}
+head(prostate_data_train)
+```
+
+
+3. _Explore step_: Produce a scatterplot matrix of the variables in the dataset, as Figure 1.1 of Hastie, et al (2009), 
+Chapter 1.
+
+```{r, Echo=FALSE}
+pairs(prostate_data[,1:9])
+# a more informatic graph
+library("PerformanceAnalytics")
+chart.Correlation(prostate_data[,1:9],histogram=TRUE,pch=19)
+```
+
+We can also create the scatterplot matrix using _ggplot2_ and _GGally_ R packages.
+
+```{r, Echo=FALSE}
+library(dplyr)
+library(ggplot2)
+library(GGally)
+ggpairs(prostate_data, columns=1:9)
+```
+
+We can see that _lcavol, lweight and age_ appear to be positively correlated with _lpsa_.
+
+
+4. Obtain the correlation matrix of the data.
+
+
+```{r}
+cor(prostate_data[1:9])
+```
+
+
+5. As the variables are on differing scales, apply standardisation by mean and standard deviation. Do not standardise the variable lpsa (response).
+
+This is important when predictors are on differing scales. We standardize by mean and 
+standard deviation. We do NOT scale 
+our response variable. In larger datasets, 
+standardization also speeds up learning algorithms.
+
+First we exclude _lpsa_ and reorder the variables to be the same order as the reference.
+
+```{r}
+predictors_train=prostate_data_train[ ,c('lcavol','lweight','age','lbph','svi','lcp','gleason','pgg45')]
+
+predictors_test=prostate_data_test[ ,c('lcavol','lweight','age','lbph','svi','lcp','gleason','pgg45')]
+```
+
+
+```{r}
+#Scale function to standardize mean and sd
+
+predictors_scaled=as.data.frame(scale(predictors_train))
+
+prostate_data_train=data.frame(prostate_data_train$lpsa,predictors_scaled)
+
+names(prostate_data_train)= c('lpsa', 'lcavol', 'lweight',    'age',   'lbph'  , 'svi' ,   'lcp', 'gleason',  'pgg45')
+```
+
+
+```{r}
+predictors_scaled_test=as.data.frame(scale(predictors_test))
+
+prostate_data_test=data.frame(prostate_data_test$lpsa,predictors_scaled_test)
+
+names(prostate_data_test)= c('lpsa', 'lcavol', 'lweight',    'age',   'lbph'  , 'svi' ,   'lcp', 'gleason',  'pgg45')
+```
+
+
+6. Use the _best-subset_ selection method to select a subset of the variables.
+
+```{r}
+library(caret)
+library(leaps)
+```
+
+
+```{r}
+best_subsets <- regsubsets(lpsa~., data = prostate_data_train, nvmax = 8,nbest=1)
+summary(best_subsets)
+```
+
+The best possible subset containing two predictors contains _lcavol_ and _lweight_. This is also known as 
+the “one standard error” rule, whereby the model that is simplest but also within one standard deviation of the minimum 
+_sum of squares model_. 
+
+Note the _stars_ indicate which variable we would include in the best subet. The argument _nbests_ returns the 
+best subset for each size up to _nvmax_. 
+
+```{r}
+linear_best_subset=lm(lpsa~lcavol+lweight,data=prostate_data_train)
+summary(linear_best_subset)
+```
+
+7. Using the training set, construct a model with only an intercept. Then calculate the residual sum of squares (RSS).
+
+```{r}
+#We need to calculate RSS for the intercept only model first. RSS_int
+
+prostate_intercept=lm(lpsa~1,data=prostate_data_train)
+
+intercept_pred=predict(prostate_intercept,new.data=prostate_data_train)
+RSS_intercept=sum((intercept_pred-prostate_data_train$lpsa)^2)
+RSS_intercept
+```
+
+8. Plot the RSS against the subset size $k=\{0,1,...,8\}$
+
+```{r}
+plot(x=0:8,c(RSS_intercept,summary(best_subsets)$rss),xlim=c(0,8),ylim=c(0,100),xlab="Subset Size k",ylab="Residual Sum-of-Squares",col='red')
+lines(x=0:8,c(RSS_intercept,summary(best_subsets)$rss),col='red')
+```
+9. Re-run `regsubsets` with `nbest = 1`, and then construct plots of adjusted $R^2$, 
+$C_p$, and BIC against number of variables. You will need to extract these criteria from 
+the summary object.
+
+
+```{r}
+# Modify some graphical parameters
+par(mfrow = c(1, 3))
+par(cex.axis = 1.5)
+par(cex.lab = 1.5)
+
+AllSubsets <- regsubsets(lpsa~., data = prostate_data_train, nvmax = 8,nbest=1)
+AllSubsets.summary <- summary(AllSubsets)
+plot(1:8, AllSubsets.summary$adjr2, xlab = "subset size", ylab = "adjusted R-squared", type = "b")
+plot(1:8, AllSubsets.summary$cp, xlab = "subset size", ylab = "Mallows' Cp", type = "b")
+abline(0,1,col=2)
+plot(1:8, AllSubsets.summary$bic, xlab = "subset size", ylab = "BIC", type = "b")
+```
+
+This now gives the “best” choice of explanatory variables for models of size 1,2,…8. So 
+out of all models with only a single covariate, we would choose (“lcavol”) as 
+the best predictor.
+
+$R^2$ recommends p=7; BIC recommends 2, 3 or 4.
+
+For the $C_p$ Mallows, you can add a reference line to help you to locate the subset size that satisfies $C_p \approx p.$  From the above plot, it is around 7.
+
+## Question 4  PRESS for Bodyfat data (Question 2)
+
+As we saw in Lecture 10, one internal measure of predictive ability of a model is the PRESS statistic. The idea is to set aside a single observation $y_i$ from the dataset, and then, using the model constructed from the remaining data, predict the value of the observation left out ($\hat{y}_{-i}$), and calculate the residual $y_i - \hat{y}_{-i}$. Do this until all observations have been left out, and then calculate the sum of the squares of these residuals, i.e., 
+$$
+\mbox{PRESS} = \sum_{i=1}^n (y_i - \hat{y}_{-i})^2
+$$
+As we saw in Lecture 10, for a linear regression, calculating $\mbox{PRESS}$ doesn't actually require this iterative procedure. Instead, $\mbox{PRESS}$ can be calculated more easily using values computed from fitting the model to **all** the data, i.e.,
+$$
+\mbox{PRESS} = \sum_{i=1}^n \left(\frac{\hat{e}_i}{1 - h_{ii}}\right)^2
+$$
+In the expression above, $\hat{e}_i$ is the $i$th residual, and $h_{ii}$ is the $i$th diagonal element of the 'hat' matrix $H = X(X'X)^{-1}X'$.
+
+The library `DAAG` (Maindonald, J.H. and Braun, W.J. (2010) *Data Analysis and Graphics Using R*, 3rd ed. Cambridge: Cambridge University Press) contains the function `press` that you can use instead of coding the explicit expressions above. 
+
+If you do not have `DAAG` installed, you have to install it first, and then load it into your *R* session using the command `library(DAAG)` before you can invoke `press`.
+
+Compare the value of the $\mbox{PRESS}$ statistic for the forward and all parameters models you constructed above in Question 2.
+The models are lmfwd and lmall
+
+```{r}
+# Install DAAG first, using Tools -> Install Packages ...
+# Then load it here:
+# library(DAAG)
+```
+
+
+```{r} 
+# Calculate PRESS for forward selection
+press(lmfwd)
+```
+
+```{r}
+# Calculate PRESS for ALL  
+press(lmall)
+```
+
+
+## Question 5 Sheather (2009): Modelling defective rates
+
+We revisit this dataset to include quadratic terms in the model.
+
+The data frame `Defects` provides data on the average number of defects per 1000 parts (`Defective`) 
+produced in an industrial process along with the values of other variables (`Temperature`, `Density`, and 
+`Rate`). The production engineer wishes to construct a linear model relating `Defective` to the potential 
+predictors.
+
+  (a) Use the `pairs` function to produce a scatterplot matrix of all the variables in Defects. Are the 
+  scatterplots of `Defective` against the other variables linear?
+
+```{r}
+defects=read.table("defects.txt",header=T)
+defects=defects[,-1]
+View(defects)
+```
+
+```{r}
+# Scatterplot
+pairs(defects)
+library(PerformanceAnalytics)
+chart.Correlation(defects)
+```
+
+From the scatterplots, we can see that Defective has:
+
++ positive, linear relationships with Temperature and Rate as an explanatory.
++ negative, linear relationships with Density as an explanatory.
++ some relationships among the explanatories that will be discussed later (multicollinearity)
+
+Clearly this is a strong positive relationship between the number of defects produced and each of the other variables, although there is a visible curvature to the relationships suggesting that these relationships are not linear (although the relationships between each of temperature, density and rate are so).
+
+(b) Develop a regression model that directly predicts the number of defects using a 
+subset or all of the 4 potential predictor variables listed above.
+
+Explain the fitted model, by interpreting the R output. We have done this in Comp Lab Week 10.
+
+```{r}
+def.lm=lm(Defective~Temperature+Density+Rate, data=defects)
+summary(def.lm)
+```
+
+(c) Multicollinearity can be detected using the cut-off of VIF (variance inflation factor). Correlation amongst the predictors increases the variance of the estimated regression coefficients
+
+$$var(\hat{\beta_j})=\frac{1}{1-r_{12}^2} \frac{\sigma^2}{S_{x_j}^2}$$
+where $r_{12}$ denote the correlation between $x_1$ and $x_2$ and  $S_{x_j}$ denote the standard deviation $x_j.$ The term 
+$\frac{1}{1-r_{12}^2}$ is called a variance inflation factor (VIF).
+
+There are high correlations among explanatory variables as shown in (a), which may be related to multicollinearity.
+
+The variance inflation factor VIF can be calculated using the function 'vif' in the 'car' R package.
+
+```{r}
+library(car)
+vif(def.lm)
+```
+
+A number of these variance inflation factors exceed 5, the cut-off often used, and so the associated regression coefficients are poorly estimated due to multicollinearity.
+

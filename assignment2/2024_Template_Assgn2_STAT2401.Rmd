@@ -1,0 +1,474 @@
+---
+title: "Assignment 2 Submission"
+author: "Himakar Gadham, Atikant Jain"
+output:
+  pdf_document: default
+  html_notebook:
+    theme: flatly
+  word_document: default
+  html_document:
+    highlight: haddock
+    theme: flatly
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Assignment 2 submitted by Student Name, Student ID
+Himakar Gadham - 23783777, Atikant Jain - 24051868
+
+### Statement of Contribution:
+Both of us contributed equally to all the questions. We both sat together in library and worked through each question. We did it by going through labs question and answers, comparing our output with each other, clarifying doubts and clearing concepts.
+
+```{r eval=FALSE, include=FALSE}
+## There are a few options in every chunk, click the setting button (greyed) near the triangle:
+# 1. to use default as in the above (show code and output, ie ECHO=TRUE) or 
+# 2. to show output only (ie ECHO=FALSE) or
+# 3. show nothing (run code) ie include=FALSE
+# 4. show nothing (dont run the code), like this chunk, ie eval=FALSE, include=FALSE
+####### 
+## You can create your own way for submission, this is just an example if you are going to use Rmd.
+## The main document must be submitted in a PDF. You should use this template as a tool only, 
+## to produce towards a final file in pdf. You can submit this as the second file Rmd. 
+## My advice is to use this template for complete R code, and then use options in chunks to include or to hide. 
+## After that, knit it into Word. Do the second edit following hints in the question sheet before converting it into a pdf.
+### You must read the hints (as marking criteria) in the question sheet. They are not included in this template.
+```
+
+
+## Question 1 Air Pollution and Mortality. Does pollution kill people?   (30 marks) 
+
+(a) (5 marks)  Carry out exploratory data analysis (EDA) of this dataset, taking into account the following groups of associations with the response (see the question sheet)
+```{r, echo=FALSE, include=FALSE}
+library(ggplot2)
+library(dplyr)
+pollution <- read.csv("Pollution.csv")
+
+summary(pollution)
+
+```
+
+```{r, echo=FALSE, warning=FALSE}
+# Plot Climate variables against Mortality
+climate_vars <- pollution[, c("Precip", "Humidity", "JanTemp", "JulyTemp", "Mortality")]
+
+# Using ggplot2 to create scatter plots
+melted_climate <- reshape2::melt(climate_vars, id.vars = "Mortality")
+ggplot(melted_climate, aes(x = value, y = Mortality, color = variable)) +
+  geom_point() +
+  facet_wrap(~variable) +
+  ggtitle("Relationship between Climate Variables and Mortality") +
+  theme_minimal()
+```
+
+Precipitation and July Temperature show a moderate positive correlation with mortality.
+January Temperature shows a weak positive correlation with mortality.
+Humidity does not show a clear correlation with mortality.
+```{r, echo=FALSE}
+socio_vars <- pollution[, c("Over65", "House", "Educ", "Sound", "Density", "NonWhite", "WhiteCol", "Poor", "Mortality")]
+
+melted_socio <- reshape2::melt(socio_vars, id.vars = "Mortality")
+ggplot(melted_socio, aes(x = value, y = Mortality, color = variable)) +
+  geom_point() +
+  facet_wrap(~variable) +
+  ggtitle("Relationship between Socioeconomic Variables and Mortality") +
+  theme_minimal()
+```
+Population Density shows a moderate positive correlation with mortality.
+Over65, House, Educ, Sound, NonWhite, WhiteCol, and Poor do not show clear trends, suggesting weak or no correlation with mortality.
+```{r, echo=FALSE}
+pollution_vars <- pollution[, c("HC", "NOX", "SO2", "Mortality")]
+
+melted_pollution <- reshape2::melt(pollution_vars, id.vars = "Mortality")
+ggplot(melted_pollution, aes(x = value, y = Mortality, color = variable)) +
+  geom_point() +
+  facet_wrap(~variable) +
+  ggtitle("Relationship between Pollution Variables and Mortality") +
+  scale_x_continuous(limits = c(0,200)) +
+  theme_minimal()
+```
+Sulfur Dioxide (SO2) shows a moderate positive correlation with mortality.
+Hydrocarbons (HC) and Nitrogen Oxides (NOX) do not show clear trends, suggesting weak or no correlation with mortality.
+```{r, echo=FALSE}
+ggplot(pollution, aes(x = State.code, y = Mortality, fill = Region)) +
+  geom_boxplot() +
+  labs(title = "Mortality by State Code", x = "State Code", y = "Mortality") +
+  theme_minimal()
+
+```
+There are noticeable differences in mortality rates across different states and regions.
+The Midwest and Northeast regions tend to have higher median mortality rates compared to the South and West regions.
+The variability in mortality rates also differs by state, with some states showing more consistency (narrower distributions) and others showing more variability (wider distributions).
+
+(b) (9 marks) Perform model selection process using {\it All Subset} method to arrive at good regression models that account for variation in mortality between the cities that can be attributed to differences in {\it  climate and socioeconomic factors.}  Identify optimal model(s) based on each of the adjusted $R^2$, BIC and $C_p.$ 
+
+```{r, echo=FALSE}
+library(leaps)
+library(knitr)
+library(corrplot)
+```
+```{r, echo=FALSE}
+climate_vars <- c("Precip", "Humidity", "JanTemp", "JulyTemp")
+socio_vars <- c("Over65", "House", "Educ", "Sound", "Density", "NonWhite", "WhiteCol", "Poor")
+
+# Combine all selected predictors
+predictors <- c(climate_vars, socio_vars)
+
+AllSubsets_model <- regsubsets(pollution$Mortality ~ ., nvmax = 10, nbest = 1, data = pollution[,predictors])
+```
+
+
+```{r, include=FALSE}
+AllSubsets_model.summary <- summary(AllSubsets_model)
+AllSubsets_model.summary$outmat
+```
+
+```{r, echo=FALSE}
+# Modify some graphical parameters
+par(mfrow = c(1, 3))
+par(cex.axis = 1.5)
+par(cex.lab = 1.5)
+
+#length(AllSubsets_model.summary$adjr2)
+#str(AllSubsets_model.summary)
+nn <- nrow(AllSubsets_model.summary$outmat)
+plot(1:nn, AllSubsets_model.summary$adjr2, xlab = "subset size", ylab = "adjusted R-squared", type = "b")
+plot(1:nn, AllSubsets_model.summary$cp, xlab = "subset size", ylab = "Mallows' Cp", type = "b")
+abline(0,1,col=2)
+plot(1:nn, AllSubsets_model.summary$bic, xlab = "subset size", ylab = "BIC", type = "b")
+```
+
+```{r, echo=FALSE}
+# Extract criteria values (adjusted R^2, BIC, Cp)
+adjusted_r_squared <- AllSubsets_model.summary$adjr2
+bic <- AllSubsets_model.summary$bic
+cp <- AllSubsets_model.summary$cp
+
+# Find the optimal models based on adjusted R^2, BIC, and Cp criteria
+optimal_model_adj_r_squared <- which.max(adjusted_r_squared)
+optimal_model_adj_r_squared
+optimal_model_bic <- which.min(bic)
+optimal_model_bic
+optimal_model_cp <- which.min(cp)
+optimal_model_cp
+```
+```{r, echo=FALSE}
+variables_adj_r_squared <- names(coef(AllSubsets_model, id = optimal_model_adj_r_squared, 10))
+variables_adj_r_squared
+variables_bic <- names(coef(AllSubsets_model, id = optimal_model_bic, 10))
+variables_bic
+variables_cp <- names(coef(AllSubsets_model, id = optimal_model_cp, 10))
+variables_cp
+```
+
+
+(c) (4 marks) Fit an optimal model with the lowest $C_p$ as obtained in (b).  Write the equation of this fitted model. Interpret this model.
+```{r, echo=FALSE}
+#Mortality = Precip + JanTemp + JulyTemp + Educ + Density + NonWhite
+model <- lm(Mortality ~ Precip + JanTemp + JulyTemp + Educ + Density + NonWhite, data = pollution)
+summary(model)
+```
+### Mortality = 1.242e+03 + 1.401e+00*Precip -1.684e+00*JanTemp -2.840e+00*JulyTemp -1.616e+01*Educ + 7.570e-03*Density + 5.275e+00*NonWhite
+
+Overall Fit: The model explains 70.86% of the variability in mortality (R-squared = 0.7086). The model is highly significant (F-statistic = 21.48, p-value = 1.305e-12).
+
+Precipitation: Each unit increase in precipitation is associated with a 1.401 increase in mortality (p = 0.0250).
+January Temperature: Each unit increase in January temperature is associated with a 1.684 decrease in mortality (p = 0.0026).
+July Temperature: Each unit increase in July temperature is associated with a 2.840 decrease in mortality (p = 0.0319).
+Education Level: Each unit increase in education level is associated with a 16.16 decrease in mortality (p = 0.0186).
+Population Density: Each unit increase in population density is associated with a 0.00757 increase in mortality (p = 0.0265).
+Percentage of Non-White Population: Each unit increase in the non-white population percentage is associated with a 5.275 increase in mortality (p < 0.001).
+
+(d) (7 marks) Perform diagnostics checking on the model in (c). Do you think there are influential points in the data? Identify the cities which are influential points using leverage and Cook's distance respectively.
+```{r}
+par(mfrow=c(2,2))
+plot(model)
+```
+Residuals vs Fitted (top-left) shows a smoothing curve with no pattern
+Scale-Location (bottom-left) shows a slight increasing trend
+Normal Q-Q (top-right) shows most observations lie around the straight line
+Residuals vs Leverage (bottom-right) shows leverage points and potential outliers
+
+```{r, include=FALSE}
+# Calculating leverage values
+Leverage <- hatvalues(model)
+head(Leverage)
+
+# Calculating Cook's Distance
+Cooks.Dist <- cooks.distance(model)
+head(Cooks.Dist)
+```
+```{r, echo=FALSE}
+# Setting up the plotting area for two plots
+par(mfrow = c(1, 2))
+par(mgp = c(1.75, 0.75, 0))
+par(mar = c(3, 3, 2, 1))
+
+p = 6
+n = 60
+
+# Plotting standardized residuals against leverage
+plot(rstandard(model) ~ Leverage, main = "Standardized Residuals vs Leverage", xlab = "Leverage", ylab = "Standardized Residuals")
+abline(h = c(-2, 2), col = "red", lty = 2)
+abline(v = 2 * (p + 1)/n, col = "green", lty = 2)  # Vertical line for leverage cut-off
+
+# Plotting standardized residuals against Cook's Distance
+plot(rstandard(model) ~ Cooks.Dist, main = "Standardized Residuals vs Cook's Distance", xlab = "Cook's Distance", ylab = "Standardized Residuals")
+abline(v = 2 * (p + 1)/(n - (p + 1)), col = "red", lty = 2)  # Vertical line for Cook's Distance cut-off
+
+```
+```{r, echo=FALSE}
+# Plotting Cook's Distance for each observation
+plot(cooks.distance(model), ylab = "Cook's Distance", main = "Cook's Distance for each Observation")
+abline(h = 2 * (p + 1)/(n - (p + 1)), col = "red", lty = 2)
+with(pollution, text(cooks.distance(model), labels = row.names(pollution), pos = 4))
+```
+```{r, echo=FALSE}
+index.highleverage <- which(hatvalues(model) > 2 * p/n)
+
+# Identifying outliers based on standardized residuals
+index.outlier <- which(abs(rstandard(model)) > 2)
+
+# Summary of findings
+cat("High leverage points:", index.highleverage, "\n")
+cat("Outliers:", index.outlier, "\n")
+```
+We have 6 high leverage point and 4 outliers. But from the interpretation of the graps we can see that only outlier 20 and 5 leverage points are influencing indicating that they are bad points.
+
+(e) (5 marks) Using the model obtained in (c), add the three pollution variables (transformed to their natural logarithm) and obtain the p-value from the extra-sum-of-squares F-test due to their addition. Summarise your findings in a few concise sentences.
+
+```{r}
+model2 <- lm(Mortality ~ Precip + JanTemp + JulyTemp + Educ + Density + NonWhite+ log(HC) + log(NOX) + log(SO2), data = pollution)
+summary(model2)
+```
+
+```{r}
+model_comparision <- anova(model, model2)
+model_comparision
+```
+We got the p value from the extra-sum-of-squares F-Test as 0.008313.
+Significance of Additional Predictors: The additional predictors log(HC) + log(NOX) + log(SO2) significantly improve the model fit, as indicated by the significant p-value (0.008313). This suggests that including these pollution variables in the model provides a better explanation of the variability in mortality. And we reject the Null Hypothesis. 
+Model Comparison: Model 2, which includes the additional pollution variables, is statistically significantly better than Model 1, which only includes the climate and socioeconomic variables. 
+Model 1 has an RSS of 66518 and Model 2 has an RSS of 52712. The decrease in RSS indicates that Model 2 explains more variability in the data than Model 1.
+
+## Question 2 Body Measurements (25 marks)
+
+(a) (4 marks)  Carry out exploratory data analysis (EDA) of this dataset before you do any modelling. 
+
+```{r, echo=FALSE, include=FALSE}
+library(readr)
+library(ggplot2)
+library(dplyr)
+library(corrplot)
+library(leaps)
+library(knitr)
+# Load the data
+body_data <- read_csv("body.csv")
+names(body)
+summary(body_data)
+
+body_data <- body_data[, -1]
+
+# Check for missing values
+sum(is.na(body_data))
+str(body_data)
+```
+
+```{r, echo=FALSE}
+# Boxplots to identify outliers
+ggplot(body_data, aes(y = Weight, x = as.factor(Gender), fill = as.factor(Gender))) + 
+  geom_boxplot() + 
+  labs(x = "Gender", y = "Weight") + 
+  ggtitle("Weight Distribution by Gender")
+
+```
+**Interpretation**:
+- **Boxplot of Weight by Gender**: Males tend to have higher weights compared to females. This suggests a potential relationship between gender and weight.
+```{r, echo=FALSE}
+#library(PerformanceAnalytics)
+#chart.Correlation(body_data[, -25])
+```
+
+- **Correlation Matrix**: Strong correlations exist among many girth measurements and between height and weight, indicating potential multicollinearity issues in the model.
+
+(b) (10 marks) After the exploratory analysis has been carried out, split the dataset into a training set and a testing set so that the training set contains 80\% of the data  and the testing set contains 20\%.  Construct a multiple linear regression model for this dataset using the training set to create 2 final fitted models at a significance level of 10\%, based on the following variable selection methods : 
+         
+           - (Model 1) The Forward selection; 
+           - (Model 2) The Backward selection.
+
+Write the two fitted model equations and compare them in a few concise sentences. 
+
+```{r}
+# Set a random seed for reproducibility
+set.seed(2401)
+TestIndex <- sample(nrow(body_data), floor(0.2 * nrow(body_data)))
+Test.body_data <- body_data[TestIndex, ]
+Train.body_data <- body_data[-TestIndex, ]
+```
+
+```{r}
+lm.all <- lm(Weight ~ ., data = Train.body_data)
+summary(lm.all)
+```
+
+```{r}
+# Forward selection
+lm.0 <- lm(Weight ~ 1, data = Train.body_data) # Set up simplest model to start with
+summary(lm.0)
+lm.forward_model1 <- step(lm.0, scope = formula(lm.all), direction = "forward", trace = 0)
+summary(lm.forward_model1)
+```
+
+```{r}
+#Backward selection
+lm.backward_model2 <- step(lm.all,  direction = "backward", trace = 0)
+summary(lm.backward_model2)
+```
+
+### Fitted Model Equations
+
+**Model 1: Forward Selection**
+
+Variables with a p-value greater than 0.10 (Elbow.diameter, Bicep.girth, and Wrist.diameter) will be excluded from the final model.
+
+\[ \text{Weight} = -118.94354 + 0.35664 \times \text{Waist.girth} + 0.30191 \times \text{Height} + 0.23965 \times \text{Thigh.girth} + 0.48622 \times \text{Forearm.girth} + 0.07093 \times \text{Shoulder.girth} + 0.34923 \times \text{Calf.maximum.girth} + 0.22429 \times \text{Hip.girth} + 0.13685 \times \text{Chest.girth} + 0.46740 \times \text{Knee.diameter} - 0.06130 \times \text{Age} + 0.30357 \times \text{Chest.depth} - 1.43739 \times \text{Gender} + 0.18447 \times \text{Knee.girth} + 0.14876 \times \text{Chest.diameter} - 0.42530 \times \text{Wrist.minimum.girth} \]
+
+**Model 2: Backward Selection**
+
+Variables with a p-value greater than 0.10 (Bicep.girth) will be excluded from the final model.
+
+\[ \text{Weight} = -119.42408 + 0.30916 \times \text{Chest.depth} + 0.14989 \times \text{Chest.diameter} + 0.47684 \times \text{Wrist.diameter} + 0.49901 \times \text{Knee.diameter} + 0.07223 \times \text{Shoulder.girth} + 0.14158 \times \text{Chest.girth} + 0.35145 \times \text{Waist.girth} + 0.22937 \times \text{Hip.girth} + 0.23220 \times \text{Thigh.girth} + 0.51681 \times \text{Forearm.girth} + 0.18553 \times \text{Knee.girth} + 0.34924 \times \text{Calf.maximum.girth} - 0.43639 \times \text{Wrist.minimum.girth} - 0.05981 \times \text{Age} + 0.30696 \times \text{Height} - 1.36753 \times \text{Gender} \]
+
+### Comparison of the Two Models
+
+1. **Model Complexity**:
+   - Both models include a comprehensive set of predictors, indicating a strong relationship between body measurements and weight.
+   - Model 2 (Final Model) excludes only the non-significant predictor (Bicep.girth), reducing the complexity slightly but maintaining high explanatory power.
+
+2. **Significance of Predictors**:
+   - Both models identify the same key predictors as significant, with similar coefficient estimates and p-values. This indicates a robust set of variables driving weight prediction.
+   - Both models include variables like Waist.girth, Height, Forearm.girth, and Chest.girth, which are consistently significant across models.
+
+3. **Model Fit**:
+   - The adjusted R-squared values for both models are very similar (~0.975), indicating that both models explain approximately 97.5% of the variance in weight.
+   - The slight reduction in predictors in Model 2 does not significantly impact the model fit, suggesting that the excluded variables were not contributing much additional explanatory power.
+
+4. **Practical Considerations**:
+   - Model 2 (Final Model) is slightly simpler and might be preferred for practical applications due to its reduced complexity without sacrificing explanatory power.
+   - The inclusion of significant predictors at a 10% level ensures a robust model while avoiding overfitting.
+
+### Conclusion
+
+Both models provide strong predictive power for weight based on body measurements. Model 2, with predictors significant at the 10% level, offers a slightly more streamlined approach while maintaining high explanatory power. The choice between models depends on the balance between simplicity and comprehensiveness, with Model 2 offering a slight edge in simplicity.
+
+
+(c) (5 marks) Perform diagnostics checking for each of the fitted models, Model 1 and  Model 2  respectively.
+
+```{r, echo=FALSE}
+# Extract residuals and standardized residuals
+res.forward = lm.forward_model1$residuals
+std.res.forward = rstandard(lm.forward_model1)  # Standardized residuals
+
+# Additional diagnostic plots
+par(mfrow = c(2, 2))  # Set up the plotting area for 4 plots
+hist(std.res.forward, main = "Histogram of Standardized Residuals (Forward)", xlab = "Standardized Residuals")
+qqnorm(std.res.forward, main = "QQ Plot (Forward)")
+qqline(std.res.forward)
+plot(std.res.forward, ylab = "Standardized Residuals", main = "Standardized Residuals vs. Index (Forward)")
+plot(lm.forward_model1$fitted.values, std.res.forward, xlab = "Fitted Values", ylab = "Standardized Residuals", main = "Standardized Residuals vs. Fitted Values (Forward)")
+
+```
+
+```{r, echo=FALSE}
+# Extract residuals and standardized residuals
+res.backward = lm.backward_model2$residuals
+std.res.backward = rstandard(lm.backward_model2)  # Standardized residuals
+
+# Additional diagnostic plots
+par(mfrow = c(2, 2))  # Set up the plotting area for 4 plots
+hist(std.res.backward, main = "Histogram of Standardized Residuals (Backward)", xlab = "Standardized Residuals")
+qqnorm(std.res.backward, main = "QQ Plot (Backward)")
+qqline(std.res.backward)
+plot(std.res.backward, ylab = "Standardized Residuals", main = "Standardized Residuals vs. Index (Backward)")
+plot(lm.backward_model2$fitted.values, std.res.backward, xlab = "Fitted Values", ylab = "Standardized Residuals", main = "Standardized Residuals vs. Fitted Values (Backward)")
+
+```
+
+
+(d) (6 marks). Despite any inadequacies that you may or may not have identified above, you use the two models obtained in (b) to make predictions of *Weight* in the test set.
+
+           -  (i)  Produce a correctly drawn and labelled plot of predicted values against the actual values in the test set, and obtain the root mean squared error of prediction (RMSEP) based on each fitted model. 
+           -  (ii)  Using the RMSEPs and the plots you produced, comment on how well the models performed. 
+
+### Step 1: Making Predictions
+Use the models from forward and backward selection methods to predict the weight in the test set.
+
+```{r}
+# Predicting weight using the backward selection model
+predictions_backward <- predict(lm.backward_model2, newdata = Test.body_data)
+
+# Predicting weight using the forward selection model
+predictions_forward <- predict(lm.forward_model1, newdata = Test.body_data)
+
+Actual <- Test.body_data$Weight
+```
+
+### Step 2: Calculate RMSEP
+Root Mean Squared Error of Prediction (RMSEP) is a standard way to measure the error of a model in predicting quantitative data. Lower values of RMSEP indicate better fit.
+
+```{r}
+M <- length(Actual)
+
+# Calculate RMSEP for the backward selection model
+rmsep_backward <- sqrt(sum((Actual - predictions_backward)^2)/M)
+
+# Calculate RMSEP for the forward selection model
+rmsep_forward <- sqrt(sum((Actual - predictions_forward)^2)/M)
+
+# Print RMSEP values
+cat("RMSEP for the backward selection model:", rmsep_backward, "\n")
+cat("RMSEP for the forward selection model:", rmsep_forward, "\n")
+```
+
+### Step 3: Plotting Predicted vs. Actual Values
+Plotting actual vs. predicted values gives a visual representation of how well the models predict new data.
+
+```{r}
+# Plot for the backward selection model
+plot(Actual, predictions_backward, main = "Backward Selection: Predicted vs Actual",
+     xlab = "Actual Weight", ylab = "Predicted Weight", pch = 19, col = 'blue')
+abline(0, 1, col = "red", lwd = 2)  # Adds a 45-degree line
+
+# Plot for the forward selection model
+plot(Actual, predictions_forward, main = "Forward Selection: Predicted vs Actual",
+     xlab = "Actual Weight", ylab = "Predicted Weight", pch = 19, col = 'green')
+abline(0, 1, col = "red", lwd = 2)  # Adds a 45-degree line
+```
+
+### Step 4: Comment on Model Performance
+
+#### Analysis of RMSEP
+- Both models have very similar RMSEP values, indicating that they have comparable predictive performance.
+- RMSEP values are relatively low, suggesting that both models have good accuracy in predicting the weight on the test data.
+
+#### Analysis of Predicted vs Actual Plots
+- **Backward Selection Model**:
+  - The plot shows that the predicted weights are closely aligned with the actual weights.
+  - The points are scattered around the 45-degree line, indicating good model accuracy.
+  - There are few outliers, suggesting that most predictions are accurate.
+
+- **Forward Selection Model**:
+  - Similar to the backward selection model, the predicted weights are closely aligned with the actual weights.
+  - The points are also scattered around the 45-degree line, indicating good model accuracy.
+  - There are few outliers, suggesting that most predictions are accurate.
+
+### Conclusion
+- **Performance Comparison**:
+  - Both models demonstrate excellent predictive performance, with nearly identical RMSEP values and well-aligned predicted vs. actual plots.
+  - The minor difference in RMSEP values (1.963649 for forward selection vs. 1.969358 for backward selection) is negligible, indicating that both models perform equally well in terms of prediction accuracy.
+
+- **Model Choice**:
+  - Since both models perform similarly, the choice between them may depend on other factors such as model simplicity or interpretability.
+  - The forward selection model includes only the predictors that were significant at the 10% level, which might make it slightly more interpretable and easier to communicate.
+

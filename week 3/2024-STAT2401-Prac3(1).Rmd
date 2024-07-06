@@ -1,0 +1,186 @@
+---
+title: "STAT2401 Analysis of Experiments"
+author: '**Practical 3**'
+#date: "Practical 2"
+output:
+  html_document:
+    highlight: haddock
+    # number_sections: yes
+    theme: flatly
+    toc: yes
+  html_notebook:
+    highlight: haddock
+    # number_sections: yes
+    theme: flatly
+  pdf_document:
+    toc: yes
+  word_document:
+    highlight: tango
+    toc: yes
+---
+
+```{r echo=TRUE, include=FALSE}
+knitr::opts_chunk$set(prompt=FALSE, comment=NA, message=FALSE, tidy=TRUE, error=TRUE)
+```
+
+**Aims of this session**
+
+When you complete this session, you will be able to:
+
+1. understand the difference between response and explanatory variables;
+2. understand a few different types of bivariate relationships we will be considering in this unit;
+3. be able to create scatterplots to explore such bivariate relationships;
+4. be able to use correlation analysis to investigate a linear relationship between two (untransformed or transformed) continuous variables;
+5. be able to calculate the sample correlation coefficients using Pearson's, Spearman's and Kendall's;
+6. be able to perform hypothesis testing related to the population correlation coefficients of Pearson's, Spearman's and Kendall's.
+
+      - To create a new chunk: Ctrl+Alt+I (Windows), Cmd+Options+I (MacOs)
+      
+      - Attempt this practical using this Rmd file, then rename it as your own file (use File then Save As)
+
+Before you start, load the stored datasets from the LMS *emissions.csv* provided for exercises below as well as other datasets by running the following chunk (assuming the file  "Workshop5.Rdata" is saved in the same directory as the .Rmd  worksheet).
+
+```{r echo=F}
+print(load("Workshop5.RData"))
+```
+
+
+# Question 1 Correlation: Motor vehicle emissions
+
+Motor vehicles must comply with certain emission standards before
+they can be sold in Australia. The dataset *emissions.csv*
+contains the results of emissions testing of a sample of 46 vehicles of a particular model.  
+
+Columns *CO, HC, NOx* represent the emissions of carbon monoxide,
+hydrocarbons and oxides of nitrogen respectively, all in g/km.
+*VN* is a number identifying the particular vehicle being
+tested.
+
+(a). Use correlation analysis to investigate the relationships between emissions of carbon monoxide, hydrocarbons and oxides of nitrogen for this model vehicle. 
+
+```{r}
+# to read the data ?read.csv
+# Read the dataset
+emissions <- read.csv("emissions.csv")
+# Check the structure of the dataset
+str(emissions)
+# to plot ?pairs or ?ggpairs from GGally package or 
+# Load necessary libraries
+library(GGally)
+# ?chart.Correlation from Performance Analytics R package
+library(PerformanceAnalytics)
+# Use ?cor
+
+# Compute correlation matrix
+correlation_matrix <- cor(emissions[, c("CO", "HC", "NOx")])
+
+# Plot the correlation matrix
+chart.Correlation(correlation_matrix, histogram=TRUE, pch=19)
+
+```
+
+
+(b). Describe the relationships between the variables.
+
+Hint. Use the 3 keywords *form, direction, strength*
+
+(c). What difficulty do you think a vehicle manufacturer may have in achieving low emissions for all 3 variables?
+
+
+# Question 2   Faithful dataset
+
+A geyser is a hot spring in which water boils intermittently, sending a tall column of water and steam into the air. One of the best known geysers in the US is *Old Faithful in Yellowstone National Park, Wyoming.* It was so named when it was first discovered in 1870 because it was (and is) said to erupt regularly. But what does regularly mean?
+
+The data file for this workshop contains the _R_ data frame `faithful`, which consists of sequential measurements of the duration of an eruption (eruptions, in minutes) and the time to the next eruption (waiting, also in minutes). They were obtained during October 1980 by volunteers. These data were collected so that park rangers could inform tourists when an eruption was likely to occur.
+
+As part of your work with the US National Park Service, you have been tasked with constructing a predictive model for waiting time as a linear function of eruption duration so that park rangers can inform tourists when an eruption is likely to occur.
+
+(a) Identify the explanatory and response variables in this case.
+
+(b) Produce a scatterplot of the waiting time and length of eruptions. (Think about which variable to plot on the y axis and which one to plot on the x axis.)
+
+```{r}
+# Use plot(y~x) or plot(x,y)
+```
+
+
+(c) Comment on any patterns you see in the data and on the relationship between waiting time and eruption duration in such a way that a tourist to Old Faithful might understand. 
+
+Hint. Use the 3 keywords *form, direction, strength*
+
+(d) Calculate Pearson’s, Spearman’s and Kendall's correlation coefficients, and comment on the similarity/difference between the three coefficients.
+
+Hint. Use ?cor
+
+(e) Perform hypothesis testing for positive correlations using Pearson’s, Spearman’s and Kendall's correlation coefficients.
+
+Hint. Refer to the lecture slides this week.
+
+(f) Summarise the 6 steps hypothesis testing for Pearson's Spearman’s and Kendall's correlations.
+
+Hint. Refer to the lecture slides this week.
+
+# Question 3 Prostate Cancer data [Sheather, Ch 7.3]
+
+The data _Prostate Cancer_ (Stamey et al. (1989)) examined the correlation between the level of prostate specific antigen (PSA) and a number of clinical measures, in 97
+men who were about to receive a radical prostatectomy.  Hastie, Tibshirani and Friedman (2001, p. 48) “randomly split the dataset into a 
+training set of size 67 and a test set of size 30.” as provided in _prostate.txt_
+
+The goal is to predict the log of PSA _lpsa_  from a number of measurements including log cancer volume _lcavol_, log prostate weight _lweight_,
+age, log of benign prostatic hyperplasia amount _lbph_, seminal vesicle invasion
+_svi_, log of capsular penetration _lcp_, Gleason score _gleason_, and
+percent of Gleason scores 4 or 5 _pgg45_.
+
+
+```{r}
+# to read the data ?read.table
+# Prostate=read.table("prostate.txt", header=TRUE)
+```
+
+
+(a) Identify the explanatory and response variables in this case.
+
+(b) Reproduce a scatter plot matrix of the variables as in Figure 7.2 (Sheather, Ch 7.3).
+
+Hint. Use ?pairs or ?chart.correlation (install _Performance Analytics package_) or ?ggpairs (install _GGally_ package)
+
+(c) Use correlation analysis to investigate the relationships among _lpsa_ and the predictors or explanatory variables. 
+
+    - Identify 3 predictors with the highest correlations (in magnitude) to the response.
+    
+    - Identify 3 predictors with the lowest correlations (in magnitude) to the response.
+    
+    - Identify 3 pairs of predictors with the highest correlations (in magnitude).
+    
+    - Perform hypothesis testing for positive correlation using Pearson’s between _lpsa_ and _age_. Use 5\% significance level.
+
+# Question 4 Paper Quality dataset [Example 1.5 JW]
+
+Paper is manufactured in continuous sheets several feet wide. Because of the orientation of fibers within the paper, it has a different strength when measured in the direction produced by the machine than when measured across, or at right angles to, the machine direction.
+
+The dataset in *PaperQuality.txt* contains 41 measurements of $X_l$ = density (grams/cubic centimeter), $X_2$ = strength (pounds) in the machine direction and $X_3$ = strength (pounds) in the cross direction. 
+
+Use R to answer the following.
+
+(a) Report the summary statistics, means, covariances and correlations among the three variables.
+
+Hint. Use ?colMeans, ?var, ?cor
+
+(b) Present a scatter plot matrix. Identify an outlier.
+
+
+# Question 5 Anscombe data
+
+The datasets in the data.frame `Anscombe` demonstrate both the importance of graphing data before analyzing it and the effect of outliers and other influential observations on statistical properties. (Anscombe, F. J. (1973). "Graphs in Statistical Analysis". American Statistician. 27 (1): 17–21)
+
+(a). First of all have a look at the data by graphing each of the 4 column pairs (x1,y1) , (x2,y2), (x3,y3) and (x4,y4) in the `Anscombe` dataset. How would you describe each relationship? 
+
+(b). Before confirming by calculation, estimate the (Pearson) correlation coefficient for each pair. 
+
+(c). Now calculate the correlation between $x$ and $y$ for each dataset. What surprising features do you notice?
+
+(d). Calculate the rank correlation coefficient for each pair. How do you explain any differences?
+
+# Reference
+
+JW: Johnson, R. A.  and Wichern, D. W. (2007) Applied Multivariate Statistical Analysis. 6th ed. , Upper Saddle River, NJ: Prentice Hall. 

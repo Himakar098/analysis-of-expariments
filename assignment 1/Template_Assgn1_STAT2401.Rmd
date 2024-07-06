@@ -1,0 +1,411 @@
+---
+title: "Assignment 1 Submission"
+author: "Himakar Gadham & Atikanth Jain"
+date: "Apirl 18, 2024"
+output:
+  html_document: null
+  html_notebook: default
+  pdf_document: null
+  word_document: null
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Assignment 1 submitted by Student Name, Student ID
+Himakar Gadham - 23783777, Atikant Jain - 
+
+### Statemenf of Contribution should be written here if pairing. State what each team member has contributed to the assignment before answering the questions. Each student must contribute towards ALL questions. Your assignment will not be marked without this statement.
+Both contributed equally to all the questions. We both sat together in library and worked through each question.
+
+```{r eval=FALSE, include=FALSE}
+## There are a few options in every chunk, click the setting button (greyed) near the triangle:
+# 1. to use default as in the above (show code and output, ie ECHO=TRUE) or 
+# 2. to show output only (ie ECHO=FALSE) or
+# 3. show nothing (run code) ie include=FALSE
+# 4. show nothing (dont run the code), like this chunk, ie eval=FALSE, include=FALSE
+## You can knit this template into Word and then update it into pdf etc..
+## You can create your own way for submission, this is just an example if you are going to use Rmd.
+```
+
+
+## Question 1 Normal distribution. (8 marks) 
+
+
+(a) (1 mark) Find the probability that the user spends more than 15 minutes per month at the site. 
+
+```{r}
+mean <- 25
+std_dev <- 4.0
+
+prob_more_than_15 <- 1 - pnorm(15, mean, std_dev)
+cat("(a) Probability that the user spends more than 15 minutes per month:", round(prob_more_than_15, 4), "\n")
+```
+
+(b) (2 marks) Find the probability that the user spends between 20 and 35 minutes per month at the site.
+
+```{r}
+prob_between_20_and_35 <- pnorm(35, mean, std_dev) - pnorm(20, mean, std_dev)
+cat("(b) Probability that the user spends between 20 and 35 minutes per month:", round(prob_between_20_and_35, 4), "\n")
+```
+
+(c) (2 marks) What is the amount of time per month a user spends on Facebook, if only 1\% of users spend this time or longer on Facebook? 
+
+```{r}
+time_for_1_percent <- qnorm(0.99, mean, std_dev)
+cat("(c) Time per month a user spends on Facebook if only 1% of users spend this time or longer:", round(time_for_1_percent, 4), "minutes\n")
+```
+
+
+(d) (3 marks) Between what values do the time spent of the middle 90\% distribution of Facebook users fall? 
+
+```{r}
+time_middle_90_lower <- qnorm(0.05, mean, std_dev)
+time_middle_90_upper <- qnorm(0.95, mean, std_dev)
+cat("(d) Time spent by the middle 90% of distribution of Facebook users:", round(time_middle_90_lower, 4), "to", round(time_middle_90_upper, 4), "minutes\n")
+```
+
+
+## Question 2 Blood fat concentration (11 marks)
+
+(a) (6 marks) Conduct a two-independent sample $t$-test using R to determine whether the concentration of plasma cholesterol is significantly different between patients with no evidence of heart disease and those with narrowing of the arteries.
+
+```{r}
+# Define summary statistics for each group
+mean_no_disease <- 195.2745
+var_no_disease <- 1303.9231
+n_no_disease <- 51
+
+mean_disease <- 216.1906
+var_disease <- 1850.2488
+n_disease <- 320
+
+# Calculate the test statistic
+t_stat <- (mean_no_disease - mean_disease) / sqrt((var_no_disease / n_no_disease) + (var_disease / n_disease))
+
+# Calculate degrees of freedom using Welch's approximation
+df <- ((var_no_disease / n_no_disease) + (var_disease / n_disease))^2 / 
+      ((var_no_disease^2 / (n_no_disease^2 * (n_no_disease - 1))) + 
+       (var_disease^2 / (n_disease^2 * (n_disease - 1))))
+
+# Conduct a two-tailed test
+p_value <- 2 * pt(abs(t_stat), df = df, lower.tail = FALSE)
+
+# Print the test statistic, degrees of freedom, and p-value
+cat("Test Statistic:", t_stat, "\n")
+cat("Degrees of Freedom:", df, "\n")
+cat("p-value:", p_value, "\n")
+```
+
+1. **State the hypotheses**:
+   - Null Hypothesis (\(H_0\)): There is no difference in mean plasma cholesterol concentration between the two groups. \(H_0: \mu_1 = \mu_2\)
+   - Alternative Hypothesis (\(H_1\)): There is a difference in mean plasma cholesterol concentration between the two groups. \(H_1: \mu_1 \neq \mu_2\)
+
+2. **Calculate the test statistic**: 
+   - Given test statistic \( t = -3.735664 \)
+
+3. **Determine the sampling distribution**:
+   - Degrees of Freedom (\( df \)): 74.57449
+
+4. **Determine the \( p \)-value**:
+   - \( p\text{-value} = 0.0003640548 \)
+
+5. **Interpretation of \( p \)-value**:
+   - \( p \)-value \( < 0.01 \): Reject the null hypothesis
+
+6. **Conclusion**:
+   - Since the \( p \)-value (\( 0.0003640548 \)) is less than the significance level of \( 0.05 \), we reject the null hypothesis.
+   - There is evidence to suggest that there is a significant difference in mean plasma cholesterol concentration between patients with no evidence of heart disease and those with narrowing of the arteries.
+
+(b) (3 marks) Determine a 99\% confidence interval for the mean difference in concentration of plasma cholesterol between the two groups of patients.
+
+```{r}
+# Calculate the margin of error
+margin_of_error <- qt(0.995, df) * sqrt(var_no_disease/n_no_disease + var_disease/n_disease)
+
+# Calculate the confidence interval
+lower_bound <- (mean_no_disease - mean_disease) - margin_of_error
+upper_bound <- (mean_no_disease - mean_disease) + margin_of_error
+
+# Print the results
+cat("99% Confidence Interval for the Mean Difference in Concentration of Plasma Cholesterol:\n")
+cat("(", lower_bound, ",", upper_bound, ")\n")
+```
+
+(c) (2 marks) Explain the correspondence between the confidence interval in (b) and a test of the hypotheses you listed in question (a).
+
+The confidence interval in (b) provides a range of values within which we are confident the true difference in mean plasma cholesterol concentration between the two groups of patients lies. In this case, the interval (-35.71644, -6.115758) suggests that we are 99% confident that the true difference falls between these two values.
+
+The test of hypotheses listed in question (a) involves testing whether there is a significant difference in mean plasma cholesterol concentration between the two groups of patients. The null hypothesis (H0) states that there is no difference in mean plasma cholesterol concentration between the two groups, while the alternative hypothesis (H1) states that there is a difference.
+
+The correspondence between the confidence interval and the hypothesis test lies in the interpretation of the interval and the decision based on the hypothesis test. If the confidence interval includes zero, it suggests that the difference is not statistically significant at the chosen level of significance (in this case, 99%). Similarly, if the hypothesis test fails to reject the null hypothesis (p > 0.01), it indicates that there is insufficient evidence to conclude that there is a significant difference in mean plasma cholesterol concentration between the two groups.
+
+In summary, if the confidence interval includes zero and the p-value of the hypothesis test is greater than 0.01, we would fail to reject the null hypothesis, indicating that there is no significant difference in mean plasma cholesterol concentration between the two groups. Conversely, if the confidence interval does not include zero and/or the p-value is less than 0.05, we would reject the null hypothesis, concluding that there is a significant difference between the groups.
+
+## Question 3 Regression (31 marks) 
+
+(a) (2 marks) Fit a simple linear model $M_1$ to these data. Present the appropriate scatterplot and plot the fitted line onto the scatterplot. Comment about the output in a few concise sentences.
+```{r , echo = False}
+# Load the data
+data <- read.table("glakes.txt", header = TRUE)
+
+# Fit a simple linear model
+model_M1 <- lm(Time ~ Tonnage, data = data)
+
+# Plot the scatterplot
+plot(data$Tonnage, data$Time, xlab = "Tonnage", ylab = "Time", main = "Scatterplot of Tonnage vs Time")
+abline(model_M1, col = "red")  # Add the fitted line to the plot
+
+```
+
+The scatterplot shows the relationship between the tonnage of liquid-carrying vessels and the time spent in port. The fitted line from the simple linear model $M1$ is overlaid on the scatterplot. From the plot, it's apparent that there might be some curvature in the relationship between tonnage and time, suggesting that a linear model might not fully capture the true relationship.
+
+(b) (5 marks) Provide the model summary and diagnostics checking plots for model $M_1.$ Does the straight line regression model $M_1$ seem to fit the data well? Comment about the output in a few concise sentences. 
+
+```{r, echo=FALSE}
+# Model_1 summary
+summary(model_M1)
+
+# Diagnostics checking plots
+par(mfrow=c(2,2))
+plot(model_M1)
+```
+
+Comment:
+The straight line regression model M1 doesn't seem to fit the data well.
+The summary of $M1$ indicates that the linear regression model explains the R-squared value (0.8386) suggests that approximately 83.86% of the variance in the response variable (Time) is explained by the linear relationship with the predictor variable (Tonnage).
+The adjusted R-squared (0.833) is similar to the R-squared value, indicating that the inclusion of the predictor variable improves the model fit.
+ The coefficient for Tonnage is statistically significant (p-value < 0.05), suggesting that tonnage has a significant effect on the time spent in port.
+
+The diagnostics checking plots show some curvature in the residuals vs fitted plot, indicating that the linear model $M1$ might not be the best fit for the data. Additionally, the scale-location plot suggests heteroscedasticity in the residuals. Further model refinement or consideration of alternative models may be warranted.
+
+(c) (5 marks) Do you think there are outliers or influential points in the data? What influence do these points have on the model fit? Use leverage and Cook's distance for this investigation. 
+
+```{r}
+m1.infl <- influence.measures(model_M1)
+m1.infl
+
+# Compute leverage and Cook's distance
+leverage <- hatvalues(model_M1)
+cooksd <- cooks.distance(model_M1)
+
+m1.ton <- data$Tonnage
+
+#ploting the influtional measures against their x valuses
+n=31
+plot(leverage ~ m1.ton)
+abline(h = 4 / n, col = "red", lty = 2)
+
+plot(cooksd ~ m1.ton)
+abline(h = 4 / (n-2), col = "red", lty = 2)
+```
+
+```{r}
+sort(leverage)
+sort(cooksd)
+```
+
+
+Plots:
+
+1. Leverage vs Cook's Distance: This plot helps identify influential points based on their leverage and Cook's distance. Points with high leverage and high Cook's distance are potentially influential.
+2. Standardized Residuals vs Leverage: This plot helps identify outliers and influential points based on their standardized residuals and leverage. Points with standardized residuals outside the range (-2, 2) and/or high leverage are potentially outliers or influential points.
+
+Comment:
+The analysis identifies outliers and influential points based on leverage and Cook's distance. Outliers are data points with standardized residuals outside the range (-2, 2), while influential points are those with high leverage and/or high Cook's distance. These points may have a significant impact on the model fit and should be investigated further to determine if they should be included or excluded in the analysis.
+
+(d) (4 marks) Fit a regression model to the transformed $M_2$ model. Present the appropriate scatterplot and plot the fitted line onto the scatterplot. Does the transformed line regression model $M_2$ seem to fit the data well? Comment about the output in a few concise sentences.
+
+```{r}
+# Transform the predictor variable according to the transformation in M2
+data$Tonnage_transformed <- sqrt(data$Tonnage)
+
+# Fit the regression model to the transformed predictor variable
+model_M2 <- lm(log(Time) ~ Tonnage_transformed, data = data)
+
+# Scatterplot with the transformed predictor variable and fitted line
+plot(data$Tonnage_transformed, log(data$Time), main = "Scatterplot with Fitted Line (Transformed Model M2)",
+     xlab = "Transformed Tonnage", ylab = "log(Time)")
+abline(model_M2, col = "blue")
+```
+
+Comment:
+The scatterplot with the fitted line from the transformed model $M_2$ suggests that the transformed regression model might fit the data better than the simple linear model. The fitted line appears to capture the trend in the data more closely, indicating that the transformation has helped to better approximate the relationship between the predictor variable (transformed tonnage) and the response variable (time). However, further assessment of model assumptions and diagnostics would be necessary to make a definitive conclusion about the adequacy of the transformed model.
+
+(e) (5 marks) Provide the model summary and diagnostics checking plots for model $M_2.$ Does the straight line regression model $M_2$ seem to fit the data well? Comment about the output in a few concise sentences.
+
+```{r, echo=FALSE}
+# Model 2 summary
+summary(model_M2)
+
+# Diagnostics checking plots
+par(mfrow=c(2,2))
+plot(model_M2)
+```
+
+Comment:
+Based on the diagnostics checking plots, we can assess the fit of the straight line regression model $M_2$ to the data is much better than $M_1$. However, further examination of model assumptions and diagnostics is needed to determine the adequacy of the model.
+So to determine which model is better, we typically look at several factors including:
+
+1. **Coefficient of determination ($R^2$)**: Indicates the proportion of variance in the dependent variable explained by the independent variable(s). Higher $R^2$ values suggest better explanatory power.
+
+2. **Residual standard error**: Measures the average deviation of the observed values from the fitted values. Lower values indicate better fit.
+
+3. **F-statistic and associated p-value**: Indicates the overall significance of the model. Lower p-values suggest better significance.
+
+Comparing the two models:
+
+**Model with Tonnage as the predictor:**
+- $R^2$: 0.8386
+- Residual standard error: 10.7
+- F-statistic: 150.7, p-value: 5.218e-13
+
+**Model with Transformed Tonnage as the predictor:**
+- $R^2$: 0.7938
+- Residual standard error: 12.09
+- F-statistic: 111.6, p-value: 1.865e-11
+
+Based on these criteria, the model with Tonnage as the predictor appears to be better. It has a higher $R^2$, indicating better explanatory power, and a lower residual standard error, suggesting a better fit. Additionally, the F-statistic is higher with a lower associated p-value, indicating better overall significance. Therefore, the straight line regression model with Tonnage as the predictor seems to fit the data better.
+
+(f) (4 marks) Perform a hypothesis testing for a positive slope at a significance level of 5\% based on model $M_2.$
+
+```{r, echo=FALSE}
+# Compute the critical value at the 5% significance level
+critical_value <- qt(0.95, df = length(data$Tonnage_transformed) - 2, lower.tail = FALSE)
+cat("critical_value: ", critical_value, "\n")
+
+# Compute the t-statistic
+t_stat <- coef(model_M2)["Tonnage_transformed"] / summary(model_M2)$coef["Tonnage_transformed", "Std. Error"]
+cat("t_stat: ", round(t_stat, 2), "\n")
+
+# Compute the p-value
+p_value <- pt(abs(t_stat), df = length(model_M2$residuals) - length(model_M2$coefficients), lower.tail = FALSE) * 2
+cat("p_value: ", p_value, "\n")
+
+# Perform the hypothesis test
+if (p_value < 0.05) {
+  cat("\nReject the null hypothesis: There is evidence of a positive slope at a significance level of 5%.\n")
+} else {
+  cat("\nFail to reject the null hypothesis: There is no evidence of a positive slope at a significance level of 5%.\n")
+}
+```
+
+To perform a hypothesis test for a positive slope in model \( M_2 \) at a significance level of 5%, we need to test whether the coefficient estimate for the predictor variable \( Tonnage^{0.5} \) is significantly different from zero. 
+
+The hypotheses are:
+
+- Null hypothesis (\( H_0 \)): The coefficient of \( Tonnage^{0.5} \) (\( \beta_1 \)) is zero.
+- Alternative hypothesis (\( H_1 \)): The coefficient of \( Tonnage^{0.5} \) (\( \beta_1 \)) is greater than zero.
+
+We can use the t-test to test this hypothesis. If the p-value associated with the coefficient estimate of \( Tonnage^{0.5} \) is less than 0.05, we reject the null hypothesis in favor of the alternative hypothesis, indicating evidence of a positive slope.
+
+The coefficient estimate for \( Tonnage^{0.5} \) in model \( M_2 \) represents the slope of the relationship between the square root of tonnage and the logarithm of time. We will check the p-value associated with this coefficient estimate. If the p-value is less than 0.05, we will reject the null hypothesis and conclude that there is evidence of a positive slope in the relationship.
+
+The critical value, t-statistic, and p-value you calculated are correct. The t-statistic of approximately 11.27 is far greater than the critical value of approximately -1.699, and the p-value is very close to zero (4.097893e-12), indicating strong evidence against the null hypothesis. Therefore, you correctly reject the null hypothesis and conclude that there is evidence of a positive slope at a significance level of 5%.
+
+(g)  (6 marks) Compare a 95\% confidence interval of the mean response and a 95\% prediction interval for a new value when Tonnage = 10,000 using the untransformed model $M_1$ and transformed model $M_2$ respectively. Provide two scatterplots that consist the fitted model, the confidence and prediction intervals for each of $M_1$ and $M_2$ respectively. Comment about the output in a few concise sentences.
+
+```{r}
+# Define the tonnage value for prediction
+new_tonnage <- 10000
+
+# Confidence interval for M1
+conf_interval_M1 <- predict(model_M1, newdata = data.frame(Tonnage = new_tonnage), interval = "confidence", level = 0.95)
+
+# Prediction interval for M1
+pred_interval_M1 <- predict(model_M1, newdata = data.frame(Tonnage = new_tonnage), interval = "prediction", level = 0.95)
+
+# Confidence interval for M2
+# Transform the tonnage value according to the transformation in M2
+new_tonnage_transformed <- sqrt(new_tonnage)
+# Predict on the transformed scale
+conf_interval_M2_transformed <- predict(model_M2, newdata = data.frame(Tonnage_transformed = new_tonnage_transformed), interval = "confidence", level = 0.95)
+# Transform the intervals back to the original scale
+conf_interval_M2 <- exp(conf_interval_M2_transformed)
+
+# Prediction interval for M2
+pred_interval_M2_transformed <- predict(model_M2, newdata = data.frame(Tonnage_transformed = new_tonnage_transformed), interval = "prediction", level = 0.95)
+# Transform the intervals back to the original scale
+pred_interval_M2 <- exp(pred_interval_M2_transformed)
+
+# Plot for M1
+plot(data$Tonnage, data$Time, xlab = "Tonnage", ylab = "Time", main = "Scatterplot with Intervals (Model M1)")
+abline(model_M1, col = "red")  # Add the fitted line
+# Add confidence interval
+matpoints(rep(new_tonnage, 2), conf_interval_M1[,2:3], lty = c(1, 2, 2), col = c("black", "red", "red"), type = "l")
+# Add prediction interval
+matpoints(rep(new_tonnage, 2), pred_interval_M1[,2:3], lty = c(1, 2, 2), col = c("black", "blue", "blue"), type = "l")
+legend("topleft", legend = c("Fitted Line", "Confidence Interval", "Prediction Interval"),
+       col = c("red", "red", "blue", "blue"), lty = c(1, 2, 2))
+
+# Plot for M2
+plot(data$Tonnage, data$Time, xlab = "Tonnage", ylab = "Time", main = "Scatterplot with Intervals (Model M2)")
+abline(model_M2, col = "red")  # Add the fitted line
+# Add confidence interval
+matpoints(rep(new_tonnage, 2), conf_interval_M2[,2:3], lty = c(1, 2, 2), col = c("black", "red", "red"), type = "l")
+# Add prediction interval
+matpoints(rep(new_tonnage, 2), pred_interval_M2[,2:3], lty = c(1, 2, 2), col = c("black", "blue", "blue"), type = "l")
+legend("topleft", legend = c("Fitted Line", "Confidence Interval", "Prediction Interval"),
+       col = c("red", "red", "blue", "blue"), lty = c(1, 2, 2))
+
+
+```
+
+```{r}
+# Define the tonnage value for prediction
+new_tonnage <- 10000
+
+# Confidence interval for M1
+conf_interval_M1 <- predict(model_M1, newdata = data.frame(Tonnage = new_tonnage), interval = "confidence", level = 0.95)
+
+# Prediction interval for M1
+pred_interval_M1 <- predict(model_M1, newdata = data.frame(Tonnage = new_tonnage), interval = "prediction", level = 0.95)
+
+# Confidence interval for M2
+# Transform the tonnage value according to the transformation in M2
+new_tonnage_transformed <- sqrt(new_tonnage)
+# Predict on the transformed scale
+conf_interval_M2_transformed <- predict(model_M2, newdata = data.frame(Tonnage_transformed = new_tonnage_transformed), interval = "confidence", level = 0.95)
+# Transform the intervals back to the original scale
+conf_interval_M2 <- exp(conf_interval_M2_transformed)
+
+# Prediction interval for M2
+pred_interval_M2_transformed <- predict(model_M2, newdata = data.frame(Tonnage_transformed = new_tonnage_transformed), interval = "prediction", level = 0.95)
+# Transform the intervals back to the original scale
+pred_interval_M2 <- exp(pred_interval_M2_transformed)
+
+# Plot for M1
+plot(data$Tonnage, data$Time, xlab = "Tonnage", ylab = "Time", main = "Scatterplot with Intervals (Model M1)")
+abline(model_M1, col = "red")  # Add the fitted line
+# Add confidence interval
+lines(rep(new_tonnage, 2), conf_interval_M1[,2:3], col = "blue", lty = 2)
+# Add prediction interval
+lines(rep(new_tonnage, 2), pred_interval_M1[,2:3], col = "green", lty = 2)
+legend("topleft", legend = c("Fitted Line", "Confidence Interval", "Prediction Interval"),
+       col = c("red", "blue", "green"), lty = c(1, 2, 2))
+
+# Plot for M2
+plot(data$Tonnage, data$Time, xlab = "Tonnage", ylab = "Time", main = "Scatterplot with Intervals (Model M2)")
+abline(model_M2, col = "red")  # Add the fitted line
+# Add confidence interval
+lines(rep(new_tonnage, 2), conf_interval_M2[,2:3], col = "blue", lty = 2)
+# Add prediction interval
+lines(rep(new_tonnage, 2), pred_interval_M2[,2:3], col = "green", lty = 2)
+legend("topleft", legend = c("Fitted Line", "Confidence Interval", "Prediction Interval"),
+       col = c("red", "blue", "green"), lty = c(1, 2, 2))
+
+```
+
+
+For Model $M_1$:
+- Confidence interval for the mean response when Tonnage = 10,000: (Lower Bound: 69.36467, Upper Bound: 77.5234)
+- Prediction interval for a new value when Tonnage = 10,000: (Lower Bound: 54.17047, Upper Bound: 77.5234)
+
+For Model $M_2$:
+- Confidence interval for the mean response when Tonnage = 10,000: (Lower Bound: 65.07762, Upper Bound: 73.88147)
+- Prediction interval for a new value when Tonnage = 10,000: (Lower Bound: 47.62944, Upper Bound: 73.88147)
+
+Comment: 
+The scatterplots for both models depict the fitted regression lines along with the 95\% confidence intervals for the mean response (for $M_1$) and the 95\% prediction intervals for a new value (for $M_2$) when Tonnage = 10,000. From the plots, we can observe how the confidence interval in $M_1$ represents the uncertainty around the estimated mean response, while the prediction interval in $M_2$ accounts for both the uncertainty in the regression line and the variability of individual observations.
+

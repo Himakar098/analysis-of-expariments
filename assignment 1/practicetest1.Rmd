@@ -1,0 +1,397 @@
+---
+title: "practice test 1"
+author: "krish"
+date: "2024-04-08"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+```{r}
+# Define the data
+# Define the data
+gpa <- c(3.1, 2.3, 3, 1.9, 2.5, 3.7, 3.4, 2.6, 2.8, 1.6, 2, 2.9, 2.3, 3.2, 1.8, 1.4, 2, 3.8, 2.2, 1.5)
+ets <- c(5.5, 4.8, 4.7, 3.9, 4.5, 6.2, 6, 5.2, 4.7, 4.3, 4.9, 5.4, 5, 6.3, 4.6, 4.3, 5, 5.9, 4.1, 4.7)
+
+# Fit a linear regression model
+model <- lm(gpa ~ ets)
+
+# Predict the GPA when ETS = 4.2
+prediction <- predict(model, newdata = data.frame(ets = 4.2), interval = "prediction", level = 0.90)
+
+# Print the prediction when ETS = 4.2
+point_prediction <- prediction[1]
+cat("The prediction when the ETS = 4.2 is", round(point_prediction, 3), "\n")
+
+# Print the 90% prediction interval when ETS = 4.2
+prediction_interval <- prediction[-1, ]
+cat("The 90% prediction interval when the ETS = 4.2 is between", round(prediction_interval[1], 3), "and", round(prediction_interval[2], 3), ".")
+
+```
+
+```{r}
+# Define the intercept and slope estimates
+intercept <- 35.738
+slope <- 2.8299
+
+# Define the weight
+weight <- 20
+
+# Calculate the predicted tail-feather length
+predicted_length <- intercept + slope * weight
+
+# Print the predicted tail-feather length
+cat("The predicted tail-feather length of a male long-tailed finch weighing 20g is:", predicted_length)
+
+```
+
+
+```{r}
+# Define the parameters
+mean_length <- 85
+sd_length <- 6
+
+# Probability of catching a brook trout less than 75 centimeters in length
+prob_less_than_75 <- pnorm(75, mean_length, sd_length)
+
+# Probability of catching a brook trout larger than 90 centimeters in length
+prob_larger_than_90 <- 1 - pnorm(90, mean_length, sd_length)
+
+# Lower cut-off to ensure that the shortest 8% of the brook trout get thrown back
+lower_cutoff <- qnorm(0.08, mean_length, sd_length)
+
+# Print the results
+cat("The probability of catching a brook trout less than 75 centimeters in length is:", round(prob_less_than_75, 4), "\n")
+cat("The probability of catching a brook trout larger than 90 centimeters in length is:", round(prob_larger_than_90, 4), "\n")
+cat("The lower cut-off to ensure that the shortest 8% of the brook trout get thrown back is:", round(lower_cutoff, 2), "centimeters")
+
+```
+
+
+```{r}
+# Define the data
+x <- c(2, 6, 9, 14, 21, 23)
+y <- c(16, 18, 26, 33, 28, 39)
+
+# Fit a linear regression model
+model <- lm(y ~ x)
+
+# Extract the slope coefficient and its standard error
+slope <- coef(model)[2]
+se_slope <- summary(model)$coefficients[2, "Std. Error"]
+
+# Calculate the test statistic for the slope
+test_statistic <- slope / se_slope
+
+# Print the test statistic
+cat("The test statistic for the slope of the regression line is:", round(test_statistic, 3))
+
+```
+
+
+```{r}
+# Define the data
+gpa <- c(3.1, 2.3, 3, 1.9, 2.5, 3.7, 3.4, 2.6, 2.8, 1.6, 2, 2.9, 2.3, 3.2, 1.8, 1.4, 2, 3.8, 2.2, 1.5)
+ets <- c(5.5, 4.8, 4.7, 3.9, 4.5, 6.2, 6, 5.2, 4.7, 4.3, 4.9, 5.4, 5, 6.3, 4.6, 4.3, 5, 5.9, 4.1, 4.7)
+
+# Fit a linear regression model
+model <- lm(gpa ~ ets)
+
+# Perform the hypothesis test for the intercept
+summary_test <- summary(model)
+p_value_intercept <- summary_test$coefficients["(Intercept)", "Pr(>|t|)"]
+
+# Print the p-value
+cat("The p-value for the hypothesis testing related to the intercept that beta_0 is not equal to 0 is:", p_value_intercept)
+
+
+```
+
+
+```{r}
+# Define the data
+gpa <- c(3.1, 2.3, 3, 1.9, 2.5, 3.7, 3.4, 2.6, 2.8, 1.6, 2, 2.9, 2.3, 3.2, 1.8, 1.4, 2, 3.8, 2.2, 1.5)
+ets <- c(5.5, 4.8, 4.7, 3.9, 4.5, 6.2, 6, 5.2, 4.7, 4.3, 4.9, 5.4, 5, 6.3, 4.6, 4.3, 5, 5.9, 4.1, 4.7)
+
+# Fit a linear regression model
+model <- lm(gpa ~ ets)
+
+# Calculate the Sum of Squares of Regression (Model)
+ssr <- sum((predict(model) - mean(gpa))^2)
+
+# Calculate the Mean Squares of Residuals (Error)
+mse <- deviance(model) / df.residual(model)
+
+# Test statistic (F-statistic)
+f_statistic <- summary(model)$fstatistic[1]
+
+# Print the results
+cat("The Sum of Squares of Regression (Model) is:", round(ssr, 3), "\n")
+cat("The Mean Squares of Residuals (Error) is:", round(mse, 3), "\n")
+cat("The test statistic (F-statistic) is:", round(f_statistic, 3))
+
+# Calculate degrees of freedom
+df_regression <- 1  # Number of predictors
+df_residual <- length(gpa) - df_regression - 1  # Total sample size - number of predictors - 1
+
+# Print degrees of freedom
+cat("Degrees of freedom for regression:", df_regression, "\n")
+cat("Degrees of freedom for residuals:", df_residual, "\n")
+
+```
+
+
+```{r}
+# Define the data
+transfer <- c(16, 9, 17, 12, 22, 13, 8, 15, 19, 11)
+broken <- c(1, 0, 2, 0, 3, 1, 0, 1, 2, 0)
+
+# Fit a linear regression model
+model <- lm(broken ~ transfer)
+
+# Extract the estimated intercept
+intercept <- coef(model)[1]
+
+# Extract the test statistic for the intercept
+test_statistic <- summary(model)$coefficients["(Intercept)", "t value"]
+
+# Calculate the confidence interval for the intercept at 90% level
+conf_interval <- confint(model, level = 0.90)
+
+# Extract the lower and upper bounds of the confidence interval
+lower_conf_interval <- conf_interval[1]
+upper_conf_interval <- conf_interval[2]
+
+# Print the results
+cat("The estimated intercept is:", round(intercept, 3), "\n")
+cat("The test statistic for the intercept is:", round(test_statistic, 3), "\n")
+cat("The lower confidence interval (90%) for the intercept is:", round(lower_conf_interval, 3), "\n")
+cat("The upper confidence interval (90%) for the intercept is:", round(upper_conf_interval, 3))
+
+
+```
+
+
+```{r}
+# Given information
+n <- 100
+se_slope <- 2
+se_intercept <- 25
+slope <- 4
+
+# Calculate the test statistic
+test_statistic <- slope / se_slope
+
+# Calculate the degrees of freedom
+df <- n - 2
+
+# Calculate the p-value
+p_value <- pt(test_statistic, df, lower.tail = FALSE)
+
+# Print the results
+cat("The test statistic of hypothesis testing for a positive slope is:", round(test_statistic), "\n")
+cat("The sampling distribution under hypothesis testing for a positive slope is T distribution with the degree of freedom:", df, "\n")
+cat("The corresponding p-value is:", round(p_value, 4))
+
+```
+
+
+```{r}
+# Define the slope and intercept
+slope <- 2.83
+intercept <- 35.74
+
+# Define the standard intact test result
+standard_intact_test <- 200
+
+# Calculate the predicted turbo test result
+predicted_turbo_test <- intercept + slope * standard_intact_test
+
+# Print the result
+cat("The predicted turbo test result for a standard intact test result of 200 ng/l is:", round(predicted_turbo_test, 2), "ng/l")
+
+```
+
+
+
+```{r}
+# Given information
+n <- 100
+se_slope <- 2
+slope <- 4
+
+# Calculate the test statistic
+t_statistic <- slope / se_slope
+
+# Calculate the degrees of freedom
+df <- n - 2
+
+# Calculate the p-value (two-tailed test)
+p_value <- 2 * pt(-abs(t_statistic), df)
+
+# Print the results
+cat("The test statistic to test the null hypothesis that the slope is zero versus the alternative hypothesis that the slope is not zero is:", round(t_statistic, 3), "\n")
+cat("The p-value for a test of the null hypothesis that the slope is zero versus the alternative hypothesis that the slope is not zero is:", round(p_value, 3), "\n")
+cat("The sampling distribution of the test statistic to test the null hypothesis that the slope is zero versus the alternative hypothesis that the slope is not zero is a t-distribution with", df, "degrees of freedom.")
+
+```
+
+
+
+```{r}
+# Define the data
+women <- c(64, 65, 65, 66, 66, 67, 68, 70)
+men <- c(68, 68, 69, 70, 72, 72, 73, 75)
+
+# Fit a linear regression model
+model <- lm(men ~ women)
+
+# Extract the test statistic and p-value for the slope coefficient
+test_statistic <- summary(model)$coefficients["women", "t value"]
+p_value <- summary(model)$coefficients["women", "Pr(>|t|)"]
+
+# Define the significance level
+alpha <- 0.10
+
+# Perform the hypothesis test
+if (p_value < alpha) {
+  decision <- "Reject the null hypothesis"
+} else {
+  decision <- "Fail to reject the null hypothesis"
+}
+# Define the data
+women <- c(64, 65, 65, 66, 66, 67, 68, 70)
+
+# Calculate the number of observations
+n <- length(women)
+
+# Calculate the degrees of freedom
+df <- n - 2
+
+# Print the result
+cat("The sampling distribution is a t-distribution with", df, "degrees of freedom.")
+
+# Print the results
+cat("The test statistic is:", round(test_statistic, 3), "\n")
+cat("The p-value is:", round(p_value, 3), "\n")
+cat("The decision is:", decision)
+
+```
+
+
+```{r}
+# Given data for male rats
+mean_male <- 39
+sd_male <- 8
+n_male <- 100
+
+# Given data for female rats
+mean_female <- 40
+sd_female <- 10
+n_female <- 100
+
+# Calculate the pooled variance
+sp_sq <- ((n_male - 1) * sd_male^2 + (n_female - 1) * sd_female^2) / (n_male + n_female - 2)
+
+# Calculate the test statistic
+t_statistic <- (mean_male - mean_female) / sqrt(sp_sq * (1/n_male + 1/n_female))
+
+# Calculate the p-value
+p_value <- pt(t_statistic, df = n_male + n_female - 2, lower.tail = TRUE)
+
+# Print the p-value
+cat("The numerical value of the p-value is:", round(p_value, 4))
+
+```
+```{r}
+# Define the data
+transfer <- c(16, 9, 17, 12, 22, 13, 8, 15, 19, 11)
+broken <- c(1, 0, 2, 0, 3, 1, 0, 1, 2, 0)
+
+# Fit a linear regression model
+model <- lm(broken ~ transfer)
+
+# Predict the number of broken ampules for transfer = 20
+new_data <- data.frame(transfer = 20)
+prediction <- predict(model, newdata = new_data)
+
+# Calculate the confidence interval for the prediction
+confidence_interval <- predict(model, newdata = new_data, interval = "confidence", level = 0.90)
+
+# Print the results
+cat("The point estimate for the population mean regression when the number of transfer is 20 is:", round(prediction, 3), "\n")
+cat("The 90% confidence interval for the population mean regression when the number of transfer is 20 is between", round(confidence_interval[1], 3), "and", round(confidence_interval[2], 3))
+
+```
+```{r}
+# Define the data
+gpa <- c(3.1, 2.3, 3, 1.9, 2.5, 3.7, 3.4, 2.6, 2.8, 1.6, 2, 2.9, 2.3, 3.2, 1.8, 1.4, 2, 3.8, 2.2, 1.5)
+ets <- c(5.5, 4.8, 4.7, 3.9, 4.5, 6.2, 6, 5.2, 4.7, 4.3, 4.9, 5.4, 5, 6.3, 4.6, 4.3, 5, 5.9, 4.1, 4.7)
+
+# Fit a linear regression model
+model <- lm(gpa ~ ets)
+
+# Prediction for ETS = 4.2
+new_data <- data.frame(ets = 4.2)
+prediction <- predict(model, newdata = new_data)
+
+# Prediction interval for ETS = 4.2
+prediction_interval <- predict(model, newdata = new_data, interval = "prediction", level = 0.90)
+
+# Print the results
+cat("The prediction when the ETS = 4.2 is:", round(prediction, 3), "\n")
+cat("The 90% prediction interval when the ETS = 4.2 is between", round(prediction_interval[1], 3), "and", round(prediction_interval[2], 3))
+
+```
+```{r}
+
+```
+```{r}
+
+```
+```{r}
+
+```
+```{r}
+
+```
+```{r}
+
+```
+```{r}
+
+```
+```{r}
+
+```
+```{r}
+
+```
+```{r}
+
+```
+```{r}
+
+```
+

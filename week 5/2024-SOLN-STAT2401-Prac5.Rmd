@@ -1,0 +1,776 @@
+---
+title: "STAT2401 Analysis of Experiments"
+author: '**Practical Week 5: Solutions**'
+#date: "Practical 2"
+output:
+  html_document:
+    highlight: haddock
+    # number_sections: yes
+    theme: flatly
+    toc: yes
+  html_notebook:
+    highlight: haddock
+    # number_sections: yes
+    theme: flatly
+  pdf_document:
+    toc: yes
+  word_document:
+    highlight: tango
+    toc: yes
+---
+
+
+```{r echo=FALSE}
+knitr::opts_chunk$set(prompt=FALSE, comment=NA, tidy=TRUE, error=TRUE, warning=FALSE, message=FALSE)
+```
+
+## Learning Check
+
+When you complete this session, you will be able to:
+
+1. calculate confidence intervals for the population regression line $\mu_Y$;
+2. calculate prediction $\hat{Y}$ and prediction intervals for the actual value of response;
+3. plot confidence and prediction intervals using R;
+4. understand the ANOVA related to SLR;
+5. interpret the elements in ANOVA R ouput.
+
+Before you start, load the stored datasets provided for exercises below by running the following chunk (assuming the file  "Workshop5.Rdata" is saved in the same directory as the .Rmd  worksheet).
+
+
+```{r echo=F}
+print(load("Workshop5.RData"))
+```
+
+      - To create a new chunk: Ctrl+Alt+I (Windows), Cmd+Options+I (MacOs)
+      
+      - Attempt this practical using this Rmd file, then rename it as your own file (use File then Save As)
+      
+      - Partial solutions will be provided for Questions 3-7. 
+
+## Question 1: Coarse woody debris (CWD) data
+
+The data for this exercise is concerned with 
+a study of the relationships between coarse woody debris (CWD) and shoreline vegetation and lake development in a sample of 16 lakes in North America. 
+The main variables of interest are the CWD basal area ({CWD.BASA}) against riparian tree density ({RIP.DENS}).
+
+First we set the working directory, load the data, look at its structure  (the \R~command
+{str()} is very useful to obtain an idea about what is stored
+in an object) and look at the data. You can read these data into \R, and store them as a
+data frame {CWD}, with the following command:
+
+```{r }
+CWD = read.csv("CWD.csv",header=TRUE)
+str(CWD)
+CWD
+```
+
+
+As always it is good to visualise the data. 
+Look at the data frame by simply typing its name, {CWD}.
+Produce a standard scatterplot of {CWD.BASA} against {RIP.DENS} with
+
+```{r }
+plot(CWD.BASA~RIP.DENS,data=CWD)
+```
+
+What are your initial impressions?
+
+Initial impressions should be that there is a relationship between {CWD.BASA} and {RIP.DENS}. 
+
+Remember we are looking to fit a linear regression to this data. Let's try it.
+Fit a simple linear regression model to the data by:
+
+```{r }
+CWD.lm = lm(CWD.BASA~RIP.DENS,data=CWD)
+summary(CWD.lm)
+```
+
+The scatterplot of CWD basal area ({CWD.BASA}) against riparian tree density ({RIP.DENS}), with a Loess smoother fitted, showed no evidence of a nonlinear relationship.
+
+
+The fitted model equation is: 
+$$
+\widehat{{CWD.BASA}} = {-77.0991} + {0.1155} \times {RIP.DENS}
+$$
+
+The percentage of varaition in {CWD.BASA} exaplined by {RIP.DENS} is given by $R^2=0.6345$ or $63.45\%$. The test of the {RIP.DENS} coefficient is statistically significant, indicating evidence against the alternative no linear relationship. An alternative way to determine this is to look at the CI of the coefficient
+
+```{r }
+confint(CWD.lm,level=0.95)
+```
+
+The 95\% confidence interval for the {RIP.DENS} coefficient of  is $[0.0653,0.1658]$, that doesn't include 0.
+
+Lastly, we can draw the confidence interval for the true regression line and prediciton interval for the new values,
+
+```{r }
+plot(CWD.BASA~RIP.DENS,data=CWD,pch=21,bg="black",main="CWD.BASA vs RIP.DENS")
+CWD.lm = lm(CWD.BASA~RIP.DENS,data=CWD)
+new = data.frame(RIP.DENS=seq(780,2220,10))
+CIs = predict(CWD.lm,new,interval="confidence")
+PIs = predict(CWD.lm,new,interval="predict")
+matpoints(new$RIP.DENS,CIs,lty=c(1,2,2),col=c("black","red","red"),type="l")
+matpoints(new$RIP.DENS,PIs,lty=c(1,2,2),col=c("black","blue","blue"),type="l")
+```
+
+Say the regression model we have fitted is 
+$$
+{CWD.BASA} = \beta_0 + \beta_1 \times {RIP.DENS} + \epsilon
+$$
+Take ${RIP.DENS}=1000$, deteremine the fitted value of {CWD.BASA}, the 95\% CI for the regression line
+${CWD.BASA} = \beta_0 + \beta_1 \times 1000$, and the the 95\% PI of a new {CWD.BASA} value.
+
+
+## Question 2: Macroinvertebrates data 
+
+
+The data for this exercise is concerned with 
+a study that investigates the relationship between the number of species 
+of macroinvertebrates, and the total abundance of macroinvertebrates, and area of
+clumps of mussels on a rocky shore in southern Australia. The variables of interest
+are clump area ({AREA}), number of species ({SPECIES}), and number of individuals ({INDIV}).
+
+First we set the working directory, load the data, look at its structure  (the \R~command
+{str()} is very useful to obtain an idea about what is stored
+in an object) and look at the data. You can read these data into \R, and store them as a
+data frame {macroinvertebrates}, with the following command:
+
+```{r }
+macroinvertebrates = read.csv("macroinvertebrates.csv",header=TRUE)
+str(macroinvertebrates)
+macroinvertebrates
+```
+
+As always it is good to visualise the data. Look at the data frame by simply typing its name, {macroinvertebrates}.
+Produce a standard scatterplot of  {log(SPECIES)} against {log(AREA)}.
+
+```{r }
+plot(I(log(SPECIES))~I(log(AREA)),data=macroinvertebrates)
+```
+
+What are your initial impressions?
+
+
+Initial impressions should be that there is a relationship between {log(SPECIES)} against {log(AREA)}. 
+
+Remember we are looking to fit a linear regression to this data. Let's try it.
+Fit a simple linear regression model to the data by:
+
+```{r }
+macroinvertebrates.lm = lm(I(log(SPECIES))~I(log(AREA)),data=macroinvertebrates)
+summary(macroinvertebrates.lm)
+```
+
+The scatterplot of log of the number of species ({log(SPECIES)}) against log of the clump area, ({log(AREA)}), with a Loess smoother fitted, showed no evidence of a nonlinear relationship.
+
+
+The fitted model equation is: 
+$$
+\widehat{{log(SPECIES)}} = {-0.6296} + {0.3858} \times {log(AREA)}
+$$
+where $-0.6296$ is the intercept and $0.3858$ is the slope, which would give the change in {log(SPECIES)} as {log(AREA)} is increased by $1$ unit (assuming the model is any good).
+
+We can add the fitted line to the plot by:
+
+```{r }
+plot(I(log(SPECIES))~I(log(AREA)),data=macroinvertebrates)
+abline(coef(macroinvertebrates.lm), col="red")
+```
+
+The fit looks reasonably well.
+
+Here $R^2=0.8194$ and we can show that numerically this is $r^2$ where $r$ correlation coefficient
+between the independent and dependent variables.
+
+```{r }
+r = with(macroinvertebrates,cor(I(log(SPECIES)),I(log(AREA))))
+r^2
+```
+
+Fit the regression line
+$$
+{log(AREA)} = \beta^\prime_0 + \beta^\prime_1 \times {log(SPECIES)} + \epsilon
+$$
+that is in \R:
+
+```{r eval=FALSE}
+lm(I(log(AREA))~I(log(SPECIES)),data=macroinvertebrates)
+```
+
+and check whether $R^2=0.8194$ as well.
+
+
+## Question 3 The timing of production runs (Sheather, 2009)
+
+
+The original data are in the form of the time taken (in minutes) for a production run, $Y$, and the number of items produced,
+$X$, for 20 randomly selected orders as supervised by three managers. At this stage we shall only consider the data for one of the managers.
+
+(a). Open the Excel file *production.txt*.
+
+```{r}
+production=read.table("production.txt", header=T)
+View(production)
+```
+
+(b). Construct a scatterplot of production run, $Y$, and the number of items produced, $X$. Fit the least squares line to the data using R. Explain the fitted model, by interpreting the slope and intercept.
+
+```{r}
+prod.lm=lm(RunTime ~ RunSize, data=production) ## the LS line
+plot(RunTime ~ RunSize, data=production, xlab="Run Size", ylab="Run Time")
+abline(prod.lm,col=4)
+summary(prod.lm)
+```
+
+The equation of the least squares line of best fit is
+
+$$\hat{y} = 149.7 + 0.26x.$$
+
+The intercept is 149.7, which is where the line of best fit crosses the run time axis. The
+intercept in the model has the following interpretation: for any production run, the
+average set up time is 149.7 minutes.
+
+The slope of the line is 0.26. Thus, we say that each
+additional unit to be produced is predicted to add 0.26 minutes to the run time. 
+
+(c). Calculate $Cov(X,Y), Var(X), \bar{X}, \bar{Y}$ of this data. Then use these to validate the above estimates slope and intercept using
+$$\hat{\beta}_1 = \frac{Cov(X,Y)}{Var(X)}, \ \ \  \hat{\beta}_0 = \bar{Y} - \hat{\beta}_1\bar{X}  $$
+
+```{r}
+sxy=cov(production$RunSize, production$RunTime) ## sxy=cov(x,y)
+sxy
+sxx=var(production$RunSize)  ## var(x)
+sxx
+beta1=sxy/sxx
+beta1
+```
+```{r}
+meanx=mean(production$RunSize)
+meanx
+meany=mean(production$RunTime)
+meany
+```
+
+
+```{r}
+beta0=mean(production$RunTime) - beta1*mean(production$RunSize)  ## ybar - beta1 * xbar
+beta0
+```
+
+(d). Perform a hypothesis testing for a positive slope at a significance level of 5% using the R output in (b).
+
+6 steps hypothesis testing for $\beta_1$:
+
+1. $H_0: \beta_1 = 0, H_1:\beta_1 > 0$ 
+
+2. The test statistic (from R output as in the above): 
+
+$t=\frac{\hat{\beta}_1-0}{se(\hat{\beta}_1)}=\frac{0.25924}{0.03714}=6.98.$
+
+3. The sampling distribution for the test statistic is $t$ is $T_{df=(n-2)}$
+that is $T_{df=20-2=18.}$
+
+4. The p-value = $P(T_{df=18} > 6.98)= 8.07 \times 10^{-6}$ (see below, a half of $1.61e-06$ from the R ouput)
+
+```{r}
+pval=pt(6.98,18, lower.tail=F)
+pval
+```
+
+
+5. Decision. Given the p-value is very small, less than the significance level, then we strongly reject the null hypothesis.
+
+6. Conclusion. We conclude that the slope is statistically significantly positive.
+
+(e). Perform ANOVA F Test to test whether there is a linear association between Run Time and Run Size.
+
+```{r}
+anova(prod.lm)
+```
+
+6 steps hypothesis testing for $\beta_1$:
+
+1. $H_0: \beta_1 = 0, H_1:\beta_1 \neq 0$ 
+
+2. The test statistic (from R output as in the above): 
+
+$F=\frac{MSR}{MSE}=\frac{12868.4}{264.1}=48.717.$
+
+3. The sampling distribution for the test statistic is $F_{df1=1, df2=n-2}$
+that is $F_{1,18}$
+
+4. The p-value = $P(F_{1,18} >48.717 )=1.61e-06$ from the R ouput
+
+5. Decision. Given the p-value is very small, less than the significance level, then we strongly reject the null hypothesis.
+
+6. Conclusion. We conclude that the slope is statistically significantly different to 0. There is a linear association between 
+
+Notice that the observed F -value of 48.717 is just the square of the observed t -value 6.98 which can be found in (d).
+
+(f). Estimate $\sigma^2.$
+
+The point estimate is the residual variance 
+
+$$s^2 = \frac{SSE}{(n-2)}= \frac{4754.6}{18}=264.1=MSE.$$
+
+(g). Calculate the 95% confidence intervals for both parameters slope and intercept respectively.
+
+```{r}
+round(confint(prod.lm,level=0.95),3)
+```
+
+We are 95% confident that the population slope of this context is between 0.181 and 0.337.
+
+We are 95% confident that the population intercept of this context is between 132.251 and 167.244.
+
+(h). Calculate the 95% confidence intervals for the population regression line $\mu_Y$ (i.e., the average Run Time) at Run Size = 50, 100, 150, 200, 250, 300, 350. 
+
+```{r}
+conf.mean0=predict(prod.lm,newdata=data.frame(RunSize=c(50,100,150,200,250,300,350)),interval="confidence",level=0.95)
+conf.mean0
+```
+
+We can also calculate the 95% confidence intervals for the population regression line $\mu_Y$ using the x (Run Size) as follows.
+
+```{r}
+conf.mean=predict(prod.lm,interval="confidence",level=0.95)
+conf.mean
+```
+
+
+Then we add the lower and upper bounds on the same scatterplot as shown below.
+
+```{r}
+plot(RunTime ~ RunSize, data=production, xlab="Run Size", ylab="Run Time")
+abline(prod.lm)
+matlines(sort(production$RunSize),
+      conf.mean[order(production$RunSize), 2:3],
+      lwd = 2, col = "blue", 
+	   lty = 1)
+```
+
+
+(i). Calculate the 95% percent prediction intervals for the actual value of $Y$ (i.e., the actual Run Time) 
+at at Run Size = 50, 100, 150, 200, 250, 300, 350.
+
+```{r}
+conf.pred0=predict(prod.lm,newdata=data.frame(RunSize=c(50,100,150,200,250,300,350)),interval="prediction",level=0.95)
+conf.pred0
+```
+
+Similarly, we can also calculate the 95% prediction intervals for the population regression line $\mu_Y$ using the x (Run Size) as follows.
+
+
+```{r warning=FALSE}
+conf.pred=predict(prod.lm,interval="prediction",level=0.95)
+conf.pred
+```
+
+
+Notice that each prediction interval is considerably wider than the corresponding
+confidence interval, as is expected.
+
+Note that the confidence interval and prediction interval using the expressions of Lecture 7:
+
++ the standard error of prediction at some value of the explanatory variable $x_{*}$ is given by
+$$ \mbox{se}(\hat{y}_*) = s\left( 1 + \frac{1}{n} + \frac{(x_* - \bar{x})^2}{S_{XX}} \right)^{1/2}$$
+
++ and so a $95\%$ prediction interval would be given by 
+$$\hat{y}_* \pm t_{0.025, n-2} \times \mbox{se}(\hat{y}_*)$$
+
+In these expressions, 
+$$\hat{y}_* = \hat{\beta}_0 + \hat{\beta}_1 x_*, \ \ S_{XX} = \sum_{i=1}^n (x_i - \bar{x})^2$$.
+
+Therefore each prediction interval is considerably wider than the corresponding
+confidence interval, as is expected.
+
+```{r}
+plot(RunTime ~ RunSize, data=production, xlab="Run Size", ylab="Run Time")
+abline(prod.lm)
+matlines(sort(production$RunSize),
+      conf.pred[order(production$RunSize), 2:3],
+      lwd = 2, col = "red", 
+	   lty = 1)
+matlines(sort(production$RunSize),
+      conf.mean[order(production$RunSize), 2:3],
+      lwd = 2, col = "blue", 
+	   lty = 1)
+
+``` 
+
+
+(j). Coefficient of determination. The value of $R^2=  0.7302$ (from R output
+line 51, multiple R-squared) which implies that 73.02% of the information 
+(variation) in Run Time is explained by the least squares regression line, 
+suggesting that the model is a good model.
+
+You can also use $R^2=SSR/SST$ using the ANOVA table,
+
+$$R^2=\frac{12868}{17623}=0.7302$$ 
+
+
+## Question 4 Wind data (From Weisberg, S. (2005). *Applied Linear Regression*, 3rd edition. New York: Wiley)
+
+In this question, you will be learning the R code in more detail to provide better visualisation which may be needed for your project. Furthermore, the ANOVA is explained in more detail following the lecture (part c).
+
+The *R* data file `Wind.RData` contains a data frame (`wm1`) containing wind speed data (in m/s) at two sites: a reference site (`Rspd`) and a candidate site (`CSpd`). Data were collected every 6 hours for the year 2002 except in the month of May. The objective is to be able to determine whether wind speed at the reference site, which has permanent wind speed monitoring equipment, can be used to predict the wind speed at this candidate site in the future in order to determine whether to place a small wind farm there.
+
+```{r}
+# Load the workshop data here
+load("Wind.RData")
+```
+
+
+a. Draw a scatterplot of the response `CSpd` against the predictor `RSpd` and label it appropriately. Is a simple linear model plausible for these data?
+
+```{r PlotData, fig.height=7}
+par(pty = "s") # A graphical parameter that sets the PlotTYpe to "square"
+
+# The syntax of the plot statement says "plot CSpd against RSpd but extract them 
+# from the data frame wm1. The xlim and ylim arguments are the same - the range 
+# of all the data. 
+plot(CSpd ~ RSpd, data = wm1, 
+     xlab = "Wind speed at reference site (m/s)", 
+     ylab = "Wind speed at candidate site (m/s)",
+     main = "Wind speeds at reference and candidate sites",
+     xlim = range(c(wm1$CSpd, wm1$RSpd)), ylim = c(range(c(wm1$CSpd, wm1$RSpd)))) 
+```
+
+b. Fit a simple linear model to these data, and present the appropriate regression summaries. Plot the fitted line onto the plot in (a).
+
+```{r}
+# Notice the similarity with the plot statement above
+Wind.lm <- lm(CSpd ~ RSpd, data = wm1)
+# Here are the contents of the object Wind.lm:
+names(Wind.lm)
+# and here's some basic output:
+Wind.lm
+
+# A bit more comes from the summary() function:
+summary(Wind.lm)
+```
+
+  *To plot the fitted line onto an existing plot in R or RStudio, you only need to invoke the `abline` command (from the console) that we've used already and that's shown below. Here, however, because I want to produce a separate plot from the one above, I have to re-plot the data using the above commands and then invoke `abline`.*
+  
+```{r fig.height=7}
+par(pty = "s")
+plot(CSpd ~ RSpd, data = wm1, 
+     xlab = "Wind speed at reference site (m/s)", 
+     ylab = "Wind speed at candidate site (m/s)",
+     main = "Wind speeds at reference and candidate sites",
+     xlim = range(c(CSpd, RSpd)), ylim = c(range(c(CSpd, RSpd)))) 
+# abline() takes two arguments: a slope and an intercept. We can
+# extract these from the object Wind.lm (which is a list) by 
+# using the $ operator, e.g., Wind.lm$coefficients (try it!) and
+# using that as an argument to abline():
+abline(Wind.lm$coef) # or simply abline(Wind.lm)
+```  
+
+
+c. The ANOVA table shows you the decomposition of the total sum of squares into the residual sum of squares and the regression sum of squares, but use the appropriate vectors containing the data and the fitted values to confirm this decomposition.
+
+The total sum of squares (SST, the overall variability in $y$) is given by 
+  $$\sum_{i=1}^n (y_i - \bar{y})^2$$, 
+  
+where $y$ represents the response variable, which in our case is `CSpd`. In R, we can calculate SST as follows:
+
+```{r}
+SST <- sum((wm1$CSpd - mean(wm1$CSpd))^2 ) 
+SST
+```
+
+Remember that R works does vector arithmetic. In the expression above, I've put some additional spaces so you can see more clearly that we square the differences first, and then sum them. If you're not sure what that expression does, break it down into steps. I could have extracted the variable `CSpd` first, e.g., `CSpd <- wm1$CSpd` and then used it in the expression above.*
+
+We could extract the residuals from the linear model object `Wind.lm` and then calculate the residual sum of squares (RSS) by squaring and then summing them, but let's do the basic calculation using the vector of fitted values (the $\hat{y}_i$) that we can also extract from `Wind.lm`, i.e., 
+
+$$\mbox{SSE} = \sum_{i=1}^n (y_i - \hat{y}_i)^2$$.
+
+```{r}
+SSE <- sum( (wm1$CSpd - Wind.lm$fitted)^2 )
+SSE # Check in ANOVA table!
+```
+
+To calculate the regression sum of squares (SSReg), we use the expression $\sum_{i=1}^n (\hat{y}_i - \bar{y})^2$, and in R this is just*
+
+```{r}
+SSReg <- sum( (Wind.lm$fitted - mean(wm1$CSpd))^2 )
+SSReg # Check in ANOVA table!
+```
+
+*You can see that `SST = SSReg + RSS`, and that $R^2$ (as calculate by the `summary()` function) is `SSReg/SST` (try it out!).*
+
+```{r}
+anova(Wind.lm)
+```
+
+
+d. Obtain and plot a 95% prediction interval. What is the 95% prediction interval for `CSpd` when `RSpd` takes on a value of 7.4285 m/s?
+
+  *To obtain and plot a prediction interval (and the confidence interval for the mean), we use the function `predict`. We also saw it's use in Lecture 7, so I'll just show the code here. Again, I'm going to re-plot the data and the fitted line, but if you were doing this in RStudio and you had the previous plot showing, you would not have to do so. I don't expect you to remember these commands and reproduce them in a test; however, you will (likely) need the for the mini-project that constitutes the third assessment.*
+
+```{r fig.height=7, warning=FALSE}
+par(pty = "s")
+plot(CSpd ~ RSpd, data = wm1, 
+     xlab = "Wind speed at reference site (m/s)", 
+     ylab = "Wind speed at candidate site (m/s)",
+     main = "Confidence and prediction intervals for wind data",
+     xlim = range(c(CSpd, RSpd)), ylim = c(range(c(CSpd, RSpd)))) 
+abline(Wind.lm$coef) 
+
+# Obtain a 95% confidence interval for the population regression line
+ConfMean <- predict(Wind.lm, interval = "confidence") # 95% is the default
+head(ConfMean)
+
+# Don't worry too much about these plotting statements
+matlines(sort(wm1$RSpd), ConfMean[order(wm1$RSpd), 2:3],
+         lwd = 2, col = "blue", lty = 1)
+
+# Obtain a 95% prediction interval
+PredInt <- predict(Wind.lm, interval = "prediction")
+head(PredInt)
+
+# Don't worry too much about these plotting statements
+matlines(sort(wm1$RSpd), PredInt[order(wm1$RSpd), 2:3],
+         lwd = 2, col = "red", lty = 1)
+```
+
+*Using the function `predict()`, we can get the 95% prediction interval for `CSpd` when `RSpd` is at a value of 7.4285 m/s. Here's the syntax:*
+
+```{r}
+predict(object = Wind.lm, newdata = data.frame(RSpd = 7.4285), interval = "prediction")
+```
+
+  *We get the fitted value, and the lower and upper bounds of the 95% confidence interval. If we re-plot the intervals and then draw a vertical line at `RSpd = 7.4285`, it will cross the prediction interval (in red) at these values.*
+  
+```{r fig.height=7, warning=FALSE}
+par(pty = "s")
+plot(CSpd ~ RSpd, data = wm1, 
+     xlab = "Wind speed at reference site (m/s)", 
+     ylab = "Wind speed at candidate site (m/s)",
+     main = "Confidence and prediction intervals for wind data",
+     xlim = range(c(CSpd, RSpd)), ylim = c(range(c(CSpd, RSpd)))) 
+abline(Wind.lm$coef) 
+
+matlines(sort(wm1$RSpd), ConfMean[order(wm1$RSpd), 2:3],
+         lwd = 2, col = "blue", lty = 1)
+
+matlines(sort(wm1$RSpd), PredInt[order(wm1$RSpd), 2:3],
+         lwd = 2, col = "red", lty = 1)
+
+# plots a (v for) vertical line at 7.4285 with double the usual LineWiDth
+abline(v = 7.4285, col = "grey", lwd = 2) 
+```
+
+## Question 5 Invoices data (Sheather, 2009)
+
+The manager of the purchasing department of a large company would like to
+develop a regression model to predict the average amount of time it takes to process a given number of invoices. Over a 30-day period, data are collected on the number of invoices processed and the total time taken (in hours). The data are available in the file *invoices.txt.* 
+
+Complete the following tasks.
+
+(a). Fit the least squares line to the data using R. Explain the fitted model, by interpreting the slope and intercept.
+
+```{r}
+invoices=read.table("invoices.txt", header=T)
+View(invoices)
+```
+
+```{r}
+inv.lm=lm(Time ~ Invoices, data=invoices)
+plot(Time ~ Invoices, data=invoices)
+abline(inv.lm)
+summary(inv.lm)
+```
+
+The equation of the least squares line of best fit is
+
+$$Time= 0.642 + 0.011 Invoices.$$
+
+The intercept is 0.642, which is not interpretable for no invoices.
+
+The slope of the line is 0.011. Thus, we say for that for each
+additional invoice, the average amount of time it takes to process increases by 0.011 hour.
+
+(b). Find a 95% confidence interval for the start-up time, i.e. $\beta_0$
+
+```{r}
+round(confint(inv.lm,level=0.95),3)
+```
+
+(c). Suppose that a best practice benchmark for the average processing time for an additional invoice is 0.01 hours (or 0.6 minutes). Test the null hypothesis $\beta_1=0.01$  against a two-sided alternative. Interpret your result.
+
+6 steps hypothesis testing for $\beta_1$:
+
+1. $H_0: \beta_1 = 0.01, H_1:\beta_1 \not= 0.01$ 
+
+2. The test statistic (from R output as in the above): 
+
+$t=\frac{\hat{\beta}_1-0.01}{se(\hat{\beta}_1)}=\frac{0.011-0.01}{0.0008}=1.22.$
+
+```{r}
+tstat=(0.011-0.01)/(0.0008184)
+tstat
+```
+
+
+3. The sampling distribution for the test statistic is $t$ is $T_{df=(n-2)}$
+that is $T_{df=30-2=28.}$
+
+4. The p-value = $P(|T_{df=28}| > 1.25)= 0.2326.$ (see below)
+
+```{r}
+pval=2*pt(1.22,28, lower.tail=F)
+pval
+```
+
+
+5. Decision. Given the p-value is large, p-value > 5%  significance level, then we do not reject the null hypothesis.
+
+6. Conclusion. We conclude that the population slope is 0.01.
+
+(d) Find a point estimate and a 95% prediction interval for the time taken to process 130 invoices. 
+
+```{r}
+predict(object = inv.lm, newdata = data.frame(Invoices=130), interval = "prediction")
+```
+
+(e). The value of $R^2=  0.8718$ which implies that 87.18% of the information
+(variation) in processing time is explained by the least squares regression 
+line, suggesting that the model is a good model.
+
+## Question 6 Concept for ANOVA
+
+We are interested in fitting a simple linear regression
+
+$$
+y = \beta_0 + \beta_1 x + \epsilon
+$$
+
+where $\epsilon$ is normally distributed with mean 0 and variance $\sigma^2$.
+
+Use the following statistics
+$\sum_{i=1}^n x_i = 250$,
+$\sum_{i=1}^n x_i^2 = 2250$,
+$\sum_{i=1}^n y_i^2 = 3546$,
+$\sum_{i=1}^n y_i = 350$,
+$\sum_{i=1}^n x_iy_i = 2750$, 
+and $n=50$, determine all elements in the analysis of variance table numerically
+
+$$
+\begin{array}{cccccc}
+\text{Source of} & \text{Degrees of} & \text{Sum of squares} & \text{Mean square} & \text{F-value} & \text{Pr($>F$)} \\
+\text{variation} & \text{freedom (df)} & \text{(SS)} & \text{(MS)} & &   \\
+\hline
+\text{Regression} & 1 & \text{RegSS} & \frac{\text{RegSS}}{1} & \frac{\text{RegSS}/1}{\text{RSS}/(n-2)}&  \\
+\text{Residual} & n-2 & \text{RSS} & \frac{\text{RSS}}{n-2}  &   &\\
+\text{Total} & n-1 & \text{TSS} &  \frac{\text{TSS}}{n-1} &   &\\
+\end{array}
+$$
+
+Test for significance of the regression at the level 5\% and also determine the $R^2$.
+
+
+Use the equality $\text{TSS}=\text{RSS}+\text{RegSS}$,
+we can compute RegSS, RSS and TSS
+
+$$
+\text{TSS} = \sum_{i=1}^n (y_i-\overline{y})^2\\
+\text{RSS} = \sum_{i=1}^n (y_i-\widehat{y}_i)^2\\
+\text{RegSS} = \sum_{i=1}^n (\widehat{y}_i-\overline{y})^2 
+~=~\widehat{\beta}_1^2\sum_{i=1}^n (x_i-\overline{x})^2
+$$
+
+Again, we first compute 
+
+$$
+\overline{x} = \frac{1}{n}\sum_{i=1}^n x_i = \frac{250}{50} = 5\\
+\overline{y} = \frac{1}{n}\sum_{i=1}^n y_i = \frac{350}{50} = 7\\
+\sum_{i=1}^n (y_i-\overline{y})^2 
+=
+\sum_{i=1}^n y_i^2- n\overline{y}^2
+= 3546 - 50\times 7^2 = 1096
+\\
+\sum_{i=1}^n (x_i-\overline{x})^2 
+=
+\sum_{i=1}^n x_i^2- n\overline{x}^2
+= 2250- 50\times 5^2 = 1000
+\\
+\sum_{i=1}^n (x_i-\overline{x})(y_i-\overline{y})
+=
+\sum_{i=1}^n x_iy_i- n\overline{x}\overline{y}
+= 2750- 50\times 5\times 7 = 1000
+$$
+
+So we have
+
+$$
+\widehat{\beta}_1 = \frac{\sum_{i=1}^n (x_i-\overline{x})(y_i-\overline{y})}{\sum_{i=1}^n (x_i-\overline{x})^2} = \frac{1000}{1000} = 1
+%\\ \widehat{\beta}_0 &=& \overline{y}-\widehat{\beta}_1 \overline{x}=7- 1\times 5 = 2
+$$
+
+Therefore
+
+$$
+\text{TSS} = \sum_{i=1}^n (y_i-\overline{y})^2 = 1096\\
+\text{RegSS} = \sum_{i=1}^n (\widehat{y}_i-\overline{y})^2 
+~=~\widehat{\beta}_1^2\sum_{i=1}^n (x_i-\overline{x})^2 ~=~ 1^2\times 1000\\
+\text{RSS} = \text{TSS} - \text{RegSS} = 1096 - 1000 = 96
+$$
+
+So we have
+
+$$
+\begin{array}{cccccc}
+\text{Source of} & \text{Degrees of} & \text{Sum of squares} & \text{Mean square} & \text{F-value} & \text{Pr($>F$)} \\
+\text{variation} & \text{freedom (df)} & \text{(SS)} & \text{(MS)} & &   \\
+\hline
+\text{Regression} & 1 & 1000 & 1000 & \frac{1000}{2}=500&  0\\
+\text{Residual} & n-2=48 & 96 & \frac{96}{48}=2  &   &\\
+\text{Total} & n-1=49 & 1096 &  \frac{1096}{49}=22.3674 &   &\\
+\end{array}
+$$
+
+The F-statistic is 500 with degrees of freedom 1 and 48, the $p$-value can be found using {R}
+
+```{r }
+1-pf(500,1,48)
+```
+
+To test for signifiance of the regression, that is 
+test H$_0:\beta_1=0$ vs H$_1:\beta_1\neq0$ for the simple linear regression. 
+the F-statistic is given by
+
+$$
+\frac{\text{RegSS}/1}{\text{RSS}/(n-2)} = 
+\frac{\sum_{i=1}^n (\widehat{y}_i-\overline{y})^2}{\widehat{\sigma}^2} =
+\frac{\widehat{\beta}_1^2\sum_{i=1}^n (x_i-\overline{x})^2}{\widehat{\sigma}^2} =
+\Big(
+\frac{\widehat{\beta}_1}{\sqrt{\widehat{Var}(\widehat{\beta}_1)}}
+\Big)^2
+$$
+
+So for the simple linear regression, this F-statistic is equal to the $($t-statistic$)^2$
+
+$$
+\frac{\text{RegSS}/1}{\text{RSS}/(n-2)} = 500 = \Big(\frac{1}{\sqrt{0.002}}\Big)^2
+=
+\Big(
+\frac{\widehat{\beta}_1}{\sqrt{\widehat{Var}(\widehat{\beta}_1)}}
+\Big)^2
+$$
+
+So $p$-value $<0.05$ and we  reject H$_0$ at the 5\% significance level.
+
+
+Lastly, $R^2$ is given by
+
+$$
+R^2
+= 1-\frac{\text{RSS}}{\text{TSS}}
+= 1-\frac{96}{1096} = 0.9124088
+$$
+
+
+
+
+

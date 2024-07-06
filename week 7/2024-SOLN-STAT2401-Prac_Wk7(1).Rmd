@@ -1,0 +1,518 @@
+---
+title: 'STAT2401 Analysis of Experiments'
+author: 'Practical 7: Solution'
+output:
+  html_document:
+    highlight: haddock
+    theme: flatly
+  html_notebook:
+    theme: flatly
+  word_document: default
+  pdf_document: default
+---
+
+## Learning Check
+
+When you complete this session, you will be able to:
+
+1. understand the matrix representation of Simple Linear Regression (SLR);
+2. understand the Multiple Linear Regression (MLR) and its matrix representation;
+3. understand Multiple Linear Regression modelling using R including interpretations;
+4. understand parameter estimation and hypothesis testing for the MLR;
+5. perform exploratory data analysis for MLR before modelling.
+
+```{r echo=TRUE}
+knitr::opts_chunk$set(prompt=FALSE, comment=NA, tidy=TRUE, error=TRUE, warning=FALSE, message=FALSE)
+```
+
+## Question 1 SLR in a matrix form
+
+The data below show the number of competing loan companies operating in the city (X) and the number of loans (per thousand) made in that city that are currently delinquent (Y):
+	
+```{r}
+X=c(4,	  1,	  2,	  3,	  3,	   4)
+Y=c(16,	5,	 10,	  15,	13,	22)
+```
+
+In the lecture we showed that 
+$$\hat{\beta}= (X^{T}X)^{-1} X^{T}Y$$ 
+
+(a) Formulate the matrices $X, Y$ and the SLR model equation based on the data.
+
+```{r}
+X=c(4,	  1,	  2,	  3,	  3,	   4)
+Y=c(16,	5,	 10,	  15,	13,	22)  ## vec Y
+One=c(1,1,1,1,1,1)
+Xmat=cbind(One,X)  ## matrix X
+Xmat
+Y
+```
+
+
+(b) Calculate the matrices multiplications using R for $Y^{T}Y,  X^{T}X.$
+
+```{r}
+YtY=t(Y)%*%Y  ## Y'Y matrix multiplication %*%
+YtY
+XXt=t(Xmat)%*%Xmat ## X'X 2x2 matrix
+XtX
+```
+
+
+```{r}
+invX=solve(XtX)
+invX
+check=(XtX)%*%invX
+check  # identity 2x2
+```
+
+
+
+(c) Calculate the estimates of $\beta_1$ using the above matrix formula in R. 
+
+```{r}
+betahat=solve(XtX)%*%t(Xmat)%*%Y
+betahat
+```
+
+The estimates are $\hat{\beta}_0=0.439;\hat{\beta}_1=4.610$
+
+(d) Find  $\hat{\epsilon}^T,$ SSE and  $\hat{\sigma}^2.$
+
+```{r}
+Yhat=Xmat%*%betahat  # Predicted 
+Yhat
+Res=Y-Yhat  # Residuals
+Res
+SSE=t(Res)%*%Res  ## SSE Sum of Squares Error
+SSE
+n=6
+s2=SSE/(n-2)  ## Estimate of sigma^2
+s2   ## hat(sigma^2)
+s=sqrt(s2) ## estimate of sigma
+s
+```
+
+
+(e) Compare the answers in (a)-(d) using *lm* function in R.
+
+```{r}
+check.lm=lm(Y~X)
+summary(check.lm)
+anova(check.lm)
+```
+
+## Question 2 Gasoline.csv
+
+The dataset presents a set of data on the gasoline mileage performance of 32 different
+automobiles.
+
+The data has the following variables
+
+         - (1) y:  Miles/gallon;
+         - (2) x1: Displacement (cubic in.); 
+         - (3) x2: Horsepower (ft-lb); 
+         - (4) x3: Torqne (ft-lb); 
+         - (5) x4: Compression ratio; 
+         - (6) x5: Rear axle ratio; 
+         - (7) x6: Carburetor (barrels); 
+         - (8) x7: No. of transmission speeds;
+         - (9) x8: Overall length (in.);
+         - (10) x9: Width (in.);
+         - (11) x10: Weight (lb);
+         - (12) x11: Type of transmission (1: automatic; 0: manual).
+
+  
+(a) Fit a multiple linear regression model relating gasoline mileage (y) (miles per
+gallon) to engine displacement (x1) and the number of carburetor barrels (x6).
+
+Read the data in and plot the data
+
+```{r size="scriptsize"}
+Gasoline = read.csv("Gasoline.csv",header=TRUE)
+```
+
+Fit the regression model and present the output
+
+```{r size="scriptsize"}
+M2 = lm(y~x1+x6,data=Gasoline)
+summary(M2)
+M3 = lm(y~x1+x2+x3+x4+x5+x7+x8+x9+x10+x11,data=Gasoline)
+summary(M3)
+```
+
+Consider the model as 
+$$y = \beta_0 + \beta_1 \texttt{x1} + \beta_2 \texttt{x6} + \epsilon$$
+
+where $\epsilon$ is a normal random variable. 
+
+So the estimates are 
+$$\hat\beta_0 =32.884551 \quad \hat\beta_1 = -0.053148 \quad \hat\beta_2 = 0.959223$$
+and the fitted line is 
+$$
+\widehat{\texttt{y}} =  32.884551
+-0.053148\texttt{x1}
++0.959223 \texttt{x6}
+$$
+(b) Test whether the model is statistically significant at the level 5\%.
+
+To test H$_0:\beta_1=\beta_2=0$ vs H$_1:$ Not H$_0$, we can look the $p$-value from the output. 
+the $p$-value is 1.79e-10 $<0.05=\alpha$, so 
+the model is statistically significant at the level 5\%.
+
+Construct the 6 steps for this question.
+
+(c) Test whether the variable x6 is statistically significant at the level 5\% 
+given the present of the variable x1.
+
+
+To test H$_0:\beta_2=0$ vs H$_1:\beta_2\neq 0$, we can look the $p$-value from the output. 
+the $p$-value is 0.163$>0.05=\alpha$, so 
+the model is NOT statistically significant at the level 5\%.
+
+(d) Determine a 95\% CI for the regression coefficient of x1.
+
+```{r size="scriptsize"}
+confint(M2,level=0.95)
+```
+
+The 95\% CI for $\beta_2$ is $(-0.06569892,-0.04059641)$
+
+
+## Question 3 Adapted from Sheather (2009) Chapter 5: Menu pricing in a new Italian restaurant in New York City 
+
+The aim of this scenario is to produce a regression model to predict the price 
+of dinner using data from surveys of customers of 168 Italian restaurants in the target area are 
+available. 
+
+The data are in the form of the average of customer views on:
+
++ Y = Price = the price (in $US) of dinner (including 1 drink & a tip)
++ X1= Food = customer rating of the food (out of 30)
++ X2= Décor = customer rating of the decor (out of 30)
++ X3= Service = customer rating of the service (out of 30)
++ X4= East = dummy variable = 1 (0) if the restaurant is east (west) of Fifth Avenue
+
+The data are given on the book web site in the file *nyc.csv.* 
+
+(a) Perform exploratory data analysis on the data using scatter plot matrix and boxplots.
+
+```{r}
+nyc=read.csv("nyc.csv")
+head(nyc)
+nyc1=nyc[,c(-1,-2,-7)]  ## nyc1 consists of all numerical data
+View(nyc1)
+```
+
+```{r}
+nyc$East=factor(nyc$East)
+head(nyc)
+```
+
+
+```{r warning=FALSE}
+# Scatterplot
+pairs(nyc1)
+library(PerformanceAnalytics)  ## install this
+chart.Correlation(nyc1)
+```
+
+Histograms: The variables Price and Food have symmetric shapes, Decor has a skewed to the left and Service has a bimodal shape.
+
+Scatterplots: Price has a quite linear postive relationship with Decor, but more variations relationships with Food and Service. Food has a positive realtionship with Decor and Service, while Service and Decor has the most scattered relationship with 3 likely outliers at the end.
+
+```{r fig.height=8, fig.width=7}
+par(mfrow=c(2,2))
+boxplot(Price~East, data=nyc, xlab="1=East, 0=West")
+boxplot(Food~East, data=nyc)
+boxplot(Decor~East, data=nyc)
+boxplot(Service~East, data=nyc)
+```
+
+In all these side by side boxplots, restaurants in the East has higher Price, Food, Decor and Service in terms of the median ratings. The shapes distribution of East are symmetric with similar spreads to West.
+
+This is how to display 3D plot (OPTIONAL). Interpret?
+
+```{r}
+library(scatterplot3d)
+with(nyc, {
+   scatterplot3d(x = Decor,
+                 y = Food, 
+                 z = Price,
+                 main="3-D Scatterplot")
+})
+```
+
+
+An extension with colors and labels (OPTIONAL). The label is the case number. Interpret No 35, 88. Dont go to No 115 (low price, low ratings)
+
+```{r fig.height=8, fig.width=8}
+library(scatterplot3d)
+with(nyc, {
+  s3d <- scatterplot3d(
+    x = Decor,
+    y = Food, 
+    z = Price,
+    color = "blue", 
+    pch = 19,      
+    type = "h",
+    main = "3-D Scatterplot",
+    xlab = "Decor",
+    ylab = "Food",
+    zlab = "Price")
+  
+  # convert 3-D coords to 2D projection
+  s3d.coords <- s3d$xyz.convert(Decor,Food,Price) 
+  
+  # plot text with 50% shrink and place to right of points
+  text(s3d.coords$x, 
+       s3d.coords$y,   
+       labels = row.names(nyc),  
+       cex = .5, 
+       pos = 4)
+})
+```
+
+(b) Develop a regression model that directly predicts the price of dinner (in dollars) using a 
+subset or all of the 4 potential predictor variables listed above.
+
+```{r}
+ny.lm=lm(Price~Food+Decor+Service+East,data=nyc)
+summary(ny.lm)
+```
+
+The initial regression model is
+
+*Price = – 24.02 + 1.54 Food + 1.91 Decor – 0.003 Service + 2.07 East*
+
+At this point we shall leave the variable Service in the model even though its
+regression coefficient is not statistically significant.
+
+(c) Explain the fitted model, by interpreting the slopes and intercept.
+
+Given below is some output from R after *dropping the predictor Service* from model
+
+```{r}
+ny1.lm=lm(Price~Food+Decor+East,data=nyc)
+summary(ny1.lm)
+```
+
+The final regression model is
+
+*Price = – 24.03 + 1.54 Food + 1.91 Decor + 2.07 East*
+
+The interpretations:
+
++ $\hat{\beta}_0=-24.03$: Not interpretable.
+
++ $\hat{\beta}_1=1.54$: Assuming Decor and East are constants, for every 1 unit increase in Food, Price increases by 1.54.
+
++ $\hat{\beta}_2=1.91$: Assuming Food and East are constants, for every 1 unit increase in Decor, Price increases by 1.91.
+
++ $\hat{\beta}_3=2.07$: Assuming Food and Decor are constants, when a restaurant in in the East, Price increases by 2.07.
+
+Comparing the last two sets of output from R, we see that the regression coefficients for the variables in both models are very similar. This does not always occur.
+
+(d) Perform hypothesis testing about $H_0: \beta_j=0$ against $H_1: \beta_j \not=0$ for $j=0,1,...,3.$
+
+The solution is provided for $\beta_1$. Please repeat the steps for other parameters.
+
+*6 steps hypothesis testing for $\beta_1$:*
+
+1. $H_0: \beta_1 = 0, H_1:\beta_1 \not=0$ 
+
+2. The test statistic (from R output as in the above): 
+
+$t=\frac{\hat{\beta}_1-0}{se(\hat{\beta}_1)}=\frac{1.5363}{0.2632}=5.838.$
+
+3. The sampling distribution for the test statistic is $t$ is $T_{df=(n-p-1)}$
+that is $T_{df=168-3-1=164.}$
+
+4. The p-value = 2.76e-08  (from the R ouput)
+
+5. Decision. Given the p-value is very small, less than the significance level, then we strongly reject the null hypothesis.
+
+6. Conclusion. We conclude that the slope is statistically significantly different to zero.
+
+(e) Determine which of the predictor variables Food, Décor and Service has the largest  estimated  
+effect  on  Price?  Is  this  effect  also  the  most  statistically significant?
+
+++ The variable *Décor* has the largest effect on Price since its regression coefficient
+is largest. Note that Food, Décor and Service are each measured on the
+same 0 to 30 scale and so it is meaningful to compare regression coefficients.
+
+++ The variable Décor is also the most statistically significant since its p -value is
+the smallest of the three.
+
+(f) Based on the R output, estimate $\sigma^2.$
+
+```{r}
+names(summary(ny1.lm))
+s=summary(ny1.lm)$sigma ## estimate of s
+s
+s2=s^2
+s2
+```
+
+The estimate for $\hat{\sigma}^2= s^2=(5.57204)^2=32.7227.$
+
+(g)  If the aim is to choose the location of the restaurant so that the price achieved for dinner 
+is maximized, should the new restaurant be on the east or west of Fifth Avenue?
+
+In order that the price achieved for dinner is maximized, the new restaurant
+should be on the east of Fifth Avenue since the coefficient of the dummy variable
+is statistically significantly larger than 0.
+
+(h)  Does it seem possible to achieve a price premium for “setting a new standard to service in 
+Manhattan” for Italian restaurants?
+
+It does not seem possible to achieve a price premium for “setting a new standard for high quality service in Manhattan” for Italian restaurants since the regression coefficient of Service is not statistically significantly greater
+than zero.
+
+## Question 4 Salary data
+
+Consider the data set *salary.csv*  The data contains the salary level, no. of years experience, quality of work and publication record of n = 24 mathematics lecturers.
+
+(a) Perform exploratory data analysis on the data using scatter plot matrix and boxplots.
+
+```{r}
+salary=read.csv("salary.csv",header=TRUE)
+head(salary)
+```
+
+```{r}
+library(PerformanceAnalytics)
+```
+
+```{r}
+# Scatterplot
+pairs(salary)
+chart.Correlation(salary)
+```
+
+Interpret the above.
+
+```{r fig.height=8, fig.width=8}
+library(scatterplot3d)
+with(salary, {
+  s3d <- scatterplot3d(
+    x = experience,
+    y = publish, 
+    z = salary,
+    color = "orange", 
+    pch = 19,      
+    type = "h",
+    main = "3-D Scatterplot",
+    xlab = "Experience",
+    ylab = "Publish",
+    zlab = "Salary")
+  
+  # convert 3-D coords to 2D projection
+  s3d.coords <- s3d$xyz.convert(salary,experience,publish) 
+  
+  # plot text with 50% shrink and place to right of points
+  text(s3d.coords$x, 
+       s3d.coords$y,   
+       labels = row.names(salary),  
+       cex = .5, 
+       pos = 4)
+})
+```
+
+(b)	Fit the linear regression model of salary on experience, quality and publish. Write down the estimated regression line and interpret the model.
+
+```{r}
+salary.lm=lm(salary ~ quality+experience+publish, data=salary)
+summary(salary.lm)
+```
+
+The regression model is
+
+*Salary = 17.847 + 1.103 Quality + 0.322 Experience + 1.289 Publish*
+
+The interpretations:
+
++ $\hat{\beta}_0=17.847$: Not interpretable.
+
++ $\hat{\beta}_1=1.103$: Assuming Experience and Publish are constants, for every 1 unit increase in Quality, Salary increases by 1.103.
+
++ $\hat{\beta}_2=0.322$: Assuming Quality and Publish are constants, for every 1 unit increase in Experience, Salary increases by 0.322.
+
++ $\hat{\beta}_3=1.289$: Assuming Quality and Experience  are constants, for every 1 unit increase in Publish, Salary increases by 1.289.
+
+(c) Obtain the estimates of $\sigma^2, var(\beta).$
+
+We know that 
+
+$$ var(\hat{\beta})=(X^T X)^{-1} \sigma^2$$
+
+Working to calculate the the variance-covariance matrix.
+
+```{r}
+X <- as.matrix(salary[,-1]) # 
+X <- cbind(1, X) ## 
+head(X)
+XtX=t(X) %*% X
+invX=solve(XtX)
+s=summary(salary.lm)$sigma
+s2=s^2
+s2
+varcov=invX*s2
+varcov
+```
+
+The estimate of $\sigma^2$ is 3.07215.
+
+The estimates of $var(\beta)$ is
+
+$$var(\hat{\beta})=\begin{pmatrix} 4.0075 & -0.3130  &0.0014 &-0.3735 \\ -0.3130 & 0.1086 &-0.0051 &-0.0235  \\
+ 0.0014 &-0.0051  & 0.0014 & -0.0014\\ -0.3735 & -0.0235 & -0.0014 & 0.0891
+\end{pmatrix}$$ 
+
+From the above matrix, we obtained from the diagonal that $var(\hat{\beta}_0)=4.0075; var(\hat{\beta}_1)=0.1086; var(\hat{\beta}_2)=0.0014; var(\hat{\beta}_3)=0.0891.$
+
+We can also obtained the covariances, eg $cov(\hat{\beta}_0, \hat{\beta}_1)= -0.3130, cov(\hat{\beta}_1, \hat{\beta}_2)= -0.0051.$
+
+
+## Question 5 Sheather (2009): Modelling defective rates
+
+The data frame `Defects` provides data on the average number of defects per 1000 parts (`Defective`) produced in an industrial process along with the values of other variables (`Temperature`, `Density`, and `Rate`). The production engineer wishes to construct a linear model relating `Defective` to the potential predictors.
+
+(a) Use the `pairs` function to produce a scatterplot matrix of all the variables in Defects. Are the scatterplots of `Defective` against the other variables linear?
+
+```{r}
+defects=read.table("defects.txt",header=T)
+defects=defects[,-1]
+View(defects)
+```
+
+```{r warning=FALSE}
+# Scatterplot
+pairs(defects)
+library(PerformanceAnalytics)
+chart.Correlation(defects)
+```
+
+From the scatterplots, we can see that Defective has:
+
+      + positive, linear relationships with Temperature and Rate as an explanatory.
+      + negative, linear relationships with Density as an explanatory.
+      + some relationships among the explanatories that will be discussed later (multicollinearity)
+
+Clearly this is a strong positive relationship between the number of defects produced and each of the other variables, although there is a visible curvature to the relationships suggesting that these relationships are not linear (although the relationships between each of temperature, density and rate are so).
+
+(b) Develop a regression model that directly predicts the number of defects using a 
+subset or all of the 4 potential predictor variables listed above.
+
+Explain the fitted model, by interpreting the R output.
+
+```{r}
+def.lm=lm(Defective~Temperature+Density+Rate, data=defects)
+summary(def.lm)
+```
+
+The regression model is
+
+*Defective = 10.3244 + 16.0779 Temperature -1.8273 Density + 0.1167 Rate*
+
+noting that all of the variables are not significant at 5\% level, due to multicollinearity that we will discuss in a few weeks. 

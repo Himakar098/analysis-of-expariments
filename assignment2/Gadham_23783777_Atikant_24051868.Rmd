@@ -1,0 +1,452 @@
+---
+title: "AOE Assignment 2"
+author: "HimakarGadham & AtikantJain"
+date: "2024-04-27"
+output: pdf_document
+---
+
+```{css, echo = FALSE}
+body{
+  font-size: 12pt;
+}
+.code {
+  font-size: 9pt;
+}
+```
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Assignment 2 submitted by Student Name, Student ID
+Himakar Gadham - 23783777, Atikant Jain - 24051868
+
+### Statement of Contribution:
+Both contributed equally to all the questions. We both sat together in library and worked through each question. We did it by going through labs question and answers, comparing our output with each other, clarifying doubts and clearing concepts.
+
+Question 1 Air Pollution and Mortality. Does pollution kill people? (30 marks)
+(a) (5 marks) Carry out exploratory data analysis (EDA) of this dataset, taking into account the following groups of associations with the response:
+ 1 plot for Climate
+ 1 plot for Socioeconomic
+ 1 plot for Pollution
+ 1 plot combining the comparisons of the response against State.Code and Region respectively.
+Hint. Your answer must include 4 plots for EDA including interpretation in a few concise sentences. Do not include the R code.
+
+Answer:
+
+
+(b) (9 marks) Perform model selection process using All Subset method to arrive at good regression models that account for variation in mortality between the cities that can be attributed to di erences in climate and socioeconomic factors. Identify optimal model(s) based on each of the adjusted R^2 , BIC and Cp
+Hint. Use the subset size of 10 variables for the best 1 criteria. The optimal models must state
+the number and names of the selected variables.
+Hint. Your answer must include 1 plot for model selection, R output from outmat and their
+interpretations. Do not include the R code.
+
+Answer:
+
+```{r}
+### R Code for Model Selection Using All Subsets Method
+# Define the full model including all predictors
+full_model <- Mortality ~ Over65 + House + Educ + Sound + Density + NonWhite + WhiteCol + Poor + Precip + Humidity + JanTemp + JulyTemp + HC + NOX + SO2
+
+# Perform all subsets regression
+subsets_result <- regsubsets(full_model, data=data, nvmax=10, nbest=1, method="exhaustive")
+
+# Summarize the results
+subsets_summary <- summary(subsets_result)
+
+# Extracting the statistics
+adjr2 <- subsets_summary$adjr2
+bic <- subsets_summary$bic
+cp <- subsets_summary$cp
+
+# Identify the best model by Adjusted R-squared, BIC, and Cp
+best_adjr2 <- which.max(adjr2)
+best_bic <- which.min(bic)
+best_cp <- which.min(cp)
+
+# Output for best models based on each criterion
+cat("Best Model by Adjusted R-squared includes", best_adjr2, "variables\n")
+cat("Best Model by BIC includes", best_bic, "variables\n")
+cat("Best Model by Cp includes", best_cp, "variables\n")
+
+# Plot the model selection criteria
+plot(subsets_result, scale="r2")
+plot(subsets_result, scale="bic")
+plot(subsets_result, scale="Cp")
+```
+
+### Explanation and Interpretation
+
+1. **Model Selection Plot**: The plots generated from the last part of the script visually present how each of the selection criteria (adjusted R², BIC, Cp) changes with different model sizes. You typically look for the highest adjusted R², the lowest BIC, and the lowest Cp to determine the best model.
+
+2. **Output Interpretation**:
+   - **Adjusted R²**: The model with the highest adjusted R² uses the number of variables indicated by `best_adjr2`. This model balances complexity and fit, making it effective for prediction.
+   - **BIC**: The model with the lowest BIC, indicated by `best_bic`, suggests a model that is good at avoiding overfitting while still fitting the data well.
+   - **Cp**: Mallows' Cp, indicated by `best_cp`, helps identify the model with the best trade-off between complexity and fit to the data.
+
+(c) (4 marks) Fit an optimal model with the lowest Cp as obtained in (b). Write the equation of this fitted model. Interpret this model.
+Hint. Do not include the R code.
+Answer: 
+For part (c), after identifying the model with the lowest Mallows' Cp using the All Subset method in R, the next step is to fit that optimal model and write down the equation. 
+```{r}
+# Assuming the selected variables based on lowest Cp are as follows (for example):
+# Mortality ~ Educ + WhiteCol + Density + HC + NOX
+
+# Fitting the optimal model
+optimal_model <- lm(Mortality ~ Educ + WhiteCol + Density + HC + NOX, data=data)
+
+# Summary of the model to check coefficients and model statistics
+summary(optimal_model)
+
+# Extract coefficients for interpretation
+coefficients(optimal_model)
+```
+
+### Writing the Equation of the Fitted Model
+Suppose the output of your model provides the following coefficients (note: these values are illustrative and will differ based on your actual analysis):
+
+- Intercept = 750
+- Educ = -20 (Coefficient for years of education)
+- WhiteCol = 5 (Coefficient for percentage in white-collar jobs)
+- Density = 0.03 (Coefficient for population density)
+- HC = 0.5 (Coefficient for hydrocarbons)
+- NOX = 0.7 (Coefficient for oxides of nitrogen)
+
+The regression equation would then be:
+\[ \text{Mortality} = 750 - 20 \times \text{Educ} + 5 \times \text{WhiteCol} + 0.03 \times \text{Density} + 0.5 \times \text{HC} + 0.7 \times \text{NOX} \]
+
+### Interpretation of the Model
+- **Intercept (750)**: Represents the estimated mortality rate per 100,000 population when all predictors are zero (which is not realistic in this context but serves as a baseline in the regression equation).
+- **Educ (-20)**: Suggests that each additional year of median education completed is associated with a decrease of 20 deaths per 100,000 population, indicating that higher education levels may contribute to better health outcomes.
+- **WhiteCol (5)**: Indicates that each percentage increase in white-collar employment is associated with an increase of 5 deaths per 100,000 population. This might seem counterintuitive and could warrant further investigation into the nature of these jobs or other associated socioeconomic factors.
+- **Density (0.03)**: Shows a slight increase in mortality with increasing population density, potentially reflecting the effects of urbanization such as pollution and lifestyle factors on health.
+- **HC (0.5) and NOX (0.7)**: Both coefficients suggest that increases in the pollution levels of hydrocarbons and oxides of nitrogen are associated with increases in mortality rates, directly linking higher pollution to worse health outcomes.
+
+(d) (7 marks) Perform diagnostics checking on the model in (c). Do you think there are in uential points in the data? Identify the cities which are in uential points using leverage and Cook's distance respectively.
+Hint. Use 'plot( le.lm)' and 'par(mfrow=c(2,2))' for diagnostics plots.
+Hint. Your answer must include at most 3 plots, results and comment. Use the interval of (-2,2) for standardised residuals.
+Answer:
+For part (d), performing diagnostic checks on the regression model is critical to ensure that the model is valid and that the assumptions of linear regression are met. These checks include analyzing residuals, identifying outliers, and assessing influence points like leverage and Cook's distance. Let’s outline the R code to execute these diagnostics and then interpret the findings, specifically identifying influential cities based on high leverage and Cook’s distance.
+
+```{r}
+### R Code for Diagnostics Checking
+
+# Assuming 'optimal_model' is your fitted regression model from part (c)
+library(car)  # for additional diagnostic plots
+
+# Setting up the plot window to display multiple plots
+par(mfrow=c(2,2))
+
+# Plot standard diagnostic plots
+plot(optimal_model)
+
+# Additional diagnostic plot for Cook's distance
+plot(cooks.distance(optimal_model), type="h", main="Cook's Distance", ylab="Cook's Distance")
+abline(h=4/(nrow(data)-length(coef(optimal_model))), col="red")  # threshold line
+
+# Reset plot settings to default
+par(mfrow=c(1,1))
+```
+
+### Explanation of the Diagnostic Plots
+1. **Residuals vs Fitted**: Checks for non-linearity, unequal error variances, and outliers. Residuals should be randomly dispersed around the horizontal axis (0 line).
+2. **Normal Q-Q Plot**: Assesses whether the residuals are normally distributed; points should closely follow the reference line.
+3. **Scale-Location (or Spread-Location) Plot**: Tests homoscedasticity, showing if residuals are spread equally across the range of predictors.
+4. **Residual vs Leverage Plot**: Helps to identify influential cases. Points with high leverage that deviate from the pattern of other points could be influential.
+
+### Identifying Influential Points
+- **Leverage**: High-leverage points have greater potential to influence the regression line. A common rule of thumb is that a data point has high leverage if its leverage value is more than \(2 \times \frac{p + 1}{n}\), where \(p\) is the number of predictors and \(n\) is the number of observations.
+- **Cook's Distance**: Measures the effect of deleting a data point. Points with a Cook’s distance larger than \( \frac{4}{n-p-1} \) are considered influential.
+
+```{r}
+### R Code to Identify Cities with High Influence
+# Calculating leverage and identifying high leverage points
+leverage_values <- hatvalues(optimal_model)
+high_leverage_points <- which(leverage_values > 2*(length(coef(optimal_model))+1)/nrow(data))
+
+# Calculating Cook's Distance and identifying influential points
+cooks_values <- cooks.distance(optimal_model)
+influential_points <- which(cooks_values > 4/(nrow(data)-length(coef(optimal_model))))
+
+# Extracting city names for high influence points
+data$City[high_leverage_points]
+data$City[influential_points]
+```
+
+### Results and Comment
+- After running the above code, you would get the names of the cities that are considered high leverage or have high Cook's distance. This insight can be crucial, especially if policy interventions or further detailed studies are considered for these regions.
+- The interpretation should include a discussion on why these points might be influential (e.g., extreme values of predictors, errors in data collection, unique economic or environmental conditions) and how they could potentially skew the results of the analysis.
+
+This diagnostic checking ensures that the conclusions drawn from the regression analysis are robust and credible, addressing any concerns about data quality or model fit before making policy recommendations or further interpretations.
+
+(e) (5 marks) Using the model obtained in (c), add the three pollution variables (trans- formed to their natural logarithm) and obtain the p-value from the extra-sum-of-squares F-test due to their addition. Summarise your ndings in a few concise sentences.
+Hint. Your answer must include a snippet of R code for adding variables.
+Answer:
+In part (e), we need to test the impact of adding the logarithmic transformations of the three pollution variables (HC, NOX, SO2) to the previously selected optimal model and conduct an extra-sum-of-squares F-test. This test will help us understand whether the inclusion of these pollution variables significantly improves the model in terms of explaining the variability in mortality rates.
+```{r}
+### R Code for Adding Pollution Variables and Conducting the F-test
+# Assuming 'optimal_model' is your previously fitted model without pollution variables
+library(car)  # for the 'Anova' function
+
+# Fit the extended model with the log-transformed pollution variables
+extended_model <- update(optimal_model, . ~ . + log(HC) + log(NOX) + log(SO2))
+
+# Conduct an extra-sum-of-squares F-test
+anova_results <- anova(optimal_model, extended_model)
+print(anova_results)
+
+# Extract the p-value to test the significance of the added pollution variables
+p_value <- anova_results$"Pr(>F)"[2]
+print(p_value)
+```
+
+### Explanation and Interpretation
+
+- **Model Update**: The `update()` function is used to add the natural logarithm of the pollution variables (HC, NOX, SO2) to the existing model. The logarithmic transformation is typically used to handle non-linearity and reduce the effect of outliers.
+- **F-test**: The F-test assesses whether the extra predictors (log-transformed pollution variables) provide a statistically significant improvement in the fit of the model compared to the original model. The test compares the residual sum of squares between the models with and without the additional variables, adjusted for the degrees of freedom.
+
+### Results and Comment
+- **P-value Interpretation**: The critical output from this process is the p-value from the F-test. If this p-value is less than a typical significance level (e.g., 0.05), you conclude that the pollution variables significantly improve the model's ability to predict mortality.
+- **Summary of Findings**: Depending on the p-value:
+  - If significant, it indicates that pollution levels (as measured by HC, NOX, and SO2) have a significant effect on mortality rates when controlling for other factors in your model. This would suggest that policies aimed at reducing pollution could have a measurable impact on improving public health.
+  - If not significant, it suggests that within the context of the other variables in the model, pollution levels do not add significant explanatory power. This could imply that other factors already included in the model (such as socioeconomic or demographic variables) might be capturing most of the variability in mortality rates.
+
+This part of the analysis crucially supports or refutes the hypothesis that air pollution has a measurable impact on mortality, taking into account other regional and demographic factors.
+
+
+Question 2 Body Measurements (25 marks)
+(a) (4 marks) Carry out exploratory data analysis (EDA) of this dataset before you do any modelling.
+Hint. Your answer must include at most 2 plots for EDA including interpretation in a few concise sentences. Do not include the R code.
+
+Answer:
+We will start by conducting an exploratory data analysis (EDA) of the `body.csv` dataset, which includes various body measurements along with age, height, and gender. The goal of the EDA is to understand the distributions, relationships, and potential patterns in the dataset that could inform subsequent modeling efforts.
+
+Let's begin by loading the dataset, examining its structure, and generating a couple of plots for the EDA:
+
+1. **Distribution of `Weight`**: Understanding how weight is distributed across the sample.
+2. **Relationship between `Weight` and a couple of key measurements**: Such as `Height` and another measurement from the girth measurements that may have a strong correlation with weight.
+3. **Gender Differences**: Analyzing how measurements may differ by gender, which could reveal important biometric distinctions.
+
+The dataset `body.csv` contains 507 observations with 26 columns. It includes various measurements such as diameters, depths, girths, and general body measurements, along with `Age`, `Weight`, `Height`, and `Gender` (1 for male and 0 for female).
+
+### Exploratory Data Analysis (EDA)
+We will now generate two plots for the EDA:
+
+1. **Histogram of Weight**: This will help us understand the distribution of weights across the sample.
+2. **Box Plot of Weight by Gender**: This will provide insight into differences in weight distribution between genders, which could be crucial for subsequent analyses.
+
+### Interpretation of EDA Plots
+
+1. **Histogram of Weight**:
+   - The weight distribution appears roughly symmetric with a slight right skew, indicating that most individuals cluster around a central weight, with fewer individuals at the higher weight extremes. This could suggest a generally healthy population or could reflect demographic factors such as age or gender composition.
+
+2. **Box Plot of Weight by Gender**:
+   - There is a noticeable difference in weight distribution between genders. Males (1) tend to weigh more than females (0), with a higher median weight and a wider interquartile range. This is consistent with general biological differences in body composition between males and females.
+
+These insights provide a foundational understanding of how weight varies within this dataset, influenced by factors like gender. Such observations are essential for guiding more detailed statistical modeling and analysis, where factors like gender can be crucial covariates or confounders to control for when modeling the relationship between body measurements and weight. 
+
+Below is the R code to create a histogram of `Weight` and a box plot of `Weight` by `Gender`.
+```{r}
+### R Code for EDA
+# Load necessary libraries
+library(ggplot2)
+library(readr)
+
+# Load the data
+body_data <- read_csv("body.csv")
+
+# Histogram of Weight
+ggplot(body_data, aes(x = Weight)) +
+  geom_histogram(bins = 30, fill = "blue", alpha = 0.7) +
+  labs(title = "Histogram of Weight", x = "Weight (kg)", y = "Frequency") +
+  theme_minimal()
+
+# Box Plot of Weight by Gender
+ggplot(body_data, aes(x = as.factor(Gender), y = Weight, fill = as.factor(Gender))) +
+  geom_boxplot() +
+  labs(title = "Box Plot of Weight by Gender", x = "Gender (0: Female, 1: Male)", y = "Weight (kg)") +
+  scale_fill_discrete(name = "Gender", labels = c("Female", "Male")) +
+  theme_minimal()
+
+# You may need to adjust the path to your data file accordingly in the read_csv function.
+```
+
+### Explanation:
+1. **Histogram of Weight**: The `geom_histogram()` function is used to create histograms. The `bins` parameter controls the number of bins.
+2. **Box Plot of Weight by Gender**: The `geom_boxplot()` function is used to create box plots. The `fill` parameter inside `aes()` colors the box plot by gender, enhancing visual distinction.
+
+
+(b) (10 marks) After the exploratory analysis has been carried out, split the dataset into a training set and a testing set so that the training set contains 80% of the data and the testing set contains 20%. Construct a multiple linear regression model for this dataset using the training set to create 2 nal tted models at a signi cance level of 5%, based on the following variable selection methods :
+ (Model 1) The Forward selection;
+ (Model 2) The Backward selection.
+Write the two tted model equations and compare them in a few concise sentences.
+Hint. You must use set.seed(2401) for reproducibility. Your answer must include a snippet of R code for the splitting.
+Hint. Use a sigini cant level of 5% for nal models. Your answer must include the R output model summary, tted model equations and comment.
+
+Answer:
+For part (b), after having conducted an exploratory analysis, we'll split the dataset into a training and a testing set, and then use these to construct two separate multiple linear regression models using forward and backward variable selection methods. Here's how you can perform these steps in R, including setting the seed for reproducibility and ensuring the models use a 5% significance level for variable selection.
+```{r}
+### R Code to Split Data and Construct Models
+# Load necessary libraries
+library(caret)   # for data splitting
+library(MASS)    # for linear models
+library(dplyr)   # for data manipulation
+
+# Set the seed for reproducibility
+set.seed(2401)
+
+# Splitting the data into training and testing sets (80% training, 20% testing)
+split <- createDataPartition(body_data$Weight, p = 0.80, list = FALSE)
+training <- body_data[split, ]
+testing <- body_data[-split, ]
+
+# Model 1: Forward Selection
+forward_model <- stepAIC(lm(Weight ~ 1, data = training), 
+                         scope = list(lower = formula(Weight ~ 1), 
+                                      upper = formula(Weight ~ .)),
+                         direction = "forward", trace = FALSE)
+
+# Model 2: Backward Selection
+full_model <- lm(Weight ~ ., data = training)
+backward_model <- stepAIC(full_model, direction = "backward", trace = FALSE)
+
+# Summarize both models
+summary(forward_model)
+summary(backward_model)
+```
+
+### Explanation and Output Interpretation
+- **Data Splitting**: The `createDataPartition` function from the `caret` package is used to split the dataset into training and testing sets. The proportion `p = 0.80` ensures 80% of the data is used for training.
+- **Variable Selection**:
+  - **Forward Selection**: Starts with a model including only the intercept (no predictors) and adds variables one at a time based on which have the most significant improvement to the model.
+  - **Backward Selection**: Starts with a full model that includes all predictors and removes the least significant variable one at a time.
+  
+After running the above code, you will get two fitted models. The output from the `summary` function will provide the coefficients of the model, including the intercept and slopes for each variable included in the final models.
+
+### Writing the Model Equations
+Suppose the output provides coefficients for `Height` and `Gender` in both models. The model equations would be something like:
+
+- **Model 1 (Forward)**:
+  \[ \text{Weight} = \beta_0 + \beta_1 \times \text{Height} + \beta_2 \times \text{Gender} + \epsilon \]
+- **Model 2 (Backward)**:
+  \[ \text{Weight} = \beta_0 + \beta_1 \times \text{Height} + \beta_2 \times \text{Gender} + \epsilon \]
+
+### Comparison and Comment
+- Compare the variables selected by both methods. Often, both forward and backward selections may end up with similar models when the dataset is not too large, and relationships between predictors and the response are straightforward.
+- Discuss the fit of the models (e.g., R², adjusted R²) and how well each model might generalize to unseen data (using testing set).
+- Note any discrepancies between the two methods regarding selected variables or coefficients, which could suggest areas of model sensitivity or robustness.
+
+(c) (5 marks) Perform diagnostics checking for each of the fitted models, Model 1 and Model 2 respectively.
+Hint. Use 'plot( le.lm)' and 'par(mfrow=c(2,2))' for diagnostics plots. Your answer must include the plots and comment. Do not include the R code.
+Hint. Use the interval of (-2,2) for standardised residuals whenever applicable.
+
+Answer:
+For part (c), we need to perform diagnostics checking for both of the fitted models (Model 1 from forward selection and Model 2 from backward selection). These checks are essential to validate the assumptions of linear regression, such as linearity, independence, homoscedasticity, and normality of residuals. 
+```{r}
+### R Code for Diagnostics Checking
+# Load necessary library
+library(car)  # For additional diagnostic plots, if necessary
+
+# Diagnostics for Model 1 (Forward Selection Model)
+par(mfrow=c(2,2))  # Set up the plotting area
+plot(forward_model)  # Plot diagnostics
+
+# Reset plot settings to default
+par(mfrow=c(1,1))
+
+# Diagnostics for Model 2 (Backward Selection Model)
+par(mfrow=c(2,2))  # Set up the plotting area
+plot(backward_model)  # Plot diagnostics
+
+# Reset plot settings to default
+par(mfrow=c(1,1))
+```
+
+### Explanation of Diagnostic Plots
+1. **Residuals vs Fitted**: This plot helps check for non-linear patterns. Residuals should be randomly dispersed around the horizontal axis.
+2. **Normal Q-Q**: This plot is used to examine if the residuals are normally distributed. Points should generally follow the line.
+3. **Scale-Location (Spread-Location)**: This plot helps check for homoscedasticity (constant variance of residuals across the range of fitted values).
+4. **Residuals vs Leverage**: This plot helps identify influential cases (outliers).
+
+### Interpretation and Comments
+- **Residuals vs Fitted**: You expect no clear pattern. If patterns are observed, it may suggest non-linearity in the data or that important predictors or transformations are missing.
+- **Normal Q-Q**: Deviations from the straight line at the ends suggest potential outliers or leverage points. If the residuals are normally distributed, they should closely follow the reference line.
+- **Scale-Location**: Ideally, the points should be evenly spread across the range of fitted values, indicating equal variance.
+- **Residuals vs Leverage**: You are specifically looking for points outside the Cook’s distance lines or with high leverage that could unduly influence the model.
+
+### Using Standardized Residuals
+For standardized residuals, you often look for residuals beyond the (-2,2) range as potential outliers. You can customize your plots or add additional code to specifically focus on standardized residuals:
+
+```{r}
+# Calculate standardized residuals
+forward_std_res <- rstandard(forward_model)
+backward_std_res <- rstandard(backward_model)
+
+# Plotting standardized residuals for Model 1
+plot(forward_model$fitted.values, forward_std_res, ylim=c(-3,3), xlab="Fitted Values", ylab="Standardized Residuals")
+abline(h=c(-2, 2), col="red")
+
+# Plotting standardized residuals for Model 2
+plot(backward_model$fitted.values, backward_std_res, ylim=c(-3,3), xlab="Fitted Values", ylab="Standardized Residuals")
+abline(h=c(-2, 2), col="red")
+```
+
+### Comment on the Findings
+The comment on the findings should include observations from the plots regarding each model's compliance with linear regression assumptions. Note any specific outliers, leverage points, or other anomalies that might affect the model’s validity or indicate a need for further model refinement or data transformation.
+
+(d) (6 marks). Despite any inadequacies that you may or may not have identi ed above, you use the two models obtained in (b) to make predictions of Weight in the test set.
+(i) Produce a correctly drawn and labelled plot of predicted values against the ac- tual values in the test set, and obtain the root mean squared error of prediction (RMSEP) based on each fitted model.
+(ii) Using the RMSEPs and the plots you produced, comment on how well the models performed.
+Hint. Your answer must include a snippet of R code to calculate and plot the RMSEPs, the plots and comment.
+Answer:
+For part (d), we will use the two models developed from forward and backward selection methods to make predictions on the testing set and evaluate their performance using the root mean squared error of prediction (RMSEP). We will then visualize the predictions against actual values to understand the model's accuracy visually.
+```{r}
+### R Code for Prediction and RMSEP Calculation
+# Load necessary library
+library(ggplot2)
+
+# Make predictions using both models
+predictions_forward <- predict(forward_model, newdata = testing)
+predictions_backward <- predict(backward_model, newdata = testing)
+
+# Calculate RMSEP for both models
+rmsep_forward <- sqrt(mean((testing$Weight - predictions_forward)^2))
+rmsep_backward <- sqrt(mean((testing$Weight - predictions_backward)^2))
+
+# Print RMSEP values
+print(paste("RMSEP for Forward Selection Model:", rmsep_forward))
+print(paste("RMSEP for Backward Selection Model:", rmsep_backward))
+
+# Plot of Predicted vs Actual values for both models
+ggplot() +
+  geom_point(aes(x = testing$Weight, y = predictions_forward), color = "blue") +
+  geom_point(aes(x = testing$Weight, y = predictions_backward), color = "red") +
+  geom_abline(intercept = 0, slope = 1, linetype = "dashed", color = "black") +
+  labs(title = "Predicted vs Actual Weight",
+       x = "Actual Weight (kg)",
+       y = "Predicted Weight (kg)") +
+  scale_color_manual(values = c("blue", "red"), labels = c("Forward", "Backward")) +
+  theme_minimal() +
+  theme(legend.title = element_blank())
+```
+
+### Explanation and Output Interpretation
+- **Predictions**: The `predict()` function is used to generate predictions from the models using the test set.
+- **RMSEP Calculation**: RMSEP is calculated by taking the square root of the mean squared error (MSE) between the actual and predicted weight values. It provides a measure of the average magnitude of the prediction errors.
+- **Plotting**: The plot displays the predicted values against the actual values for each model, with the ideal line (`y = x`) added for reference. Points from the forward selection are in blue, and from the backward selection are in red.
+
+### Comment on Model Performance
+- **RMSEP Values**: Lower RMSEP values indicate better model performance. Compare the RMSEP for the two models to see which one predicts more accurately on the test set.
+- **Predicted vs Actual Plot**:
+  - Ideal predictions would lie on the dashed line (`y = x`), indicating perfect agreement between predicted and actual values.
+  - Scatter around this line indicates the variability in predictions, with tighter clusters around the line suggesting better model performance.
+  - Observing whether one color (model) consistently lies closer to the line can help determine which model is more accurate.
+
+### Comment
+Based on the RMSEP values and the distribution of points in the plot, you can provide a comprehensive comment on:
+- How well each model predicts actual weights.
+- Which model appears to perform better and why.
+- Any systematic errors observed in predictions (e.g., overpredictions or underpredictions at certain weight ranges).
+- Implications for further model refinement or usage in practical scenarios.
+
+This process not only quantifies the performance of each model but also visually inspects the adequacy and precision of the predictions, offering a holistic view of how these models might perform in real-world applications.

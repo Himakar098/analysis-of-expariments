@@ -1,0 +1,839 @@
+---
+title: 'STAT2401 Analysis Experiments'
+author: 'Practical Week 9: Solutions'
+output:
+  html_document:
+    highlight: haddock
+    theme: flatly
+  html_notebook:
+    theme: flatly
+  word_document: default
+  pdf_document: default
+---
+
+## Learning Check
+
+When you complete this session, you will be able to:
+
+1. understand how to perform *All-Subsets* selection method for model selection;
+2. understand how to perform *forward* using AIC method for model selection;
+3. understand  how to perform *backward* using AIC method for model selection;
+4. understand how to perform *forward* using F test method for model selection;
+5. understand  how to perform *backward* using F test method for model selection.
+
+
+```{r echo=TRUE, message=FALSE}
+knitr::opts_chunk$set(prompt=FALSE, comment=NA, tidy=TRUE, message=FALSE, warning=FALSE)
+```
+For Highway dataset:
+
+```{r}
+# Load data
+print(load("S2_2019_STAT1000_Lab_Week9.RData"))
+```
+
+```{r}
+# Load these libraries that are included in later code; install them on your computer if they aren't already there.
+library(leaps)
+library(knitr)
+library(corrplot)
+```
+
+```{r include=FALSE}
+library(MASS)
+library(dplyr)
+library(ggplot2)
+library(leaps)
+library(PerformanceAnalytics)
+library(datarium)
+```
+## Question 1 Highway Data - All-Subsets selection
+
+We will focus on model selection, looking at all-subsets and sequential regression and criteria for evaluating different models (AIC, BIC, $C_p$, and adjusted $R^2$). Each of these criteria is a compromise between how well a model fits the data and the number of parameters in that model. 
+
+The data `Highway1` contains the accident rate in the US state of Minnesota in 1973 along with many potential explanatory variables. First, we'll fit a regression with all the variables, and then carry out all-subsets selection.
+
+
+![](Highway1.png)
+
+(a) You should first of all get a feel for the data by using functions such as `head` and appropriate plotting functions. A good one to start with is `pairs`. Is it easy to interpret? If you only want to look at the relationship between `logRate` and each of the other variables, what could you do? Notice that `hwy` is a variable that can take on one of four categories. 
+
+```{r echo=TRUE, fig.height=10, fig.width=10}
+# construct a scatterplot of your variables
+View(Highway1)
+str(Highway1)
+library(PerformanceAnalytics)
+chart.Correlation(Highway1[,-12])
+```
+
+Note that the factor variable “hwy” has been automatically coded as numeric, taking the values from 1 to the number of levels, but there is no indication here of what these represent. 
+
+To focus on just the dependent variable, ie the top row, you can plot “logRate” against all the others using familiar formula syntax:
+
+
+```{r}
+# plot logRate against the other variables
+par(mfrow=c(3,4),mar=c(3,3,1,1),mgp=c(1.2,0.3,0),tcl=-0.01)  # setting up the plotting region to have 3 rows and 4 columns, with suitable paramaters to make the plots more readable
+```
+    
+There is also a file uploaded to BB called `PairsWithHist.R` that contains a modification of the `pairs` function. Source it, and see what it does.
+
+```{r fig.height=10, fig.width=10}
+source("PairsWithHist.R")
+pairs(Highway1, lower.panel = panel.pts, upper.panel = panel.cor, diag.panel = panel.hist)
+```
+
+Here now we see that “hwy” has been recognised as a factor and plotted appropriately by boxplots. Several of the variables were provided as logs in the original data file - in this example we won’t be worrying about further transformations or whether there are outliers present. 
+
+If this data was to have been used for a project though, we would have suggested restricting to only 2 or 4-lane highways, and where only those highways with a lane width (“lwid”) of 12 feet.
+
+It is useful to look at these plots keeping in mind that *correlations between the explanatory variables* can have impact on the model selection process. For example, if 2 variables are providing similar information with regard to variability in the dependent variable, then either of the 2 explanatory variables may be significant in a “good” model by themselves but may both appear insignificant if they are included in the model together. (Note that here the absolute value of the correlations has been provided in the top right half of the plot).
+
+(b) How many possible linear models could be constructed using these data?
+
+The design matrix that underpins the model fitting process will have one column for each of 
+
+### the 10 numeric explanatory variables and 
+
+### 4-1=3 columns for “hwy” which is a factor with 4 levels. 
+
+Therefore there are $2^{(10+(4-1))}=2^{13}=8192$ possible linear models for this data.
+
+
+(c) The package `leaps` contains the function `regsubsets` that you can use to construct models of increasing complexity (more explanatory variables). For a given number of terms in the model, `regsubsets` provides by default the explanatory variables(s) that minimize residual sums of squares. It can be useful to look at the top-2, and sometimes even top-3.
+
+The syntax to carry out all-subsets regression is as follows, where 
+
+++ the argument `nvmax` specifies the maximum size of the model to consider, and 
+
+++ the argument `nbest` specifies the top-nbest models to consider for $1, 2, \ldots,$ `nvmax` variables:
+
+```{r echo=TRUE}
+AllSubsets2 <- regsubsets(logRate ~ ., nvmax = 10, nbest = 2, data = Highway1)
+```
+    
+Save the results of `regsubsets` into an object, and then display the results as follows:
+
+```{r echo=TRUE}
+AllSubsets2.summary <- summary(AllSubsets2)
+names(AllSubsets2.summary)
+```
+
+```{r}
+AllSubsets2.summary$cp
+```
+
+
+The object `AllSubsets2.summary` contains lots of useful information, some of which you'll need below. To see what's in it, try the command `names(AllSubsets2.summary)`. 
+
+```{r eval=FALSE}
+# Display results
+AllSubsets2.summary$outmat
+```
+
+
+```{r eval=FALSE}
+# The function kable just gives you a nicer-looking print-out of the table; 
+# you don't have to use it, but if you do, you need to load the library knitr.
+# Once you have done so, uncomment the line below.
+    
+kable(AllSubsets2.summary$outmat)
+```
+
+### The numbers at the very left give the size of the model ie the number of explanatory variables; 
+
+### The bracketed numbers are for the first and second best model (in terms of minimum RSS ie maximum R^2) for the respective size.
+
+(d) Re-run `regsubsets` with `nbest = 1`, and then construct plots of adjusted $R^2$, $C_p$, and BIC against number of variables. You will need to extract these criteria from the summary object.
+
+```{r}
+# Modify some graphical parameters
+par(mfrow = c(1, 3))
+par(cex.axis = 1.5)
+par(cex.lab = 1.5)
+
+AllSubsets <- regsubsets(logRate ~ ., nvmax = 10, nbest = 1, data = Highway1)
+AllSubsets.summary <- summary(AllSubsets)
+plot(1:10, AllSubsets.summary$adjr2, xlab = "subset size", ylab = "adjusted R-squared", type = "b")
+plot(1:10, AllSubsets.summary$cp, xlab = "subset size", ylab = "Mallows' Cp", type = "b")
+abline(0,1,col=2)
+plot(1:10, AllSubsets.summary$bic, xlab = "subset size", ylab = "BIC", type = "b")
+```
+
+This now gives the “best” choice of explanatory variables for models of size 1,2,…10. So out of all models with only a single covariate, we would choose speed limit (“slim”) as the best predictor of accident rate.
+
+For the $C_p$ Mallows, you can add a reference line to help you to locate the subset size that satisfies $C_p \approx p.$  From the above plot, it is between 3 and 4.
+
+(e) Which model(s) would you choose to then fit and then carry forward for further evaluation?
+
+From the results above, it’s probably best to carry forward models with 4 or 5 variables, chosen from the table produced by regsubsets above. 
+
+For example, the model with 4 variables contains logLen, logSigs1, slim, and hwy taking the value “PA”, so we’d fit it as follows:
+
+```{r}
+lm4 <- lm(logRate ~ logLen + logSigs1 + slim + I(hwy=="PA"), data = Highway1)
+summary(lm4)
+
+```
+
+A model with 5 variables contains the additional variable logADT:
+
+```{r}
+lm5 <- lm(logRate ~ logLen + logSigs1 + logADT + slim + I(hwy=="PA"), data = Highway1)
+summary(lm5)
+```
+
+The addition of the 5th variable logADT (daily traffic) has increased the adjusted $R^2$ from 0.71 to 0.73 which isn’t enough to be deemed significant by the drop-in-F test with a P-value of 0.11 (equivalent to the T-test in the output above as the partial-F test is only assessing the dropping of a single term).
+
+(Note that in practice, you would usually consider inclusion or otherwise of the variable “hwy” as a whole, not pull off just one of the factor levels.)
+
+# Question 2 Highway Data - Sequential method
+
+(a) Construct a model containing *all* the variables and output a summary. You can retain the design matrix by including the argument "x=TRUE" to your call to `lm`. Compare the design matrix with the model matrix.
+
+```{r}
+# Set up a model that has all the variables
+lm.all <- lm(logRate ~ ., data = Highway1,x=TRUE)
+summary(lm.all)
+``` 
+Remember that the effects of the explanatory variables here must be considered 
+jointly, ie as effects in the presence of the other variables. When there are 
+covariates which are themselves correlated note that:
+
+### Variables which by themselves may be quite significant can be washed out when considered with others. For example, logTrks is quite strongly correlated with the accident rate when considered alone (R=-0.54, P=0.0003) but not in the model in the full model above. 
+
+### Sometimes the effects may actually go in the opposite direction to what you would expect as they are counterbalanced by other variables (possibly too many variables in the model). Note, for example, that all 3 levels of “hwy” MA/MC/PA appear to be associated with lower accident rates than the baseline FAI, and yet from the boxplots above we see that when unadjusted for any other variables FAI has the lowest number of rates on average.
+
+
+(b) What is your final model using *backward sequential* selection that uses the change in the residual sums of squares as the criterion in the model building process. 
+
+This is relatively straightforward to do directly, as it’s equivalent to sequentially dropping off the least significant variable you can see in the output table of each iteration. 
+
+Starting with the full model above, the first variable to be omitted would be “shld” *(with the highest p-value 0.9313)*
+
+```{r}
+round(summary(lm(logRate ~ logLen+logADT+logTrks+logSigs1+slim+lane+acpt+itg+lwid+hwy,data=Highway1))$coef,4)
+```
+
+Then removing "itg" with the p-val=0.8878
+
+```{r}
+round(summary(lm(logRate ~ logLen+logADT+logTrks+logSigs1+slim+lane+acpt+lwid+hwy,data=Highway1))$coef,4)
+```
+
+Then removing "lane" with p-value 0.8443
+
+```{r}
+round(summary(lm(logRate ~ logLen+logADT+logTrks+logSigs1+slim+acpt+lwid+hwy,data=Highway1))$coef,4)
+```
+
+Then removing "lwid" with p-val=0.7214
+
+```{r}
+round(summary(lm(logRate ~ logLen+logADT+logTrks+logSigs1+slim+acpt+hwy,data=Highway1))$coef,4)
+```
+
+Then removing "hwyMC" with p-val=0.5230
+
+```{r}
+round(summary(lm(logRate ~ logLen+logADT+logTrks+logSigs1+slim+I(hwy=="MA")+I(hwy=="PA"),data=Highway1))$coef,4)
+```
+
+Then removing "logTrks" with p-val=0.2950
+
+
+```{r}
+round(summary(lm(logRate ~ logLen+logADT+logSigs1+slim+I(hwy=="MA")+I(hwy=="PA"),data=Highway1))$coef,4)
+```
+
+
+Then removing "hwy=="MA"" with p-val=0.2085
+
+```{r}
+round(summary(lm(logRate ~ logLen+logADT+logSigs1+slim+I(hwy=="PA"),data=Highway1))$coef,4)
+```
+
+Then removing "logADT" with p-val=0.1187
+
+```{r}
+round(summary(lm(logRate ~ logLen+logSigs1+slim+I(hwy=="PA"),data=Highway1))$coef,4)
+```
+
+
+(c) Now try backward and forward sequential selection by changing the "method" argument in `regsubsets` to construct potential models for the highway data. 
+
+Do the procedures yield the same models?
+
+```{r}
+par(mfrow = c(1, 3))
+par(cex.axis = 1.5)
+par(cex.lab = 1.5)
+Backward <- regsubsets(logRate ~ ., nbest = 1, data = Highway1,method="backward")
+Backward.summary <- summary(Backward)
+nn<-nrow(Backward.summary$outmat)
+plot(1:nn, Backward.summary$adjr2, xlab = "subset size", ylab = "adjusted R-squared", type = "b")
+plot(1:nn, Backward.summary$cp, xlab = "subset size", ylab = "Mallows' Cp", type = "b")
+abline(0,1, col=2)
+plot(1:nn, Backward.summary$bic, xlab = "subset size", ylab = "BIC", type = "b")
+```
+
+Retrieve the results from Q1, using All Subsets for comparison:
+
+```{r}
+AllSubsets.summary$outmat
+```
+
+```{r}
+Backward.summary$outmat
+```
+
+```{r}
+par(mfrow = c(1, 3))
+par(cex.axis = 1.5)
+par(cex.lab = 1.5)
+Forward <- regsubsets(logRate ~ ., nbest = 1, data = Highway1,method="forward")
+Forward.summary <- summary(Forward)
+nn<-nrow(Forward.summary$outmat)
+plot(1:nn, Forward.summary$adjr2, xlab = "subset size", ylab = "adjusted R-squared", type = "b")
+plot(1:nn, Forward.summary$cp, xlab = "subset size", ylab = "Mallows' Cp", type = "b")
+abline(0,1, col=2)
+plot(1:nn, Forward.summary$bic, xlab = "subset size", ylab = "BIC", type = "b")
+
+```
+
+```{r}
+Forward.summary$outmat
+```
+
+Consideration of the successive models from the backward selection process arrives at the same best set of 4 variables as the All Subsets method. 
+
+However, for the forward selection method once a variable is in the “best” set it stays there in all larger models, and this has compromised the trade-off between balancing the goodness-of-fit and the penalty of adding extra variables to the model.
+
+(d) Alternatively, you can try backward and forward sequential selection using `step` in the base "stats" package, which uses AIC as the criterion for the model building process.
+
+```{r}
+# backward selection
+lm.backward <- step(lm.all,  direction = "backward", trace = 0)
+summary(lm.backward)
+```
+
+```{r}
+# Forward selection
+lm.0 <- lm(logRate ~ 1, data = Highway1) # Set up simplest model to start with
+lm.forward <- step(lm.0, scope = formula(lm.all), direction = "forward", trace = 0)
+summary(lm.forward)
+```
+
+Do the procedures yield the same model as from `regsubsets`?
+
+With the different criterion of the AIC, and given the high degree of correlation between the explanatory variables, for both backward and forward selection we have arrived at different “best” sets of variables again.
+
+Toggling the "trace" argument provides more output from intermediate steps - can you follow what is happening when trace=1?
+
+```{r}
+# backward selection with intermediate output
+step(lm.all,  direction = "backward", trace = 1)
+```
+
+```{r}
+# Forward selection with intermediate output
+ step(lm.0, scope = formula(lm.all), direction = "forward", trace = 1)
+```
+
+
+(e)  When there is high correlation between explanatory variables the different approaches are likely to yield different "best" models, and you are likely to run into the problem of multi-collinearity (when one of the variables can be predicted fairly well from some combination of the others). This can lead to inflated variances of predicted values and greater chance of having influential observations. The function `corrplot` (found in the "corrplot" library) is another function that provides useful plots for examining correlation.
+
+
+```{r}
+corrplot(cor(Highway1[,-12]),method="ellipse")
+```
+
+
+## Question 3  Bridge data (Sheather, 2009) - Variable selection
+
+The following is reproduced from the textbook.
+
+Information from 45 bridge projects was compiled for use in this study. The data are partially listed in Table 6.3 below and can be found on the book web site in the
+file *bridge.txt*. The response and predictor variables are as follows:
+
+$Y$ = Time = design time in person-days
+$X_1$ = DArea = Deck area of bridge (000 sq ft)
+$X_2$ = CCost = Construction cost ($000)
+$X_3$ = Dwgs = Number of structural drawings
+$X_4$ = Length = Length of bridge (ft)
+$X_5$ = Spans = Number of spans
+
+```{r include=FALSE}
+bridge <- read.table("bridge.txt", header=TRUE)
+attach(bridge)
+```
+
+(a). Conduct exploratory analysis for this dataset.
+
+```{r}
+#Figure 6.39 page 197
+pairs(Time~DArea+CCost+Dwgs+Length+Spans,data=bridge,cex.labels=1.4)
+```
+
+The above scatterplot matrix contains a scatter plot matrix of response
+variable and the five predictor variables. 
+
+### The response variable and a number of the predictor variables are highly skewed. 
+
+### There is also evidence of nonconstant variance in the top row of plots. 
+
+Thus, we need to consider *transformations* of the response and the five predictor variables.
+
+```{r}
+#Figure 6.40 page 198
+pairs(log(Time)~log(DArea)+log(CCost)+log(Dwgs)+log(Length)+log(Spans),data=bridge)
+```
+
+Each variable is transformed using the log transformation. Figure in the above shows a
+scatter plot matrix of the log-transformed response and predictor variables. The pairwise
+relationships in the above are much more linear than those in figure without transformation.
+There is no longer any evidence of nonconstant variance in the top row of plots.
+
+(b). Fit a full model based on the transformation in (a). 
+
+Fitting the full model.
+
+```{r}
+#Figure 6.41 page 199
+m1 <- lm(log(Time)~log(DArea)+log(CCost)+log(Dwgs)+log(Length)+log(Spans))
+```
+
+
+```{r}
+#Regression output on page 200
+summary(m1)
+```
+
+While the overall F-test for model is highly statistically significant (i.e., has very small p-value), note that though:
+
+     - only one of the estimated regression coefficients is statistically significant (i.e., log(Dwgs) with a p-value < 0.001).
+     - the estimated regression coefficients for log(DArea) and log(Length) are of the wrong sign (i.e., negative), since longer bridges or bridges with larger area should take a longer rather than a shorter time to design.
+
+Having observed that there are possible relationships among explanatory variables, 
+we have checked the  *multicollinearity* last week.
+
+We will be using it now for model selection.
+
+The R codes are taken from the textbook Sheather (2009). It is slighly different to
+Questions 1 and 2, but the methods are the same.
+
+As only one of the estimated regression coefficients is statistically significant
+(i.e., log(Dwgs) with a p -value < 0.001). Thus, we wish to choose a subset of the
+predictors using *variable selection*.
+
+(c) Conduct all-subsets method.
+
+Firstly, we construct the matrix X of 5 explanatory variables.
+
+```{r}
+#Figure 7.1 on page 235
+m1 <- lm(log(Time)~log(DArea)+log(CCost)+log(Dwgs)+log(Length)+log(Spans))
+logDArea <- log(DArea)
+logCCost <- log(CCost)
+logDwgs <- log(Dwgs)
+logLength <- log(Length)
+logSpans <- log(Spans)
+X <- cbind(logDArea,logCCost,logDwgs,logLength,logSpans)
+head(X)
+```
+
+
+```{r}
+#install.packages("leaps")
+library(leaps)
+b <- regsubsets(as.matrix(X),log(Time))
+rs <- summary(b)
+rs
+```
+
+Model 1: logDwgs
+
+Model 2: logDwgs, logSpans
+
+Model 3: logCCost, logDwgs, logSpans
+
+Model 4: logDArea logCCost logDwgs logSpans
+
+Model 5: logDArea logCCost logDwgs logLength logSpans
+
+(d) Calculate the adjusted $R^2$ for the 5 models.
+
+```{r}
+plot(1:5,rs$adjr2,xlab="Subset Size",ylab="Adjusted R-squared")
+```
+
+
+```{r}
+#Table 7.1 on page 235
+#Calculate adjusted R-squared
+rs$adjr2
+```
+Using adjusted $R^2$, it recommends Model 3: logCCost, logDwgs, logSpans.
+
+(e) Calculate the Akaike criterions for the 5 models.
+
+```{r}
+om1 <- lm(log(Time)~log(Dwgs))
+om2 <- lm(log(Time)~log(Dwgs)+log(Spans))
+om3 <- lm(log(Time)~log(Dwgs)+log(Spans)+log(CCost))
+om4 <- lm(log(Time)~log(Dwgs)+log(Spans)+log(CCost)+log(DArea))
+om5 <- m1
+```
+
+Below, the R codes are used to calculate AIC, AICc and BIC, for each subset 1-5.
+
+The R command `extractAIC` computes the (generalized) Akaike An Information Criterion for a fitted parametric model.
+
+```{r}
+#Subset size=1
+n <- length(om1$residuals)
+npar <- length(om1$coefficients) +1
+#Calculate AIC
+extractAIC(om1,k=2)
+#Calculate AICc
+extractAIC(om1,k=2)+2*npar*(npar+1)/(n-npar-1)
+#Calculate BIC
+extractAIC(om1,k=log(n))
+```
+
+The two values for each AIC, AICc and BIC are
+
+    - edf: the ‘equivalent degrees of freedom’ for the fitted model fit.
+    - AIC: the (generalized) Akaike Information Criterion for fit.
+
+```{r}
+#Subset size=2
+npar <- length(om2$coefficients) +1
+#Calculate AIC
+extractAIC(om2,k=2)
+#Calculate AICc
+extractAIC(om2,k=2)+2*npar*(npar+1)/(n-npar-1)
+#Calculate BIC
+extractAIC(om2,k=log(n))
+```
+
+
+```{r}
+#Subset size=3
+npar <- length(om3$coefficients) +1
+#Calculate AIC
+extractAIC(om3,k=2)
+#Calculate AICc
+extractAIC(om3,k=2)+2*npar*(npar+1)/(n-npar-1)
+#Calculate BIC
+extractAIC(om3,k=log(n))
+```
+
+
+```{r}
+#Subset size=4
+npar <- length(om4$coefficients) +1
+#Calculate AIC
+extractAIC(om4,k=2)
+#Calculate AICc
+extractAIC(om4,k=2)+2*npar*(npar+1)/(n-npar-1)
+#Calculate BIC
+extractAIC(om4,k=log(n))
+```
+
+
+```{r}
+#Subset size=5
+npar <- length(om5$coefficients) +1
+#Calculate AIC
+extractAIC(om5,k=2)
+#Calculate AICc
+extractAIC(om5,k=2)+2*npar*(npar+1)/(n-npar-1)
+#Calculate BIC
+extractAIC(om5,k=log(n))
+```
+
+Based on the above criteria, adjusted $R^2$ and AIC recommend the predictor subset of size 3 to be “best” while AICC and BIC judge the subset of size 2 to be the best. 
+
+(f) Summarise the two models from the subset selection method.
+
+```{r}
+#Regression output on pages 235 and 236
+summary(om2)
+summary(om3)
+```
+Notice that both predictor variables are judged to be statistically
+significant in the two-variable model, while just one variable is judged to
+be statistically significant in the three-variable model.
+
+(g). Apply backward method, using AIC and BIC respectively.
+
+```{r}
+#Output from R on page 237
+backAIC <- step(m1,direction="backward", data=bridge)
+```
+
+
+```{r}
+backBIC <- step(m1,direction="backward", data=bridge, k=log(n))
+```
+
+(h). Apply the forward  method using AIC and BIC respectively.
+
+```{r}
+#Output from R on page 238
+mint <- lm(log(Time)~1,data=bridge)
+forwardAIC <- step(mint,scope=list(lower=~1, 
+upper=~log(DArea)+log(CCost)+log(Dwgs)+log(Length)+log(Spans)),
+direction="forward", data=bridge)
+```
+
+Backward elimination based on AIC chooses the model with the three
+predictors log(CCost), log(Dwgs) and log(Spans). It can be shown that backward
+elimination based on BIC chooses the model with the two predictors log(Dwgs) and
+log(Spans).
+
+```{r}
+forwardBIC <- step(mint,scope=list(lower=~1, 
+upper=~log(DArea)+log(CCost)+log(Dwgs)+log(Length)+log(Spans)),
+direction="forward", data=bridge,k=log(n))
+```
+
+
+Forward selection based on AIC (shown in the above) arrives at the same model as backward elimination based on AIC. 
+
+It can be shown that forward selection based on BIC arrives at the same model as backward elimination based on BIC. We are again faced with a choice between the two-predictor and three-predictor models
+discussed earlier.
+
+## Question 4 Election data - Backward using F Test
+
+The Presidential Election Data (1916-1996), {\tt Election.txt}, shows the proportion
+of votes obtained by a presidential candidate in a United States
+presidential election, which can be predicted accurately by three
+macroeconomic variables, incumbency, and a variable which indicates
+whether the election was held during or just after a war. 
+
+The variables considered are given here
+
+      - `YEAR`: Election year
+      - `V`: Democratic share of the two-party presidential vote
+      - `I`:Indicator variable ($1$ if there is a Democratic incumbent at the time of the election\\
+        & and $-1$ if there is a Republican incumbent)
+      - `D`: Indicator variable (1 if a Democratic incumbent is running for election, -1 if a
+         Republican incumbent is running for election, and 0 otherwise)
+      - `W`: Indicator variable (1 for the elections of 1920, 1944, and 1948, and 0 otherwise)
+      - `G`: Growth rate of real per capita GDP in the first three quarters of the election year
+      - `P`: Absolute value of the growth rate of the GDP deflator in the first 15 quarters of 
+            the administration
+      - `N`: Number of quarters in the first 15 quarters of the administration in which the growth 
+        & rate of real per capita GDP is greater than 3.2\%
+
+
+All growth rates are annual rates in percentage points. Consider
+fitting the initial model
+$$
+{\tt V}=\beta_0+\beta_1{\tt I}+\beta_2{\tt D}+\beta_3{\tt W}+\beta_4({\tt G}{\tt I})+\beta_5{\tt P}+\beta_6{\tt N}+\epsilon%
+$$
+to the data. Here {\tt G}`I` is the product of the values `G` and `I` and it
+can be calculated as
+${\tt GI = G*I}$ in \texttt{R}.
+
+(a) Do we need to keep the variables `I` and ({\tt G}{\tt I}) in the above model?
+
+Read the data in
+
+```{r size="scriptsize"}
+Election = read.table("Election.txt",header=T)
+Election = cbind(Election,GI=Election$G*Election$I)
+```
+
+Again, we use extra SS principle: 
+
+        - Full Model: With `I` and ({\tt G}{\tt I})
+        - Reduced Model: Without `I` and ({\tt G}{\tt I})
+
+```{r size="scriptsize"}
+Election.full.lm = lm(V~I+D+W+GI+P+N,data=Election)
+Election.reduced.lm = lm(V~D+W+P+N,data=Election)
+anova(Election.reduced.lm,Election.full.lm)
+```
+
+Here we consider the test $H_0:\beta_1=\beta_4=0$ against $H_1:$
+$\beta_1\neq0$ or $\beta_4\neq0$. $p$-value $=0.0003335<0.05$. Reject
+$H_0$ at the 5\% significance level. We do keep the variables.
+
+The response variable `V` is the proportion of votes. Since the
+response is a proportion, it has a value between 0 and 1. The
+transformation $`Y` = {\tt log}\big(\frac{{\tt V}}{1-{\tt
+V}}\big)$ takes the variable `V` with values between $0$ and $1$
+to a variable `Y` with values between $-\infty$ to $+\infty$. It
+is therefore more reasonable to expect that `Y` satisfies the
+normality assumption than does {\tt V}. Now, Consider fitting the
+model
+
+$$
+{\tt Y}=\beta_0+\beta_1{\tt I}+\beta_2{\tt D}+\beta_3{\tt W}+\beta_4({\tt G}{\tt I})+\beta_5{\tt P}+\beta_6{\tt N}+\epsilon%
+$$
+
+
+(b) Do we need to keep the variables `I` and ({\tt G}{\tt I}) in the above model?
+
+
+We do the transformation and create a variable $\texttt{Y}$
+
+```{r size="scriptsize"}
+Election$Y = log(Election$V/(1-Election$V))
+```
+
+Conduct the test:
+        
+          - Full Model: With `I` and ({\tt G}{\tt I})
+          - Reduced Model: Without `I` and ({\tt G}{\tt I})
+
+```{r size="scriptsize"}
+Election.full.lm = lm(Y~I+D+W+GI+P+N,data=Election)
+Election.reduced.lm = lm(Y~D+W+P+N,data=Election)
+anova(Election.reduced.lm,Election.full.lm)
+```
+
+With the test $H_0:\beta_1=\beta_4=0$ against $H_1:$
+$\beta_1\neq0$ or $\beta_4\neq0$, here $p$-value $=0.0003194<0.05$. Reject
+$H_0$ at the 5\% significance level. We do keep the variables.
+
+(c) Apply backward elimination based on $F$-test to choose the best model or models that might be expected to perform best in predicting future presidential elections.
+
+
+Backward elimination based on $F$-test:
+
+- We start from the full model: ${\tt Y}=\beta_0+\beta_1{\tt I}+\beta_2{\tt D}+\beta_3{\tt W}+\beta_4({\tt G}{\tt I})+\beta_5{\tt P}+\beta_6{\tt N}+\epsilon$
+
+```{r size="scriptsize"}
+Election.lm = lm(Y~I+D+W+GI+P+N,data=Election)
+drop1(Election.lm,test="F")
+```
+
+- Drop \texttt{P}
+
+```{r size="scriptsize"}
+Election.lm = update(Election.lm,.~.-P)
+drop1(Election.lm,test="F")
+```
+
+- Drop \texttt{W}
+```{r size="scriptsize"}
+Election.lm = update(Election.lm,.~.-W)
+drop1(Election.lm,test="F")
+```
+
+- Drop \texttt{I}
+
+```{r size="scriptsize"}
+Election.lm = update(Election.lm,.~.-I)
+drop1(Election.lm,test="F")
+```
+
+- Drop \texttt{N}
+```{r size="scriptsize"}
+Election.lm = update(Election.lm,.~.-N)
+drop1(Election.lm,test="F")
+```
+
+The Final model: ${\tt Y}=\beta_0+\beta_2{\tt D}+\beta_4({\tt G}{\tt I})+\epsilon$
+
+Two-variable model is to be preferred since both predictor variables are statistically significant with $\alpha=0.05$
+
+## Question 5 Gal\'apagos Islands
+
+The Gal\'apagos Islands off the coast of Ecuador provide an excellent laboratory for studying the factors that influence the development and survival of different life species. The data is
+available in {\tt galapagos.txt}, giving the
+number of species and related variables for 29 different islands.
+
+The variables are:
+
+     - Island: Island name
+     - Number of species: Number of endemic species (occurs only on that island)
+     - Area: Surface area of island, hectares
+     - Anear: Area of closest island, hectares
+     - Dist: Distance to closest island, kilometers
+     - DistSC: Distance from Santa Cruz Island, kilometers
+     - Elevation: Elevation in m, missing values given as "NA"
+     - EM: 1 if elevation is observed, 0 if missing
+
+To ensure the data accessible, we could take all the "{\tt NA}" to
+be zero.
+
+
+```{r eva=FALSE,size="scriptsize"}
+galapagos = read.table("galapagos.txt",header=T)
+galapagos[is.na(galapagos)] = 0
+```
+
+Counts are given for both the total number of species (\texttt{NS}) and the number
+of species that occur only on that one island (the endemic species). Use these data to find factors, \texttt{Area}, \texttt{Anear}, \texttt{Dist}, \texttt{DistSC}, and \texttt{Elevation}, that influence diversity, as measured by the total
+number of species, \texttt{NS}. 
+
+Use backward elimination and forward selection based on $F$-test
+
+The solution:
+
+- Read the data in
+
+```{r size="scriptsize"}
+galapagos = read.table("galapagos.txt",header=T)
+galapagos[is.na(galapagos)] = 0
+```
+
+- Backward elimination based on $F$-test:
+
+            - We start from the full model: $\texttt{NS}=\beta_0+\beta_1\texttt{Area}+\beta_2\texttt{Anear}+\beta_3\texttt{Dist}+\beta_4\texttt{DistSC}+\beta_5\texttt{Elevation}+\epsilon$
+
+```{r size="scriptsize"}
+galapagos.lm = lm(NS~Area+Anear+Dist+DistSC+Elevation,data=galapagos)
+drop1(galapagos.lm,test="F")
+```
+            
+            - remove \texttt{Dist}
+```{r size="scriptsize"}
+galapagos.lm = update(galapagos.lm,.~.-Dist)
+drop1(galapagos.lm,test="F")
+```
+
+           - remove \texttt{Area}
+```{r size="scriptsize"}
+galapagos.lm = update(galapagos.lm,.~.-Area)
+drop1(galapagos.lm,test="F")
+```
+ 
+           - remove \texttt{DistSC}
+```{r size="scriptsize"}
+galapagos.lm = update(galapagos.lm,.~.-DistSC)
+drop1(galapagos.lm,test="F")
+```
+
+The Final model: $\texttt{SN}=\beta_0+\beta_2\texttt{Anear}+\beta_5\texttt{Elevation}+\epsilon$
+
+- Forward selection based on $F$-test:
+
+              - We start from the null model: $\texttt{NS}=\beta_0+\epsilon$
+
+```{r size="scriptsize"}
+galapagos.lm = lm(NS~1,data=galapagos)
+add1(galapagos.lm,~Area+Anear+Dist+DistSC+Elevation,test="F")
+```
+         
+              - add \texttt{Elevation}
+              
+```{r size="scriptsize"}
+galapagos.lm = update(galapagos.lm,.~.+Elevation)
+add1(galapagos.lm,~Area+Anear+Dist+DistSC+Elevation,test="F")
+```
+        
+              - add \texttt{Anear}
+              
+```{r size="scriptsize"}
+galapagos.lm = update(galapagos.lm,.~.+Anear)
+add1(galapagos.lm,~Area+Anear+Dist+DistSC+Elevation,test="F")
+```
+
+The Final model: $\texttt{SN}=\beta_0+\beta_2\texttt{Anear}+\beta_5\texttt{Elevation}+\epsilon$
+

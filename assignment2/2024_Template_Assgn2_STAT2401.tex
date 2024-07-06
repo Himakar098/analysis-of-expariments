@@ -1,0 +1,915 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\usepackage[margin=1in]{geometry}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  pdftitle={Assignment 2 Submission},
+  pdfauthor={Himakar Gadham, Atikant Jain},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\title{Assignment 2 Submission}
+\author{Himakar Gadham, Atikant Jain}
+\date{}
+
+\begin{document}
+\maketitle
+
+\hypertarget{assignment-2-submitted-by-student-name-student-id}{%
+\subsection{Assignment 2 submitted by Student Name, Student
+ID}\label{assignment-2-submitted-by-student-name-student-id}}
+
+Himakar Gadham - 23783777, Atikant Jain - 24051868
+
+\hypertarget{statement-of-contribution}{%
+\subsubsection{Statement of
+Contribution:}\label{statement-of-contribution}}
+
+Both of us contributed equally to all the questions. We both sat
+together in library and worked through each question. We did it by going
+through labs question and answers, comparing our output with each other,
+clarifying doubts and clearing concepts.
+
+\hypertarget{question-1-air-pollution-and-mortality.-does-pollution-kill-people-30-marks}{%
+\subsection{Question 1 Air Pollution and Mortality. Does pollution kill
+people? (30
+marks)}\label{question-1-air-pollution-and-mortality.-does-pollution-kill-people-30-marks}}
+
+\begin{enumerate}
+\def\labelenumi{(\alph{enumi})}
+\tightlist
+\item
+  (5 marks) Carry out exploratory data analysis (EDA) of this dataset,
+  taking into account the following groups of associations with the
+  response (see the question sheet)
+\end{enumerate}
+
+\includegraphics{2024_Template_Assgn2_STAT2401_files/figure-latex/unnamed-chunk-3-1.pdf}
+
+Precipitation and July Temperature show a moderate positive correlation
+with mortality. January Temperature shows a weak positive correlation
+with mortality. Humidity does not show a clear correlation with
+mortality.
+\includegraphics{2024_Template_Assgn2_STAT2401_files/figure-latex/unnamed-chunk-4-1.pdf}
+Population Density shows a moderate positive correlation with mortality.
+Over65, House, Educ, Sound, NonWhite, WhiteCol, and Poor do not show
+clear trends, suggesting weak or no correlation with mortality.
+
+\begin{verbatim}
+## Warning: Removed 6 rows containing missing values (`geom_point()`).
+\end{verbatim}
+
+\includegraphics{2024_Template_Assgn2_STAT2401_files/figure-latex/unnamed-chunk-5-1.pdf}
+Sulfur Dioxide (SO2) shows a moderate positive correlation with
+mortality. Hydrocarbons (HC) and Nitrogen Oxides (NOX) do not show clear
+trends, suggesting weak or no correlation with mortality.
+\includegraphics{2024_Template_Assgn2_STAT2401_files/figure-latex/unnamed-chunk-6-1.pdf}
+There are noticeable differences in mortality rates across different
+states and regions. The Midwest and Northeast regions tend to have
+higher median mortality rates compared to the South and West regions.
+The variability in mortality rates also differs by state, with some
+states showing more consistency (narrower distributions) and others
+showing more variability (wider distributions).
+
+\begin{enumerate}
+\def\labelenumi{(\alph{enumi})}
+\setcounter{enumi}{1}
+\tightlist
+\item
+  (9 marks) Perform model selection process using \{\it All Subset\}
+  method to arrive at good regression models that account for variation
+  in mortality between the cities that can be attributed to differences
+  in \{\it  climate and socioeconomic factors.\} Identify optimal
+  model(s) based on each of the adjusted \(R^2\), BIC and \(C_p.\)
+\end{enumerate}
+
+\begin{verbatim}
+## corrplot 0.92 loaded
+\end{verbatim}
+
+\includegraphics{2024_Template_Assgn2_STAT2401_files/figure-latex/unnamed-chunk-10-1.pdf}
+
+\begin{verbatim}
+## [1] 7
+\end{verbatim}
+
+\begin{verbatim}
+## [1] 4
+\end{verbatim}
+
+\begin{verbatim}
+## [1] 6
+\end{verbatim}
+
+\begin{verbatim}
+## [1] "(Intercept)" "Precip"      "JanTemp"     "JulyTemp"    "House"      
+## [6] "Educ"        "Density"     "NonWhite"
+\end{verbatim}
+
+\begin{verbatim}
+## [1] "(Intercept)" "JanTemp"     "House"       "Educ"        "NonWhite"
+\end{verbatim}
+
+\begin{verbatim}
+## [1] "(Intercept)" "Precip"      "JanTemp"     "JulyTemp"    "Educ"       
+## [6] "Density"     "NonWhite"
+\end{verbatim}
+
+\begin{enumerate}
+\def\labelenumi{(\alph{enumi})}
+\setcounter{enumi}{2}
+\tightlist
+\item
+  (4 marks) Fit an optimal model with the lowest \(C_p\) as obtained in
+  (b). Write the equation of this fitted model. Interpret this model.
+\end{enumerate}
+
+\begin{verbatim}
+## 
+## Call:
+## lm(formula = Mortality ~ Precip + JanTemp + JulyTemp + Educ + 
+##     Density + NonWhite, data = pollution)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -80.685 -21.529   1.422  22.777  83.055 
+## 
+## Coefficients:
+##               Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)  1.242e+03  1.233e+02  10.078 6.41e-14 ***
+## Precip       1.401e+00  6.074e-01   2.307   0.0250 *  
+## JanTemp     -1.684e+00  5.330e-01  -3.161   0.0026 ** 
+## JulyTemp    -2.840e+00  1.289e+00  -2.203   0.0319 *  
+## Educ        -1.616e+01  6.652e+00  -2.429   0.0186 *  
+## Density      7.570e-03  3.316e-03   2.283   0.0265 *  
+## NonWhite     5.275e+00  6.906e-01   7.639 4.24e-10 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 35.43 on 53 degrees of freedom
+## Multiple R-squared:  0.7086, Adjusted R-squared:  0.6756 
+## F-statistic: 21.48 on 6 and 53 DF,  p-value: 1.305e-12
+\end{verbatim}
+
+\hypertarget{mortality-1.242e03-1.401e00precip--1.684e00jantemp--2.840e00julytemp--1.616e01educ-7.570e-03density-5.275e00nonwhite}{%
+\subsubsection{\texorpdfstring{Mortality = 1.242e+03 +
+1.401e+00\emph{Precip -1.684e+00}JanTemp -2.840e+00\emph{JulyTemp
+-1.616e+01}Educ + 7.570e-03\emph{Density +
+5.275e+00}NonWhite}{Mortality = 1.242e+03 + 1.401e+00Precip -1.684e+00JanTemp -2.840e+00JulyTemp -1.616e+01Educ + 7.570e-03Density + 5.275e+00NonWhite}}\label{mortality-1.242e03-1.401e00precip--1.684e00jantemp--2.840e00julytemp--1.616e01educ-7.570e-03density-5.275e00nonwhite}}
+
+Overall Fit: The model explains 70.86\% of the variability in mortality
+(R-squared = 0.7086). The model is highly significant (F-statistic =
+21.48, p-value = 1.305e-12).
+
+Precipitation: Each unit increase in precipitation is associated with a
+1.401 increase in mortality (p = 0.0250). January Temperature: Each unit
+increase in January temperature is associated with a 1.684 decrease in
+mortality (p = 0.0026). July Temperature: Each unit increase in July
+temperature is associated with a 2.840 decrease in mortality (p =
+0.0319). Education Level: Each unit increase in education level is
+associated with a 16.16 decrease in mortality (p = 0.0186). Population
+Density: Each unit increase in population density is associated with a
+0.00757 increase in mortality (p = 0.0265). Percentage of Non-White
+Population: Each unit increase in the non-white population percentage is
+associated with a 5.275 increase in mortality (p \textless{} 0.001).
+
+\begin{enumerate}
+\def\labelenumi{(\alph{enumi})}
+\setcounter{enumi}{3}
+\tightlist
+\item
+  (7 marks) Perform diagnostics checking on the model in (c). Do you
+  think there are influential points in the data? Identify the cities
+  which are influential points using leverage and Cook's distance
+  respectively.
+\end{enumerate}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{par}\NormalTok{(}\AttributeTok{mfrow=}\FunctionTok{c}\NormalTok{(}\DecValTok{2}\NormalTok{,}\DecValTok{2}\NormalTok{))}
+\FunctionTok{plot}\NormalTok{(model)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{2024_Template_Assgn2_STAT2401_files/figure-latex/unnamed-chunk-14-1.pdf}
+Residuals vs Fitted (top-left) shows a smoothing curve with no pattern
+Scale-Location (bottom-left) shows a slight increasing trend Normal Q-Q
+(top-right) shows most observations lie around the straight line
+Residuals vs Leverage (bottom-right) shows leverage points and potential
+outliers
+
+\includegraphics{2024_Template_Assgn2_STAT2401_files/figure-latex/unnamed-chunk-16-1.pdf}
+\includegraphics{2024_Template_Assgn2_STAT2401_files/figure-latex/unnamed-chunk-17-1.pdf}
+
+\begin{verbatim}
+## High leverage points: 3 7 8 13 19 20
+\end{verbatim}
+
+\begin{verbatim}
+## Outliers: 4 20 50 60
+\end{verbatim}
+
+We have 6 high leverage point and 4 outliers. But from the
+interpretation of the graps we can see that only outlier 20 and 5
+leverage points are influencing indicating that they are bad points.
+
+\begin{enumerate}
+\def\labelenumi{(\alph{enumi})}
+\setcounter{enumi}{4}
+\tightlist
+\item
+  (5 marks) Using the model obtained in (c), add the three pollution
+  variables (transformed to their natural logarithm) and obtain the
+  p-value from the extra-sum-of-squares F-test due to their addition.
+  Summarise your findings in a few concise sentences.
+\end{enumerate}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{model2 }\OtherTok{\textless{}{-}} \FunctionTok{lm}\NormalTok{(Mortality }\SpecialCharTok{\textasciitilde{}}\NormalTok{ Precip }\SpecialCharTok{+}\NormalTok{ JanTemp }\SpecialCharTok{+}\NormalTok{ JulyTemp }\SpecialCharTok{+}\NormalTok{ Educ }\SpecialCharTok{+}\NormalTok{ Density }\SpecialCharTok{+}\NormalTok{ NonWhite}\SpecialCharTok{+} \FunctionTok{log}\NormalTok{(HC) }\SpecialCharTok{+} \FunctionTok{log}\NormalTok{(NOX) }\SpecialCharTok{+} \FunctionTok{log}\NormalTok{(SO2), }\AttributeTok{data =}\NormalTok{ pollution)}
+\FunctionTok{summary}\NormalTok{(model2)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Call:
+## lm(formula = Mortality ~ Precip + JanTemp + JulyTemp + Educ + 
+##     Density + NonWhite + log(HC) + log(NOX) + log(SO2), data = pollution)
+## 
+## Residuals:
+##    Min     1Q Median     3Q    Max 
+## -78.49 -18.65   4.88  19.27  61.66 
+## 
+## Coefficients:
+##               Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)  1.143e+03  1.534e+02   7.448 1.20e-09 ***
+## Precip       2.036e+00  6.534e-01   3.117  0.00303 ** 
+## JanTemp     -1.976e+00  6.559e-01  -3.013  0.00405 ** 
+## JulyTemp    -2.204e+00  1.646e+00  -1.339  0.18673    
+## Educ        -1.160e+01  6.447e+00  -1.800  0.07789 .  
+## Density      5.178e-03  3.482e-03   1.487  0.14329    
+## NonWhite     4.505e+00  8.138e-01   5.536 1.14e-06 ***
+## log(HC)     -2.820e+01  1.475e+01  -1.912  0.06158 .  
+## log(NOX)     4.343e+01  1.431e+01   3.034  0.00382 ** 
+## log(SO2)    -5.149e+00  6.431e+00  -0.801  0.42709    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 32.47 on 50 degrees of freedom
+## Multiple R-squared:  0.7691, Adjusted R-squared:  0.7275 
+## F-statistic:  18.5 on 9 and 50 DF,  p-value: 4.593e-13
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{model\_comparision }\OtherTok{\textless{}{-}} \FunctionTok{anova}\NormalTok{(model, model2)}
+\NormalTok{model\_comparision}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Analysis of Variance Table
+## 
+## Model 1: Mortality ~ Precip + JanTemp + JulyTemp + Educ + Density + NonWhite
+## Model 2: Mortality ~ Precip + JanTemp + JulyTemp + Educ + Density + NonWhite + 
+##     log(HC) + log(NOX) + log(SO2)
+##   Res.Df   RSS Df Sum of Sq     F   Pr(>F)   
+## 1     53 66518                               
+## 2     50 52712  3     13806 4.365 0.008313 **
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+\end{verbatim}
+
+We got the p value from the extra-sum-of-squares F-Test as 0.008313.
+Significance of Additional Predictors: The additional predictors log(HC)
++ log(NOX) + log(SO2) significantly improve the model fit, as indicated
+by the significant p-value (0.008313). This suggests that including
+these pollution variables in the model provides a better explanation of
+the variability in mortality. And we reject the Null Hypothesis. Model
+Comparison: Model 2, which includes the additional pollution variables,
+is statistically significantly better than Model 1, which only includes
+the climate and socioeconomic variables. Model 1 has an RSS of 66518 and
+Model 2 has an RSS of 52712. The decrease in RSS indicates that Model 2
+explains more variability in the data than Model 1.
+
+\hypertarget{question-2-body-measurements-25-marks}{%
+\subsection{Question 2 Body Measurements (25
+marks)}\label{question-2-body-measurements-25-marks}}
+
+\begin{enumerate}
+\def\labelenumi{(\alph{enumi})}
+\tightlist
+\item
+  (4 marks) Carry out exploratory data analysis (EDA) of this dataset
+  before you do any modelling.
+\end{enumerate}
+
+\includegraphics{2024_Template_Assgn2_STAT2401_files/figure-latex/unnamed-chunk-22-1.pdf}
+\textbf{Interpretation}: - \textbf{Boxplot of Weight by Gender}: Males
+tend to have higher weights compared to females. This suggests a
+potential relationship between gender and weight.
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Correlation Matrix}: Strong correlations exist among many
+  girth measurements and between height and weight, indicating potential
+  multicollinearity issues in the model.
+\end{itemize}
+
+\begin{enumerate}
+\def\labelenumi{(\alph{enumi})}
+\setcounter{enumi}{1}
+\item
+  (10 marks) After the exploratory analysis has been carried out, split
+  the dataset into a training set and a testing set so that the training
+  set contains 80\% of the data and the testing set contains 20\%.
+  Construct a multiple linear regression model for this dataset using
+  the training set to create 2 final fitted models at a significance
+  level of 10\%, based on the following variable selection methods :
+
+\begin{verbatim}
+   - (Model 1) The Forward selection; 
+   - (Model 2) The Backward selection.
+\end{verbatim}
+\end{enumerate}
+
+Write the two fitted model equations and compare them in a few concise
+sentences.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Set a random seed for reproducibility}
+\FunctionTok{set.seed}\NormalTok{(}\DecValTok{2401}\NormalTok{)}
+\NormalTok{TestIndex }\OtherTok{\textless{}{-}} \FunctionTok{sample}\NormalTok{(}\FunctionTok{nrow}\NormalTok{(body\_data), }\FunctionTok{floor}\NormalTok{(}\FloatTok{0.2} \SpecialCharTok{*} \FunctionTok{nrow}\NormalTok{(body\_data)))}
+\NormalTok{Test.body\_data }\OtherTok{\textless{}{-}}\NormalTok{ body\_data[TestIndex, ]}
+\NormalTok{Train.body\_data }\OtherTok{\textless{}{-}}\NormalTok{ body\_data[}\SpecialCharTok{{-}}\NormalTok{TestIndex, ]}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{lm.all }\OtherTok{\textless{}{-}} \FunctionTok{lm}\NormalTok{(Weight }\SpecialCharTok{\textasciitilde{}}\NormalTok{ ., }\AttributeTok{data =}\NormalTok{ Train.body\_data)}
+\FunctionTok{summary}\NormalTok{(lm.all)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Call:
+## lm(formula = Weight ~ ., data = Train.body_data)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -7.3377 -1.2952 -0.0582  1.2598  9.0126 
+## 
+## Coefficients:
+##                           Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)             -118.73262    3.07968 -38.554  < 2e-16 ***
+## Biacromial.diameter       -0.05031    0.07659  -0.657 0.511610    
+## Biiliac.diameter           0.07509    0.07654   0.981 0.327190    
+## Bitrochanteric.diameter   -0.07215    0.10346  -0.697 0.485998    
+## Chest.depth                0.31033    0.07710   4.025 6.87e-05 ***
+## Chest.diameter             0.16640    0.09209   1.807 0.071554 .  
+## Elbow.diameter             0.21094    0.20682   1.020 0.308408    
+## Wrist.diameter             0.34573    0.25829   1.339 0.181512    
+## Knee.diameter              0.41808    0.16438   2.543 0.011373 *  
+## Ankle.diameter             0.13886    0.18102   0.767 0.443499    
+## Shoulder.girth             0.08079    0.03533   2.287 0.022762 *  
+## Chest.girth                0.12684    0.04274   2.967 0.003192 ** 
+## Waist.girth                0.36034    0.03153  11.428  < 2e-16 ***
+## Navel.girth               -0.01943    0.02840  -0.684 0.494269    
+## Hip.girth                  0.24877    0.05462   4.555 7.07e-06 ***
+## Thigh.girth                0.22579    0.06292   3.588 0.000376 ***
+## Bicep.girth                0.16775    0.09808   1.710 0.088009 .  
+## Forearm.girth              0.46957    0.15620   3.006 0.002820 ** 
+## Knee.girth                 0.18883    0.08847   2.134 0.033444 *  
+## Calf.maximum.girth         0.34377    0.07660   4.488 9.53e-06 ***
+## Ankle.minimum.girth        0.02250    0.11475   0.196 0.844631    
+## Wrist.minimum.girth       -0.39786    0.23130  -1.720 0.086221 .  
+## Age                       -0.06126    0.01472  -4.161 3.92e-05 ***
+## Height                     0.30064    0.02075  14.485  < 2e-16 ***
+## Gender                    -1.47242    0.61374  -2.399 0.016915 *  
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 2.146 on 381 degrees of freedom
+## Multiple R-squared:  0.9762, Adjusted R-squared:  0.9747 
+## F-statistic: 650.3 on 24 and 381 DF,  p-value: < 2.2e-16
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Forward selection}
+\NormalTok{lm}\FloatTok{.0} \OtherTok{\textless{}{-}} \FunctionTok{lm}\NormalTok{(Weight }\SpecialCharTok{\textasciitilde{}} \DecValTok{1}\NormalTok{, }\AttributeTok{data =}\NormalTok{ Train.body\_data) }\CommentTok{\# Set up simplest model to start with}
+\FunctionTok{summary}\NormalTok{(lm}\FloatTok{.0}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Call:
+## lm(formula = Weight ~ 1, data = Train.body_data)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -25.395 -10.795  -1.295  10.205  47.805 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)  68.5946     0.6693   102.5   <2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 13.49 on 405 degrees of freedom
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{lm.forward\_model1 }\OtherTok{\textless{}{-}} \FunctionTok{step}\NormalTok{(lm}\FloatTok{.0}\NormalTok{, }\AttributeTok{scope =} \FunctionTok{formula}\NormalTok{(lm.all), }\AttributeTok{direction =} \StringTok{"forward"}\NormalTok{, }\AttributeTok{trace =} \DecValTok{0}\NormalTok{)}
+\FunctionTok{summary}\NormalTok{(lm.forward\_model1)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Call:
+## lm(formula = Weight ~ Waist.girth + Height + Thigh.girth + Forearm.girth + 
+##     Shoulder.girth + Calf.maximum.girth + Hip.girth + Chest.girth + 
+##     Knee.diameter + Age + Chest.depth + Gender + Knee.girth + 
+##     Chest.diameter + Bicep.girth + Elbow.diameter + Wrist.minimum.girth + 
+##     Wrist.diameter, data = Train.body_data)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -7.3979 -1.2832 -0.0807  1.2514  9.0969 
+## 
+## Coefficients:
+##                       Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)         -118.94354    3.00524 -39.579  < 2e-16 ***
+## Waist.girth            0.35664    0.02917  12.228  < 2e-16 ***
+## Height                 0.30191    0.01889  15.986  < 2e-16 ***
+## Thigh.girth            0.23965    0.06154   3.894 0.000116 ***
+## Forearm.girth          0.48622    0.15402   3.157 0.001720 ** 
+## Shoulder.girth         0.07093    0.03335   2.127 0.034038 *  
+## Calf.maximum.girth     0.34923    0.07048   4.955 1.08e-06 ***
+## Hip.girth              0.22429    0.04525   4.957 1.07e-06 ***
+## Chest.girth            0.13685    0.04120   3.321 0.000981 ***
+## Knee.diameter          0.46740    0.14904   3.136 0.001843 ** 
+## Age                   -0.06130    0.01386  -4.423 1.27e-05 ***
+## Chest.depth            0.30357    0.07640   3.974 8.45e-05 ***
+## Gender                -1.43739    0.57360  -2.506 0.012623 *  
+## Knee.girth             0.18447    0.08431   2.188 0.029273 *  
+## Chest.diameter         0.14876    0.08756   1.699 0.090117 .  
+## Bicep.girth            0.15346    0.09535   1.609 0.108331    
+## Elbow.diameter         0.22482    0.19554   1.150 0.250959    
+## Wrist.minimum.girth   -0.42530    0.21911  -1.941 0.052983 .  
+## Wrist.diameter         0.39274    0.25308   1.552 0.121510    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 2.137 on 387 degrees of freedom
+## Multiple R-squared:  0.976,  Adjusted R-squared:  0.9749 
+## F-statistic: 874.8 on 18 and 387 DF,  p-value: < 2.2e-16
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#Backward selection}
+\NormalTok{lm.backward\_model2 }\OtherTok{\textless{}{-}} \FunctionTok{step}\NormalTok{(lm.all,  }\AttributeTok{direction =} \StringTok{"backward"}\NormalTok{, }\AttributeTok{trace =} \DecValTok{0}\NormalTok{)}
+\FunctionTok{summary}\NormalTok{(lm.backward\_model2)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Call:
+## lm(formula = Weight ~ Chest.depth + Chest.diameter + Wrist.diameter + 
+##     Knee.diameter + Shoulder.girth + Chest.girth + Waist.girth + 
+##     Hip.girth + Thigh.girth + Bicep.girth + Forearm.girth + Knee.girth + 
+##     Calf.maximum.girth + Wrist.minimum.girth + Age + Height + 
+##     Gender, data = Train.body_data)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -7.3908 -1.3082 -0.1104  1.2070  9.1297 
+## 
+## Coefficients:
+##                       Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)         -119.42408    2.97727 -40.112  < 2e-16 ***
+## Chest.depth            0.30916    0.07627   4.053 6.11e-05 ***
+## Chest.diameter         0.14989    0.08759   1.711 0.087823 .  
+## Wrist.diameter         0.47684    0.24238   1.967 0.049855 *  
+## Knee.diameter          0.49901    0.14654   3.405 0.000730 ***
+## Shoulder.girth         0.07223    0.03334   2.167 0.030874 *  
+## Chest.girth            0.14158    0.04101   3.452 0.000618 ***
+## Waist.girth            0.35145    0.02883  12.192  < 2e-16 ***
+## Hip.girth              0.22937    0.04505   5.091 5.56e-07 ***
+## Thigh.girth            0.23220    0.06123   3.792 0.000173 ***
+## Bicep.girth            0.15422    0.09538   1.617 0.106735    
+## Forearm.girth          0.51681    0.15177   3.405 0.000730 ***
+## Knee.girth             0.18553    0.08434   2.200 0.028412 *  
+## Calf.maximum.girth     0.34924    0.07051   4.953 1.09e-06 ***
+## Wrist.minimum.girth   -0.43639    0.21899  -1.993 0.046993 *  
+## Age                   -0.05981    0.01380  -4.333 1.88e-05 ***
+## Height                 0.30696    0.01837  16.705  < 2e-16 ***
+## Gender                -1.36753    0.57061  -2.397 0.017020 *  
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 2.138 on 388 degrees of freedom
+## Multiple R-squared:  0.9759, Adjusted R-squared:  0.9749 
+## F-statistic: 925.5 on 17 and 388 DF,  p-value: < 2.2e-16
+\end{verbatim}
+
+\hypertarget{fitted-model-equations}{%
+\subsubsection{Fitted Model Equations}\label{fitted-model-equations}}
+
+\textbf{Model 1: Forward Selection}
+
+Variables with a p-value greater than 0.10 (Elbow.diameter, Bicep.girth,
+and Wrist.diameter) will be excluded from the final model.
+
+\[ \text{Weight} = -118.94354 + 0.35664 \times \text{Waist.girth} + 0.30191 \times \text{Height} + 0.23965 \times \text{Thigh.girth} + 0.48622 \times \text{Forearm.girth} + 0.07093 \times \text{Shoulder.girth} + 0.34923 \times \text{Calf.maximum.girth} + 0.22429 \times \text{Hip.girth} + 0.13685 \times \text{Chest.girth} + 0.46740 \times \text{Knee.diameter} - 0.06130 \times \text{Age} + 0.30357 \times \text{Chest.depth} - 1.43739 \times \text{Gender} + 0.18447 \times \text{Knee.girth} + 0.14876 \times \text{Chest.diameter} - 0.42530 \times \text{Wrist.minimum.girth} \]
+
+\textbf{Model 2: Backward Selection}
+
+Variables with a p-value greater than 0.10 (Bicep.girth) will be
+excluded from the final model.
+
+\[ \text{Weight} = -119.42408 + 0.30916 \times \text{Chest.depth} + 0.14989 \times \text{Chest.diameter} + 0.47684 \times \text{Wrist.diameter} + 0.49901 \times \text{Knee.diameter} + 0.07223 \times \text{Shoulder.girth} + 0.14158 \times \text{Chest.girth} + 0.35145 \times \text{Waist.girth} + 0.22937 \times \text{Hip.girth} + 0.23220 \times \text{Thigh.girth} + 0.51681 \times \text{Forearm.girth} + 0.18553 \times \text{Knee.girth} + 0.34924 \times \text{Calf.maximum.girth} - 0.43639 \times \text{Wrist.minimum.girth} - 0.05981 \times \text{Age} + 0.30696 \times \text{Height} - 1.36753 \times \text{Gender} \]
+
+\hypertarget{comparison-of-the-two-models}{%
+\subsubsection{Comparison of the Two
+Models}\label{comparison-of-the-two-models}}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  \textbf{Model Complexity}:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Both models include a comprehensive set of predictors, indicating a
+    strong relationship between body measurements and weight.
+  \item
+    Model 2 (Final Model) excludes only the non-significant predictor
+    (Bicep.girth), reducing the complexity slightly but maintaining high
+    explanatory power.
+  \end{itemize}
+\item
+  \textbf{Significance of Predictors}:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Both models identify the same key predictors as significant, with
+    similar coefficient estimates and p-values. This indicates a robust
+    set of variables driving weight prediction.
+  \item
+    Both models include variables like Waist.girth, Height,
+    Forearm.girth, and Chest.girth, which are consistently significant
+    across models.
+  \end{itemize}
+\item
+  \textbf{Model Fit}:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    The adjusted R-squared values for both models are very similar
+    (\textasciitilde0.975), indicating that both models explain
+    approximately 97.5\% of the variance in weight.
+  \item
+    The slight reduction in predictors in Model 2 does not significantly
+    impact the model fit, suggesting that the excluded variables were
+    not contributing much additional explanatory power.
+  \end{itemize}
+\item
+  \textbf{Practical Considerations}:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Model 2 (Final Model) is slightly simpler and might be preferred for
+    practical applications due to its reduced complexity without
+    sacrificing explanatory power.
+  \item
+    The inclusion of significant predictors at a 10\% level ensures a
+    robust model while avoiding overfitting.
+  \end{itemize}
+\end{enumerate}
+
+\hypertarget{conclusion}{%
+\subsubsection{Conclusion}\label{conclusion}}
+
+Both models provide strong predictive power for weight based on body
+measurements. Model 2, with predictors significant at the 10\% level,
+offers a slightly more streamlined approach while maintaining high
+explanatory power. The choice between models depends on the balance
+between simplicity and comprehensiveness, with Model 2 offering a slight
+edge in simplicity.
+
+\begin{enumerate}
+\def\labelenumi{(\alph{enumi})}
+\setcounter{enumi}{2}
+\tightlist
+\item
+  (5 marks) Perform diagnostics checking for each of the fitted models,
+  Model 1 and Model 2 respectively.
+\end{enumerate}
+
+\includegraphics{2024_Template_Assgn2_STAT2401_files/figure-latex/unnamed-chunk-28-1.pdf}
+
+\includegraphics{2024_Template_Assgn2_STAT2401_files/figure-latex/unnamed-chunk-29-1.pdf}
+
+\begin{enumerate}
+\def\labelenumi{(\alph{enumi})}
+\setcounter{enumi}{3}
+\item
+  (6 marks). Despite any inadequacies that you may or may not have
+  identified above, you use the two models obtained in (b) to make
+  predictions of \emph{Weight} in the test set.
+
+\begin{verbatim}
+   -  (i)  Produce a correctly drawn and labelled plot of predicted values against the actual values in the test set, and obtain the root mean squared error of prediction (RMSEP) based on each fitted model. 
+   -  (ii)  Using the RMSEPs and the plots you produced, comment on how well the models performed. 
+\end{verbatim}
+\end{enumerate}
+
+\hypertarget{step-1-making-predictions}{%
+\subsubsection{Step 1: Making
+Predictions}\label{step-1-making-predictions}}
+
+Use the models from forward and backward selection methods to predict
+the weight in the test set.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Predicting weight using the backward selection model}
+\NormalTok{predictions\_backward }\OtherTok{\textless{}{-}} \FunctionTok{predict}\NormalTok{(lm.backward\_model2, }\AttributeTok{newdata =}\NormalTok{ Test.body\_data)}
+
+\CommentTok{\# Predicting weight using the forward selection model}
+\NormalTok{predictions\_forward }\OtherTok{\textless{}{-}} \FunctionTok{predict}\NormalTok{(lm.forward\_model1, }\AttributeTok{newdata =}\NormalTok{ Test.body\_data)}
+
+\NormalTok{Actual }\OtherTok{\textless{}{-}}\NormalTok{ Test.body\_data}\SpecialCharTok{$}\NormalTok{Weight}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{step-2-calculate-rmsep}{%
+\subsubsection{Step 2: Calculate RMSEP}\label{step-2-calculate-rmsep}}
+
+Root Mean Squared Error of Prediction (RMSEP) is a standard way to
+measure the error of a model in predicting quantitative data. Lower
+values of RMSEP indicate better fit.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{M }\OtherTok{\textless{}{-}} \FunctionTok{length}\NormalTok{(Actual)}
+
+\CommentTok{\# Calculate RMSEP for the backward selection model}
+\NormalTok{rmsep\_backward }\OtherTok{\textless{}{-}} \FunctionTok{sqrt}\NormalTok{(}\FunctionTok{sum}\NormalTok{((Actual }\SpecialCharTok{{-}}\NormalTok{ predictions\_backward)}\SpecialCharTok{\^{}}\DecValTok{2}\NormalTok{)}\SpecialCharTok{/}\NormalTok{M)}
+
+\CommentTok{\# Calculate RMSEP for the forward selection model}
+\NormalTok{rmsep\_forward }\OtherTok{\textless{}{-}} \FunctionTok{sqrt}\NormalTok{(}\FunctionTok{sum}\NormalTok{((Actual }\SpecialCharTok{{-}}\NormalTok{ predictions\_forward)}\SpecialCharTok{\^{}}\DecValTok{2}\NormalTok{)}\SpecialCharTok{/}\NormalTok{M)}
+
+\CommentTok{\# Print RMSEP values}
+\FunctionTok{cat}\NormalTok{(}\StringTok{"RMSEP for the backward selection model:"}\NormalTok{, rmsep\_backward, }\StringTok{"}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## RMSEP for the backward selection model: 1.969358
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{cat}\NormalTok{(}\StringTok{"RMSEP for the forward selection model:"}\NormalTok{, rmsep\_forward, }\StringTok{"}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## RMSEP for the forward selection model: 1.963649
+\end{verbatim}
+
+\hypertarget{step-3-plotting-predicted-vs.-actual-values}{%
+\subsubsection{Step 3: Plotting Predicted vs.~Actual
+Values}\label{step-3-plotting-predicted-vs.-actual-values}}
+
+Plotting actual vs.~predicted values gives a visual representation of
+how well the models predict new data.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Plot for the backward selection model}
+\FunctionTok{plot}\NormalTok{(Actual, predictions\_backward, }\AttributeTok{main =} \StringTok{"Backward Selection: Predicted vs Actual"}\NormalTok{,}
+     \AttributeTok{xlab =} \StringTok{"Actual Weight"}\NormalTok{, }\AttributeTok{ylab =} \StringTok{"Predicted Weight"}\NormalTok{, }\AttributeTok{pch =} \DecValTok{19}\NormalTok{, }\AttributeTok{col =} \StringTok{\textquotesingle{}blue\textquotesingle{}}\NormalTok{)}
+\FunctionTok{abline}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{1}\NormalTok{, }\AttributeTok{col =} \StringTok{"red"}\NormalTok{, }\AttributeTok{lwd =} \DecValTok{2}\NormalTok{)  }\CommentTok{\# Adds a 45{-}degree line}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{2024_Template_Assgn2_STAT2401_files/figure-latex/unnamed-chunk-32-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Plot for the forward selection model}
+\FunctionTok{plot}\NormalTok{(Actual, predictions\_forward, }\AttributeTok{main =} \StringTok{"Forward Selection: Predicted vs Actual"}\NormalTok{,}
+     \AttributeTok{xlab =} \StringTok{"Actual Weight"}\NormalTok{, }\AttributeTok{ylab =} \StringTok{"Predicted Weight"}\NormalTok{, }\AttributeTok{pch =} \DecValTok{19}\NormalTok{, }\AttributeTok{col =} \StringTok{\textquotesingle{}green\textquotesingle{}}\NormalTok{)}
+\FunctionTok{abline}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{1}\NormalTok{, }\AttributeTok{col =} \StringTok{"red"}\NormalTok{, }\AttributeTok{lwd =} \DecValTok{2}\NormalTok{)  }\CommentTok{\# Adds a 45{-}degree line}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{2024_Template_Assgn2_STAT2401_files/figure-latex/unnamed-chunk-32-2.pdf}
+
+\hypertarget{step-4-comment-on-model-performance}{%
+\subsubsection{Step 4: Comment on Model
+Performance}\label{step-4-comment-on-model-performance}}
+
+\hypertarget{analysis-of-rmsep}{%
+\paragraph{Analysis of RMSEP}\label{analysis-of-rmsep}}
+
+\begin{itemize}
+\tightlist
+\item
+  Both models have very similar RMSEP values, indicating that they have
+  comparable predictive performance.
+\item
+  RMSEP values are relatively low, suggesting that both models have good
+  accuracy in predicting the weight on the test data.
+\end{itemize}
+
+\hypertarget{analysis-of-predicted-vs-actual-plots}{%
+\paragraph{Analysis of Predicted vs Actual
+Plots}\label{analysis-of-predicted-vs-actual-plots}}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Backward Selection Model}:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    The plot shows that the predicted weights are closely aligned with
+    the actual weights.
+  \item
+    The points are scattered around the 45-degree line, indicating good
+    model accuracy.
+  \item
+    There are few outliers, suggesting that most predictions are
+    accurate.
+  \end{itemize}
+\item
+  \textbf{Forward Selection Model}:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Similar to the backward selection model, the predicted weights are
+    closely aligned with the actual weights.
+  \item
+    The points are also scattered around the 45-degree line, indicating
+    good model accuracy.
+  \item
+    There are few outliers, suggesting that most predictions are
+    accurate.
+  \end{itemize}
+\end{itemize}
+
+\hypertarget{conclusion-1}{%
+\subsubsection{Conclusion}\label{conclusion-1}}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Performance Comparison}:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Both models demonstrate excellent predictive performance, with
+    nearly identical RMSEP values and well-aligned predicted vs.~actual
+    plots.
+  \item
+    The minor difference in RMSEP values (1.963649 for forward selection
+    vs.~1.969358 for backward selection) is negligible, indicating that
+    both models perform equally well in terms of prediction accuracy.
+  \end{itemize}
+\item
+  \textbf{Model Choice}:
+
+  \begin{itemize}
+  \tightlist
+  \item
+    Since both models perform similarly, the choice between them may
+    depend on other factors such as model simplicity or
+    interpretability.
+  \item
+    The forward selection model includes only the predictors that were
+    significant at the 10\% level, which might make it slightly more
+    interpretable and easier to communicate.
+  \end{itemize}
+\end{itemize}
+
+\end{document}

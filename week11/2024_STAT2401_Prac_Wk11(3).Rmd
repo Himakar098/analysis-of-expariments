@@ -1,0 +1,394 @@
+---
+title: 'STAT2401 Analysis of Experiments'
+author: 'Practical Week 11: Question and Solution'
+output:
+  html_document:
+    highlight: haddock
+    theme: flatly
+  html_notebook:
+    theme: flatly
+  word_document: default
+  pdf_document: default
+---
+
+## Learning Check
+
+When you complete this session, you will be able:
+
+1. to understand about ANCOVA;
+
+2. to understand about polynomial regression.
+
+
+```{r include=TRUE, echo=FALSE, message=FALSE}
+knitr::opts_chunk$set(prompt=FALSE, comment=NA, tidy=TRUE, message=FALSE, warning=FALSE)
+```
+
+
+
+## Exercise 1: Analysis of covariance --- wheat data
+
+
+The following data gives the results of an experiment that examined the yield of wheat plant when two treatments were applied to each of 5 plots.  However,
+the plots each had different numbers of plants on and hence this would have an impact on the plot yield.  We will carry out an ANCOVA to make adjustments
+for the numbers of plants per plot.
+
+The variables are the following:
+
+\begin{tabular}{ll}
+\hline
+\texttt{Treat}& the treatment applied to the plot\\
+\texttt{yield} &the response yield per plot\\
+\texttt{plants} &the number of plants per plot\\
+\hline
+\end{tabular}
+
+First fit an ANOVA comparing just treatments.  Read these data into \R, and store them as a
+data frame \texttt{wheat}.
+Reading in and visualising the data: 
+
+```{r }
+wheat = read.csv(file="wheat.csv",header=T)
+str(wheat)
+```
+
+Have a look at the data.  Let's plot the yield by the number of plants per plot.
+
+```{r }
+plot(yield~plants, data=wheat)
+```
+
+Adding symbols to represent the different treatment:
+
+```{r }
+plot(yield~plants, pch=Treat, data=wheat)
+```
+Treatment differences appear to be difficult to detect however a first impression would indicate that treatment 2 is below treatment 1 for any given value of plants. 
+
+There appears to be a linear trend.  As the number of plants per pot increases the yield increases too.  
+
+
+Now fit a standard one way ANOVA model comparing treatments.  First visualise the comparison.  Boxplots might not be that useful with small data
+so we could just plot the whole data instead.
+
+Fitting the one way ANOVA
+
+```{r }
+  boxplot(yield~Treat, data=wheat)
+anova(lm(yield~factor(Treat), data=wheat))
+```
+
+  No differnces from the plot and none from the ANOVA.  However, if anything treatment 1 appears to be slightly larger than treatment 2. 
+
+Let us try now an ANCOVA.
+
+```{r }
+wheat.acov=lm(yield~factor(Treat) + plants , data=wheat)
+summary(wheat.acov)
+```
+
+Checking the parallel lines assumption: 
+  
+  ```{r }
+  wheat.np=lm(yield~factor(Treat)*plants , data=wheat)
+summary(wheat.np)
+```
+  
+  the interaction term in the non-parrallel lines model is not significant indiciting a parrallel lines regression model is sufficient in this instance. 
+
+
+## Exercise 2: Linear Modelling for Fishers Iris data
+
+
+This question analyses the maybe most famous data set in statistics. Type \texttt{help(iris)} in \R to get more information.
+
+Let's have a look at the data to start with.  Type \texttt{iris}
+
+\begin{itemize}
+-  Fit the following models in order to explain the response variable \texttt{Sepal.Length} based on the information of \texttt{Petal.Length}:
+	\begin{itemize}
+	-  $M1$, a single linear regression for all observations (i.e.~intercept
+	and slope not dependent on species)
+	-  $M2$, parallel regressions for observations from each species (i.e.~regressions
+	have the same slope but the intercept varies from species to species).
+	-  $M3$, separate regression for observations from each species (i.e.~regressions
+	have intercept and slope that varies from species to species).
+	\end{itemize}
+\end{itemize}
+
+Fisher's Iris data is a well used dataset in statistical education and is pre-loaded into \R.  To see this data type \texttt{iris} and to get more information on the dataset type \texttt{help(iris)}
+
+We want to fit 3 models to this data. 
+
+```{r }
+M1=lm(Sepal.Length~Petal.Length, data=iris)
+summary(M1)
+M2=lm(Sepal.Length~Petal.Length+ Species, data=iris)
+summary(M2)
+M3=lm(Sepal.Length~Petal.Length*Species, data=iris)
+summary(M3)
+```
+
+Use F tests to select the most appropriate model from $M1$, $M2$, and $M3$, working at a 5\% significance level. Explain your reasoning clearly, and include the P-values that you obtain for your tests.  Remember you can use the \texttt{anova(mod1,mod2)} function to compare two nested models, with $mod1$ being the smaller of the two models.
+
+Look briefly at the model diagnostics for your final model.  Do you see any glaring problems?
+
+To see if the models are different from eachother we can use the \texttt{anova()} function. 
+
+```{r }
+anova(M1,M2)
+anova(M2,M3)
+```
+
+These results would indicate that we need separate intercepts but that one slope is sufficient.  
+
+Visualising this: 
+
+```{r }
+plot(Sepal.Length ~ Petal.Length, data=iris, col=as.numeric(Species))
+abline(coefficients(M3)[1], coefficients(M3)[2], col=1)
+abline(coefficients(M3)[1]+coefficients(M3)[3], coefficients(M3)[2]+coefficients(M3)[5], col=2)
+abline(coefficients(M3)[1]+coefficients(M3)[4], coefficients(M3)[2]+coefficients(M3)[6], col=3)
+```
+Whilst these slopes look marginally different they are not sufficiently so to make the unequal slopes model statsitically significanlty different to the parrallel lines regression model.   
+
+```{r }
+plot(Sepal.Length ~ Petal.Length, data=iris, col=as.numeric(Species))
+abline(coefficients(M2)[1],coefficients(M2)[2],col=1)
+abline(coefficients(M2)[1]+coefficients(M2)[3],coefficients(M2)[2], col=2)
+abline(coefficients(M2)[1]+coefficients(M2)[4],coefficients(M2)[2], col=3)
+```
+
+
+## Exercise 3: Polynomial Regression for \texttt{reef} data
+
+
+This lab uses functions from the \R package \texttt{Rcmdr}. To be able to use these functions, you need to open the package using \texttt{library(Rcmdr)}. This will also open up the \texttt{RCommander} GUI interface. We will not be using this interface for this unit, so you can close the interface straight away.
+
+```{r echo=FALSE}
+suppressWarnings(suppressMessages(library("Rcmdr")))
+```
+
+```{r }
+library("Rcmdr")
+```
+
+
+This exercise is concerned with the density of the coral \texttt{Porites lobata}
+on the Great Barrier Reef. The following variables are recorded.
+
+\begin{tabular}{ll}
+\hline
+\texttt{Reef} & Name of reef.\\
+\texttt{Distance} & Distance to the Australian shore (in km).\\
+\texttt{Density} & Coral head density (in g/cm$^3$).\\
+\hline
+\end{tabular}
+
+The data are taken from the following paper:
+
+Risk, M. J., and Sammarco, P. W. (1981). Cross-shelf trends in skeletal density of the massive coral Porites lobata from the Great Barrier Reef. {\em Marine Ecology Progress Series} {\bf 69}, 195-200.
+
+
+The authors fitted a second order polynomial regression (i.e.~a quadratic regression) of
+\texttt{Density} on \texttt{Distance}. We are going to fit such a model using \R, and store the result as
+\texttt{reef.lm.2}. Also, fit a fourth order polynomial regression model, \texttt{reef.lm.4}.
+Perform an F-test to see which of these models is preferable. (Hint: use the
+\texttt{anova()} command.)
+
+First we set the working directory, load the data, look at its structure  (the \R~command
+\texttt{str()} is very useful to obtain an idea about what is stored
+in an object) and look at the data.  
+%Note we need the \texttt{Rcmdr} library to do some of the functions in this lab. 
+
+
+
+```{r }
+reef = read.table(file="reef.txt",header=T)
+str(reef)
+reef
+```
+
+Take a look at the data. You should observe that
+multiple observations have been taken at each reef. 
+%Produce a scatter plot of \texttt{Density} against \texttt{Distance}.
+
+
+
+As always it is good to visualise the data: 
+```{r }
+plot(Density~Distance, data=reef)
+```
+
+Initial impressions should be that there something going on between  \texttt{Density} and \texttt{Distance} but some strangeness in the data may suggest more than a linear or even quadratic relationship.  
+
+
+
+Let's investigate this: 
+
+
+We fit the model of degree 2 and degree 4 to start with:
+
+```{r }
+reef.lm.2 = lm(Density~Distance + I(Distance^2), data=reef)
+summary(reef.lm.2)
+
+reef.lm.4 = lm(Density~Distance + I(Distance^2) + I(Distance^3) + 
+                 I(Distance^4), data=reef)
+summary(reef.lm.4)
+```
+ 
+We note several things.  First, in \R, we make use of the \texttt{I(.)} terminology to specify higher degree terms. This terminology is used to inhibit the interpretation of operators such as ``$+$", ``$-$",  ``$*$" and ``$\wedge$" as formula operators in model statements and allows us to create our higher degree terms.  Second, when we fitted the degree 4 polynomial regression model we not only added the degree 4 term but added the degree 3 term too.  This should almost always be done.  Higher degree polynomials should always include all lower degree terms.   Finally, we note that the quadratic term in \texttt{reef.lm.2} is not significant.  
+
+If we want to compare these two models we can use the \texttt{anova} command. This command tests the two specified models against each other to see if there is a significant difference. 
+
+```{r }
+anova(reef.lm.2, reef.lm.4)
+```
+
+This tells us that the additional sums of squares explained by the degree 4 model is 0.10506, at a cost of 2 extra degrees of freedom.  The test to see whether this amount is sufficieintly large to declare the degree 4 model better than the degree 2 model is the given $F$ test.  In this case the p-value is given by 0.001264, highly significant and hence we conclude the difference is sufficent to declare the larger model more effective. 
+
+We can consider all models in this way.  Sometimes we would start with the highest polynomial model we are willing to consider.  In this case we look at everything up to degree 6: 
+
+```{r }
+reef.lm.6 = lm(Density~Distance + I(Distance^2) + I(Distance^3) + I(Distance^4) + 
+                 I(Distance^5) + I(Distance^6), data=reef)
+summary(reef.lm.6)
+reef.lm.5 = lm(Density~Distance + I(Distance^2) + I(Distance^3) + I(Distance^4) +
+                 I(Distance^5) , data=reef)
+summary(reef.lm.5)
+reef.lm.3 = lm(Density~Distance + I(Distance^2) + I(Distance^3), data=reef)
+summary(reef.lm.3)
+reef.lm.1 = lm(Density~Distance, data=reef)
+summary(reef.lm.1)
+```
+We note for the degree 6 model the highest degree polynomial term is not significant ($P=0.09572$).  Hence we can remove this.  Of course the t-test looking at the summary of the model coefficients for the degree 6 term is equivalent to that if we compared two models with and without the degree 6 term.  I.e.\
+
+```{r }
+anova(reef.lm.5, reef.lm.6)
+```
+
+Note the p-value is the same here p-value $=0.09572$
+
+Given the degree 6 term is not needed we need to work out whether or not the degree 5 term is needed.  Again either looking at the coefficents and the p-value associated with this term in model \texttt{reef.lm.5}.  Again this is not significant suggesting a degree 4 polynomial would be just as good.  
+
+We know previously that the degree 4 polynomial has a signficant degree 4 term so we could argue that this is the best place to stop.  However, for completeness we may wish to compare it to all the lower degree models just in case. The only model we haven't compared this to is the linear model.  Let's 
+
+```{r }
+anova(reef.lm.1, reef.lm.4)
+```
+The result of this test indicates the degree 4 is better than the straight line (degree 1) polynomial regression model. 
+
+Hence we stick with our `best' model as \texttt{reef.lm.4}.
+
+To visualise the fitted model we can make use of the predict function.  
+
+```{r }
+x = 1:80
+x
+y = predict(reef.lm.4,newdata=data.frame(Distance=x))
+y
+```
+Notice now the $x$ is just a sequence from 1 to 80.  These are all the values of $x$ we want to predict $y$ at.  The $y$s are the predicted values from the \texttt{reef.lm.4}.  Note: we could have followed the instructions in the lab sheet and created \texttt{Distance.2} etc but in this instance it is not necessary as \R is clever enough to work it out. 
+
+Plotting the data again with the fitted lines on is easy: 
+
+```{r }
+plot(Density~Distance, data=reef)
+lines(x,y, col="red")
+```
+
+
+
+## Exercise 4 Polynomial Regression for \texttt{baseball} data
+
+In 1954 Branch Rickey wrote an article for Life Magazine entitled Goodbye to
+some old baseball ideas. He criticized some traditional baseball statistics and
+proposed some of his own that he thought more useful. For individual hitting
+Rickey proposed the sum of on-base average (OBA) and extra-base power
+(EBP). A main question is whether OBA and EBP are distinct components
+of hitting ability.
+
+We would like to determine an appropriate polynomial regression model of OBA (the response)
+on EBP. We should consider models up to degree 6 (i.e.\ with the
+highest power of EBP being at most 6).
+
+
+In this exercise we look at the relationship between EBP (predictor) and OBA (response) from the baseball data.  First we read in the data and look at it. 
+
+```{r }
+baseball = read.table(file="baseball.txt",header=T)
+baseball
+plot(OBA~EBP, data=baseball, ylim=c(300,500))
+```
+
+We see the data is pretty messy and predicting the response OBA from EBP may not be the most straight forward of tasks.   However, we consdier all polynomial regression models up to degree 6.  First we fit these models: 
+
+```{r }
+#straight line
+fm1=lm(OBA~EBP, data=baseball)
+summary(fm1)
+#quadratic
+fm2=lm(OBA~EBP+I(EBP^2), data=baseball)
+#cubic
+fm3=lm(OBA~EBP+I(EBP^2)+I(EBP^3), data=baseball)
+#quartic
+fm4=lm(OBA~EBP+I(EBP^2)+I(EBP^3)+I(EBP^4), data=baseball)
+#quintic
+fm5=lm(OBA~EBP+I(EBP^2)+I(EBP^3)+I(EBP^4)+I(EBP^5), data=baseball)
+# sextic (degree 6)
+fm6=lm(OBA~EBP+I(EBP^2)+I(EBP^3)+I(EBP^4)+I(EBP^5)+ I(EBP^6), data=baseball)
+```
+
+In order to compare these models we can use the \texttt{anova} command to compare two models or simply look at the coefficients on the higest degree polynomial.  We will use the former.  It is usually sensible to start with the highest degree polynomial: 
+
+```{r }
+# comparing the sextic to the quintic. 
+anova(fm5, fm6)
+# no significant difference let's continue
+```
+We could of course have looked at the p-value for the degree 6 term from the degree 6 polynomial model: 
+```{r }
+summary(fm6)
+```
+Note this p-value is 0.715 which is the same as using the \texttt{anova} comparison. So we continue in the same fashion until we can not reduce the polynomial further: 
+```{r }
+# comparing the quintic to the quartic 
+anova(fm4, fm5)
+# no significant difference let's continue
+# comparing the quartic to the cubic 
+anova(fm3, fm4)
+# no significant difference let's continue
+# comparing the cubic to the quadratic 
+anova(fm2, fm3)
+# no significant difference let's continue
+# comparing the quadratic to the linear model 
+anova(fm1, fm2)
+summary(fm2)
+```
+This final comparison provides a significant difference and suggests the quadratic would be the most suitable based on the data. 
+
+We should plot our selectd model with confidence and prediction bands: 
+
+```{r }
+min(baseball$EBP)
+max(baseball$EBP)
+x=111:271
+x
+y=predict(fm2, newdata = data.frame(EBP=x), interval="confidence")
+head(y)
+plot(OBA~EBP, data=baseball, ylim=c(300,500))
+lines(y[,1]~x, col='red')
+lines(y[,2]~x, col='green')
+lines(y[,3]~x, col='green')
+
+y.p=predict(fm2, newdata = data.frame(EBP=x), interval="prediction")
+head(y.p)
+lines(y.p[,2]~x, col='blue')
+lines(y.p[,3]~x, col='blue')
+```
+
+Note the red line is the fitted curve, the green the confidence bands, and the blue the prediction bands.  The fit is not brilliant and the prediction band is very wide indiciating that any prediction of the response from the predictor variable may be unreliable. 
+
+
+

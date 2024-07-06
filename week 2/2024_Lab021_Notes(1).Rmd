@@ -1,0 +1,643 @@
+---
+title: "STAT2401 Analysis of Experiments"
+author: '**Practical 2**'
+#date: "Practical 2"
+output:
+  html_document:
+    highlight: haddock
+    # number_sections: yes
+    theme: flatly
+    toc: yes
+  html_notebook:
+    highlight: haddock
+    # number_sections: yes
+    theme: flatly
+  pdf_document:
+    toc: yes
+  word_document:
+    highlight: tango
+    toc: yes
+---
+
+```{r echo=TRUE}
+knitr::opts_chunk$set(prompt=FALSE, comment=NA, message=FALSE, tidy=TRUE, error=TRUE)
+```
+
+**Aims of this session**
+
+This practical session has the following objectives:
+
+1. to learn how to write simple functions in R, including _sample_ command.
+
+2. to learn about Normal distribution.
+
+3. to perform statistical inference (hypothesis testing and confidence
+    intervals) using *2 sample t-test.*
+
+4. to perform data manipulation and visualisation using R.
+
+
+Partial solutions will be provided for Exercises 3-5. 
+
+# Exercise 1: Normal Distribution
+
+## 1.1 Standard Normal 
+
+Many natural phenomena follow the normal distribution, whose probability density
+function is the familiar *bell-shaped* curve, symmetric about the mean $\mu$. In addition,
+a celebrated theoretical result called the Central Limit Theorem says that the
+sampling distributions of sample means 
+
+$$\bar X =\frac{1}{n}\sum_{i=1}^n X_i$$ 
+
+say $X_1,\ldots,X_n$$ is a random sample of size $n$ from a proper distribution and
+sample totals $\sum_{i=1}^n X_i$ each are approximately normally distributed if the sample size $n$ is *sufficiently large*. Since this theorem applies to almost all possible probability distributions
+from which a sample might be selected, including discrete distributions, the
+theorem brings the normal distribution into play in a wide variety of circumstances.
+
+If $X$ has a normal distribution with mean $\mu$ and standard deviation $\sigma$, and we
+define the standardization of $X$ as 
+
+$$Z = \frac{X-\mu}{\sigma}$$ 
+
+then  $Z$ is normally distributed with
+mean $0$ and standard deviation $1$, i.e., the standard normal distribution. 
+
+We write
+$X \sim N(\mu,\sigma^2)$ to indicate that $X$ has a normal distribution with mean $mu$ and variance
+$\sigma^2$ (or we could say with standard deviation $\sigma$). In this notation, the standard
+normal distribution is $N(0, 1)$. The density function $\phi(z)$ and cumulative distribution
+function $\Phi(z)$.
+
+In _R_, we can plot $\phi(z)$
+
+```{r }
+y = seq(-5,5,0.01)
+plot(y,dnorm(y,0,1),type="l",lwd=2,main="Standard Normal Density")
+```
+or
+```{r }
+plot(y,dnorm(y),type="l",lwd=2,main="Standard Normal Density")
+```
+
+The default values of mean and variance are 0 and 1 respectively.
+
+Determine the values $\phi(0)$, $\phi(1)$, and $\phi(2)$.
+
+The cumulative distribution function $\Phi(z)$ can be plotted as well.
+
+```{r }
+y = seq(-5,5,0.01)
+plot(y,pnorm(y,0,1),type="l",lwd=2,main="Standard Normal cumulative distribution function")
+```
+
+or
+
+```{r }
+plot(y,pnorm(y),type="l",lwd=2,main="Standard Normal cumulative distribution function")
+```
+
+Determine the values $P(Z>0)$, $P(Z>1)$, and $P(Z>2)$.
+
+The normal distribution is *bell-shaped* and symmetrically distributed about $\mu$,
+which is also this distribution's median and mode. Almost all of the probability is
+concentrated in the interval $\mu \pm 3\sigma$. For example
+$X\sim N(1,2^2)$, the probability $P(\mu - 3\sigma\leq X\leq\mu + 3\sigma)$ is given by
+
+```{r }
+mu = 1
+sigma = 2
+pnorm(mu+3*sigma,mu,sigma)-pnorm(mu-3*sigma,mu,sigma)
+```
+
+Determine also the probabilities $P(\mu - 2\sigma\leq X\leq\mu + 2\sigma)$ and $P(\mu - \sigma\leq X\leq\mu + \sigma)$.
+
+We use $z_\alpha$ to be the solution to the equation
+$P(Z > z_\alpha) = \alpha$. This is the value on the horizontal axis that has area $\alpha$ under the
+curve and to its right. For example, $z_{0.05} = 1.645$. Approximately,
+
+```{r }
+1-pnorm(1.645)
+```
+or we could find $z_{0.05}$ directly by 
+
+```{r }
+qnorm(1-0.05)
+```
+
+
+Here we show the normal density function for a $N(100,5^2)$ distribution
+
+```{r }
+y = seq(80,120,0.1)
+plot(y,dnorm(y,100,5),type="l",lwd=2)
+```
+
+
+If $X$ has this distribution, the left
+shaded area of the following figure represents 95\% of the area under the density function.
+
+```{r }
+y = seq(80,120,0.1)
+plot(y,dnorm(y,100,5),type="l",lwd=2)
+yy = seq(80,qnorm(1-0.05,100,5),0.1)
+polygon(c(yy,rev(yy)),c(dnorm(yy,100,5),rep(0,length(yy))),col='skyblue')
+```
+
+That is, 
+
+$$
+P(Z\leq 1.645) = 0.95 \rightarrow P(\frac{X-\mu}{\sigma}\leq 1.645) = P(X\leq \mu+1.645\sigma)
+= P(X\leq 108.2243)= 0.95
+$$
+
+that the value $x$ such that $P(X\leq x)= 0.95$ could be also determined by 
+
+```{r }
+qnorm(1-0.05,100,5)
+```
+or
+```{r }
+100+5*qnorm(1-0.05)
+```
+
+One could also do the checking by computing 
+
+```{r }
+pnorm(108.2243,100,5)
+```
+
+or
+```{r }
+pnorm((108.2243-100)/5)
+```
+
+Now, Let $X$ be a $N(20,4^2)$ random variable. Determine $x$ that $P(X>x)=0.025$. Further, compute the probability $P(19\leq X\leq 21)$.
+
+## 1.2 Calculating Normal probabilities
+
+The normal distribution is very useful in modelling many different real world situations. The basic characteristics of the distribution are the same in each case - only the mean and standard deviation differ.
+
+### 1.2.1 Mechanical component
+
+The diameters of a mechanical component produced on a certain production line are known from experience to have a normal distribution with mean 97.5mm and standard deviation 4.4mm.
+
+First, we plot the pdf.
+
+```{r}
+set.seed(1400)
+x<-rnorm(1000, mean=97.5,sd=4.4)
+hist(x)
+```
+
+Denoting X be the diameter. Then X is distributed Normal(mean=97.5, sd=4.4)
+
+1. Find the proportion of components with diameter less than 90mm. Sketch it by hand for better understanding.
+
+P(X<90)=pnorm(90,97.5, 4.4)= 0.0441.
+
+```{r}
+px90=pnorm(90,97.5, 4.4)
+px90
+```
+
+The proportion of components with diameter less than 90mm is about 4.4\%.
+
+2. Find the proportion of components with diameter between 95 and 105mm. Sketch it by hand for better understanding. 
+
+P(95<X<105)=pnorm(105,97.5, 4.4) - pnorm(95,97.5, 4.4) = 0.6709.
+
+```{r}
+pnorm(105,97.5, 4.4) - pnorm(95,97.5, 4.4)
+```
+The proportion of components with diameter between 95 and 105mm is about 67.09\%.
+
+3. Find the proportion of components with diameter greater than 110mm. Sketch it by hand for better understanding. 
+
+P(X > 110)= 1 - P(X$\le$ 110) = 1 - pnorm(110,97.5, 4.4) =0.0022.
+
+```{r}
+1 - pnorm(110,97.5, 4.4)
+
+```
+The proportion of components with diameter greater than 110mm is about 0.22\%.
+
+### 1.2.2. BMI data. Complete the questions independently.
+
+The body mass index is a commonly used measure of body fat for humans calculated using
+
+$$BMI=\frac{mass(kg)}{(height(m))^2} $$
+
+1. Assuming that the BMI of boys aged 10 years old is approximately normally distributed with a  mean of 16.5 kg/m² and standard deviation of 1.5 kg/m².
+
+Suppose X be the the BMI of boys aged 10 years old. Then X is distributed Normal, with mean=16.5, sd=1.5.
+
+Sketch it by hand for better understanding.
+
+(a) Find the probability that a 10 year old boy has a BMI of more than 13.5 kg/m².
+P(X > 13.5)= 1 - P(X$\le$ 13.5) = 1 - pnorm(13.5,16.5, 1.5) =0.0022.
+
+```{r}
+1 - pnorm(13.5,16.5, 1.5)
+```
+
+(b) What BMI would a 10 year old boy need to be counted in the most obese 10%?
+```{r }
+qnorm(1-0.1,16.5, 1.5)
+```
+(c) Find the probability that a 10 year old boy’s BMI lies between 14.625 kg/m² and 19.125 kg/m².
+```{r}
+pnorm(19.125,16.5, 1.5) - pnorm(14.625,16.5, 1.5)
+```
+           
+# Exercise 2: Graphical Display of Rugby Data
+
+The data from this exercise are from games of rugby union. Typically, a game consists of bursts of activity which end when points are scored, or when the ball is moved out of the field of play, or when foul play occurs. The governing body for the sport makes occasional (minor) changes to the rules in the hope of promoting more continuous games. In order to investigate the effectiveness of these rule changes the length of time of passages of continuous play is often recorded during matches.
+
+The data at hand concern lengths of time of passages of play for ten international rugby matches involving the New Zealand  team (the `All Blacks'). 
+
+You can download the data from LMS and save them in a local directory and read the file as
+
+```{r }
+rugby = read.table(file="rugby.txt",header=T)
+str(rugby)
+```
+
+You may need to translate the {Game} variable to be the factor variable if it has the type of {chr} (character), here we give the demonstrate how to translate it back to {chr} (character):
+
+```{r }
+rugby$Game = as.character(rugby$Game)
+str(rugby)
+```
+and now to {Factor} (factor),
+
+```{r}
+rugby$Game = factor(rugby$Game)
+str(rugby)
+```
+
+Look at the top part of the data frame by typing
+
+```{r}
+head(rugby)
+```
+
+You should see that the data frame has two columns, headed {Game} and {Time} respectively. (These headings were read in from the text file, {rugby.txt}; _R_ was alerted to the presence of these headings by the {header=T} syntax in the {read.table} command.) Type {str(rugby)} to get more information on the data frame. You will see that there are {979} observations, and the variable {Game} is a factor with 10 levels identifying the match (labelled {A}, {B}, $\ldots$, {K}) and the variable {Time} contains the times of passages of play, in seconds.
+
+Type in {Game}. You should get an error. Attach the data frame with
+
+```{r}
+attach(rugby)
+```
+then try typing {Game}. You should get some output now that the data frame
+is attached (so that _R_ can `see' the variables inside).
+
+The variable {Game} is {categorical}, or a {factor}. We can get the frequencies for each category by
+
+```{r}
+table(Game)
+```
+Which game had the most separate passages of play? Which had the least?
+H and G
+We can display the data using a bar plot. Type
+
+```{r}
+barplot(table(Game))
+```
+
+There are various ways of beautifying this plot.
+
+You can add axis names,
+changes colours and so on. (The flexibility and quality of graphical display
+in _R_ is one of the attractions of the package.)
+
+Try
+
+```{r}
+barplot(table(Game),col="cyan",xlab="Game",ylab="Frequency",main="Rugby Data")
+```
+
+for example. You can use the help function to learn more -- try
+{help(barplot)}.
+
+The passage of play time is a continuous numerical variable. Try
+displaying it using a histogram:
+
+```{r }
+hist(Time)
+```
+
+Guess how you might add colour to the plot (try {help(hist)} if necessary.) Is the distribution of {Time} normal? If not, have you seen any other data sets with similarly shaped histograms?
+Indeed, we can see the distribution of time is {\it right skewed}.  This is something we should remember for our analysis.  Also, it should be noted that counts or lengths of time variables tend to have this shape.  
+
+Finally, we can look at the times broken down by individual match. Type
+
+```{r }
+Time[Game=="A"]
+```
+
+That gives you just the passage times for match {A}. Try producing histograms of the passage times for both game {A} and game {H}.
+```{r }
+hist(Time[Game=="A"])
+hist(Time[Game=="H"])
+```
+Now produce boxplots of {Time} for each match. Do this using {plot(rugby)}. 
+
+```{r }
+plot(rugby)
+```
+
+What happens if you use {boxplot(rugby)}? What is _R_ doing here? 
+
+```{r }
+boxplot(Time~Game,data=rugby)
+```
+
+Notice the first of these only works, {plot(rugby)}, because the dataframe contains only two variables, one determing the continuous variable and the other the grouping variable or factor.
+
+
+# Exercise 3 Introduction to Programming: Writing simple functions in _R_
+
+It's often the case that we wish to carry out certain complex calculations or operations repeatedly. It would be 
+tedious to have to write out the code to carry out those calculations or operations every single time inside an R 
+Markdown chunk or in a script file. Indeed, you've been using just such sequences of calculations a lot, in the form
+of function. In this section, you'll learn how to write simple functions.
+
+Functions gather a sequence of operations into a whole, preserving it for ongoing use. Functions provide:
+
+- a name we can remember and invoke it by
+- relief from the need to remember the individual operations
+- a defined set of inputs and expected outputs
+- rich connections to the larger programming environment
+
+As the basic building block of most programming languages, user-defined functions constitute "programming" as much 
+as any single abstraction can.
+
+## Defining a function
+
+Here's a very simple function for converting from degrees Fahrenheit to Kelvin. (You might remember from chemistry 
+that Kelvin is an absolute temperature scale.)
+
+
+```{r}
+fahrenheit_to_kelvin <- function(temp_F) {
+  temp_K <- ((temp_F - 32) * (5 / 9)) + 273.15
+  return(temp_K)
+}
+```
+
+We define `fahrenheit_to_kelvin` by assigning it to the output of function. The list of argument names are contained within parentheses. Next, the body of the function–the statements that are executed when it runs–is contained within
+curly braces ({}). The statements in the body are indented by two spaces, which makes the code easier to read but 
+does not affect how the code operates. 
+
+When we call the function, the values we pass to it are assigned to those variables so that we can use them inside 
+the function. Inside the function, we use a return statement to send a result back to whoever asked for it. 
+
+**In _R_, it is not necessary to include the return statement. _R_ automatically returns whichever variable is on 
+the last line of the body of the function. Since we are just learning, we will explicitly define the return 
+statement.**
+
+
+**Questions**
+
+1. Try out `fahrenheit_to_kelvin` on the freezing and boiling point of water. [**Hint**: F=32 for freezing, F=212 for boiling.]
+
+2. Write a function called `kelvin_to_celsius` that takes a value in Kelvin and returns that temperature in degrees Celsius. [**Hint**: To convert from Kelvin to Celsius, subtract 273.15.]
+
+## Combining functions
+
+The real power of functions comes from mixing, matching and combining them into ever-larger chunks to get the effect we want.
+
+**Questions**
+
+1. Define a function `fahrenheit_to_celsius` to convert directly from Fahrenheit to Celsius by reusing the two functions you have already created, and try it out on a few values.
+
+2. Modify your function so that it returns a character vector that contains the numerical value of the temperature 
+followed the string "degrees Celsius".
+
+## The `sample` function
+
+Without going into the details of just how it works, the very useful _R_ function `sample` simulates a finite random
+variable. The syntax is
+
+```{r eval=FALSE}
+sample(x, size, replace = FALSE, prob = NULL)
+```
+
+The inputs are:
+
+`x` A vector giving the possible values that random variable can take;
+`size` How many random variates to simulate;
+`replace` A logical argument that specifies whether sampling is carried out with replacement;
+`prob` A vector giving the probabilities of the values in `x`. If omitted then the values in `x` are assumed to be equally likely.
+
+
+**Questions**
+
+1. Simulate a sample of size 10 from the numbers 1 to 15 with and without replacement. What do you notice?
+```{r}
+sample(1:15, size = 10, replace = TRUE, prob = NULL)
+sample(1:15, size = 10, replace = FALSE, prob = NULL)
+```
+2. Simulate a very large number of samples from the numbers 0 and 1 with replacement (of course!). What is the proportion of ones and zeroes you obtained?
+
+Hint. Use _table()_ command. Try ?table.
+```{r}
+s1 = sample(c(0, 1), size = 1000, replace = TRUE, prob = NULL)
+table(s1)
+```
+# Exercise 5: 2 sample $t$-test
+
+This exercise uses a study that was concerned the effect of Vitamin C on
+tooth growth in guinea pigs. The response is the length of odontoblasts
+(*teeth*) in each of 10 guinea pigs at each of three dose levels of
+Vitamin C (0.5, 1, and 2 mg) with each of two *delivery* methods (orange
+juice or ascorbic acid). For this example, we will ignore the different
+*dose* levels.
+
+We first read in the data and store them as a dataframe *tooth*
+
+```{r}
+tooth = read.csv(file="tooth.csv")
+str(tooth)
+```
+
+Before we do any analyses we need to examine our data. With the analysis
+being considered, usually boxplot would give us a good feel for what is
+in our data.
+
+```{r}
+boxplot(length ~ delivery, data=tooth)
+```
+
+Check the result of analysing this data using t-test. We are looking to
+see if there are differences in tooth length for the two delivery
+methods. Assuming that the variances are equal.
+
+```{r}
+t.test(length ~ delivery, var.equal = TRUE, data=tooth)
+```
+
+An alternative way is to look at the ANOVA output
+
+```{r}
+tooth.aov = aov(length ~ delivery, data=tooth)
+summary(tooth.aov)
+```
+
+Note the p-value of *0.06039* and the degrees of freedom are exactly the
+same as in the ANOVA output.
+
+The bottom line is that doing a two-sample $t$-test assuming equal
+variance is the same as an ANOVA with only two groups to compare. What
+is the conclusion that you would make?
+
+Summarise the hypothesis testing in 6 steps. 
+
+
+# Exercise 6 Fish Oil and Blood Pressure
+
+Researchers used 7 red and 7 black playing cards to randomly assign 14
+volunteer males with high blood pressure to one of two diets for four
+weeks: a fish oil diet and a standard oil diet. The reductions in
+diastolic blood pressure are shown below
+
+$$
+\begin{array}{lrrrrrrr}
+\text{Fish oil diet ({Treatment}):}    & 8 & 12 & 10 & 14 & 2 & 0 & 0\\
+\text{Regular oil diet ({Control}):} & -6 & 0 & 1 & 2 & -3 & -4 & 2
+\end{array}
+$$
+
+Enter the data in {R} using the following code
+
+```{r eval=FALSE,size="scriptsize"}
+Dat = data.frame(
+  Reduction=c(8,12,10,14,2,0,0,-6,0,1,2,-3,-4,2),
+  Diet=c("Treatment","Treatment","Treatment","Treatment",
+         "Treatment","Treatment","Treatment","Control",
+         "Control","Control","Control","Control","Control","Control")
+  )
+```
+
+Follow the instructions and compare the treatments.
+
+```{r size="scriptsize"}
+Dat = data.frame(
+  Reduction=c(8,12,10,14,2,0,0,-6,0,1,2,-3,-4,2),
+  Diet=c("Treatment","Treatment","Treatment","Treatment",
+         "Treatment","Treatment","Treatment","Control",
+         "Control","Control","Control","Control","Control","Control")
+  )
+str(Dat)
+```
+
+    a. Take the means of the control and treatment groups be $\mu_1$ and  $\mu_2$ respectively. Apply Two sample $t$ test using the function {t.test} in {R}, assuming equal variances.
+```{r}
+t.test(Reduction ~ Diet, data = Dat, var.equal = TRUE)
+```
+    b. What are the Null and Alternative hypotheses for the test performed in part (a)?
+```{t}
+
+```
+    c. What are the test statistic and the sampling distribution for this case, based on R output?
+```{t}
+
+```
+    d. Is the $p$-value greater than 0.05 and what is your conclusion? Summarise in 6-steps for hypothesis testing.
+```{t}
+
+```
+    e. Compute the averages and the sample standard deviations for each group separately.
+
+```{r size="scriptsize"}
+mean.sample = with(Dat,tapply(Reduction,Diet,mean))
+mean.sample
+var.within = with(Dat,tapply(Reduction,Diet,var))
+var.within
+sqrt(var.within)
+```
+         
+    f. Compute the pooled sample variance.
+    
+    g. Write an R function to calculate the pooled sample variance, $s^2_p$, the degree of freedom, the test statistic and the p-value using the formula below for equal variances. Compute the results and compare it with the results from (a).
+    
+The formulas are summarised as follows:
+
+$$s_p^2=\frac{(n_1-1)s_1^2 +(n_2-1)s_2^2 }{n_1+n_2-2}, \quad df=n_1+n_2-2$$
+
+$$t=\frac{(\bar{x}_1-\bar{x}_2)}{\sqrt{s_p^2*(\frac{1}{n_1}+\frac{1}{n_2})}}, \quad p-value=2*P(T_{df} > t)$$
+
+    h. Use the answers in part (e) and (f), reproduce the $t$-statistic from the {R}-output of part (a).
+
+    i. What is the degree of freedom of the $t$-statistic presented in the {R}-output of part (a).
+
+    j. Determine the critical value of the $t$ distribution for the test at the 5\% significance level (the degress of freedom of this $t$ distribution is the answer of part (h)).
+    
+    k. Using the critical value in part (j), construct a 95\% Confidence Interval for the difference (the mean difference between Control and treatment groups)
+
+
+# Exercise 7: Visualisation using ggplot2 R package - The fuel mpg data <https://r4ds.had.co.nz/data-visualisation.html>
+
+The dataset *mpg* (which is available in _ggplot2_ R package) contains observations collected by the US Environmental Protection Agency (EPA) on 38 models of car available on https://fueleconomy.gov/. It  contains only models which had a new release every year between 1999 and 2008 - this was used as a proxy for the popularity of the car.
+
+Questions that can be asked about this scenario:
+
+1. Do cars with big engines use more fuel than cars with small engines? 
+
+2. What does the relationship between engine size and fuel efficiency look like? Is it positive? Negative? Linear? 
+Nonlinear?
+
+A template for ggplot
+
+```{r eval=FALSE, include=FALSE}
+ggplot(data = <DATA>) + 
+  <GEOM_FUNCTION>(mapping = aes(<MAPPINGS>))
+```
+
+An _aesthetic (aes)_ is a visual property of the objects in your plot. Aesthetics include things like the size, the shape, or the color of your points.
+
+## Questions
+
+1. Run _ggplot(data = mpg)_. What do you see?
+```{r}
+library(ggplot2)
+mpg
+```
+```{r}
+ggplot(data = mpg)
+```
+2. How many rows are in _mpg_? How many columns?
+```{r}
+mpg
+```
+4. Which variables in _mpg_ are categorical? Which variables are numerical? 
+```{r}
+`?`(mpg)
+str(mpg)
+```
+5. What does the _drv_ variable describe? Read the help for _?mpg_ to find out.
+
+6. Make a scatterplot of *hwy vs cyl*.
+```{r}
+ggplot(data = mpg) + geom_point(mapping = aes(x = cyl, y = hwy))
+```
+```{r}
+mpg$cyl = factor(mpg$cyl)
+ggplot(mpg, aes(cyl, hwy)) + geom_boxplot()
+```
+7. What happens if you make a scatterplot of *class vs drv*? Why is the plot not useful?
+```{r}
+ggplot(data = mpg) + geom_point(mapping = aes(x = class, y = drv))
+```
+8. Use _ggplot2_ to plot _displ_ on the x-axis and _hwy_ on the y-axis. Interpret the plot.
+```{r}
+ggplot(data = mpg) + geom_point(mapping = aes(x = displ, y = hwy))
+```
+9. Using aesthetic, map the colors of points in the plot in 6 to the _class_ variable to reveal the class of each car.
+```{r}
+ggplot(data = mpg) + geom_point(mapping = aes(x = displ, y = hwy, color = class))
+```
+Explore independently how to visualise using ggplot2 with *facets, geometric objects and statistical transformations*.
+
+

@@ -1,0 +1,594 @@
+---
+title: "STAT2401 Analysis of Experiments "
+author: "Practice Examination Semester 1 2024"
+date: "For Monday 10th June 2024"
+output:
+  pdf_document: default
+  html_notebook:
+    highlight: haddock
+    theme: flatly
+  html_document:
+    highlight: haddock
+    theme: flatly
+  word_document:
+    highlight: haddock
+---
+
+# STAT2401 Practice Examination - Semester 1 2024 (60 marks)
+
+## Student name: Himakar Gadham
+
+## Student ID: 23783777
+
+
+```{r echo=FALSE}
+knitr::opts_chunk$set(prompt=FALSE, comment=NA, message=FALSE, tidy=TRUE, error=TRUE, warning=FALSE)
+```
+
+# Instructions
+
+1. You are provided with Rmd template for your working that you are strongly recommended to submit under Question 1 File Response for partial marks. 
+
+2. Save the RMD template (within the LMS, *right click ON the file, then Save Link As*) to your working directory and rename it in the format of *studentID_Surname.Rmd*, eg, *123456_Nur.Rmd*.
+
+3. Marks for each question are shown. The total number of marks is 60.
+  
+    - This is a 2-hour examination.
+    
+    - You are provided with 15 minutes extra time for Rmarkdown template download, save and upload time.
+    
+    - There are 20 questions (Q2-Q21) set as multiple choice, multiple blanks, matching, calculated numeric. You must enter your answers on the LMS.
+    
+    - Include relevant R-output in your answers for some questions using R, if required.
+    
+         - You must provide your R code into the template provided here for full marks. 
+         
+         - Incorrect answers with R code attempt will be allocated some partial marks.
+         
+         - If you have any question or comment about the exam or would like to alert your Unit Coordinator to a perceived error, include a comment in your working in Rmd file, if appropriate, to indicate how you interpreted the question.
+               
+    - Carry out all of your work in this Rmarkdown file. 
+
+4. **Save your work frequently!**
+
+5. When you are finished, upload this *Rmarkdown file* back into *Question 1 File Response* on the LMS.
+
+    -  You only need to submit this RMD file.
+    
+    -  You don't need to knit this file. 
+    
+    - DO NOT BE LATE. You must submit within the examination time (135 minutes). *We do not accept any Rmd submission by email.*
+
+
+## Remarks
+
+- Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+
+- You can add your working in this file whenever applicable, eg theoretical question. Clearly indicates the question number before your answer. 
+
+- Make sure your program works for every chunk.
+
+- It is your responsibility to call the libraries of R packages.
+
+- The following chunk listed some R packages for the datasets that you may need to load as libraries.
+
+```{r include=FALSE}
+## Add libraries from the computer labs
+# library(tidyverse)
+library(ggplot2)
+library(PerformanceAnalytics)
+library(leaps)
+```
+
+
+```{r}
+## R packages for the datasets
+library(datarium)
+library(HSAUR2)
+library(MASS)
+library(ISLR)
+```
+
+
+
+# Based on Questions 2-21 on the LMS. 
+
+## Question 3
+
+```{r}
+x <- c(2,6,9, 14, 21,23)
+
+y<- c(16,18,  26, 33, 28, 39)
+
+# Calculate means
+mean_x <- mean(x)
+mean_y <- mean(y)
+
+# Calculate the numerator and denominator for the slope
+numerator <- sum((x - mean_x) * (y - mean_y))
+denominator <- sum((x - mean_x)^2)
+
+# Calculate the slope
+slope <- numerator / denominator
+slope
+fit <- lm(y~x)
+summary(fit)
+
+```
+Which of the following statements is (are) FALSE?
+
+	a.	
+A scatter plot is a useful graphical tool for displaying the strength of the relationship between two quantitative variables.
+
+	b.	
+A categorical variable can be added to a scatter plot by using a different color or symbol for each category.
+
+	c.	
+If above-average values of two quantitative variables and below-average values of the same two quantitative variables tend to occur together, the two variables are positively associated.
+
+	d.	
+An individual value that deviates from the overall pattern displayed on a scatter plot is called an outlier.
+
+	e.	
+The only relationship that a scatter plot can usefully display is linear with no outliers.
+
+
+
+
+
+## Question 5
+
+```{r}
+# Data
+women <- c(64, 65, 65, 66, 66, 67, 68, 70)
+men <- c(68, 68, 69, 70, 72, 72, 73, 75)
+# Fit the linear regression model
+fit <- lm(men ~ women)
+summary(fit)
+# Perform ANOVA
+anova_output <- anova(fit)
+anova_output
+```
+
+
+## Question 6
+```{r}
+# Given values
+SST <- 133.46949
+SSR <- 105.96390
+n <- 14
+DF_regression <- 1
+DF_total <- n - 1
+DF_error <- DF_total - DF_regression
+
+# Calculate SSE
+SSE <- SST - SSR
+
+# Calculate MSE
+MSE <- SSE / DF_error
+
+# Output the result
+MSE
+
+```
+
+
+## Question 8
+```{r}
+# Given values
+intercept <- 116.95
+slope <- -0.26
+goals_allowed <- 170
+
+# Calculate the predicted winning percentage
+predicted_winning_percentage <- intercept + (slope * goals_allowed)
+
+# Output the result
+predicted_winning_percentage
+
+```
+
+
+## Question 9
+```{r}
+# Calculate p-value for two-tailed test
+t_statistic_slope <- 2
+df <- 100 - 2
+p_value_slope <- 2* pt(-abs(t_statistic_slope), df)
+round(p_value_slope, 2)
+
+```
+
+
+
+## Question 10
+```{r}
+women <- c(64,65,65,66,66,67,68,70)
+men <-c(68,68,69,70,72,72, 73,75)
+
+fitw <- lm(women ~ men)
+summary(fitw)
+```
+
+
+## Question 11
+
+```{r}
+gpa=c(3.1,    2.3,    3,    1.9,    2.5,    3.7,    3.4,    2.6,    2.8,    1.6,    2,    2.9,    2.3,    3.2,    1.8,    1.4,    2,    3.8,    2.2,    1.5)
+ets=c(5.5,    4.8,    4.7,    3.9,    4.5,    6.2,    6,    5.2,    4.7,    4.3,    4.9,    5.4,    5,    6.3,    4.6,    4.3,    5,    5.9,    4.1,    4.7)
+fitp <- lm(gpa ~ ets)
+summary(fitp)
+anova(fitp)
+ETS_value <- 4.0
+confint(fitp, newdata = data.frame(ets = ETS_value),level = 0.90)
+```
+```{r}
+# Data
+gpa <- c(3.1, 2.3, 3, 1.9, 2.5, 3.7, 3.4, 2.6, 2.8, 1.6, 2, 2.9, 2.3, 3.2, 1.8, 1.4, 2, 3.8, 2.2, 1.5)
+ets <- c(5.5, 4.8, 4.7, 3.9, 4.5, 6.2, 6, 5.2, 4.7, 4.3, 4.9, 5.4, 5, 6.3, 4.6, 4.3, 5, 5.9, 4.1, 4.7)
+
+# Fit the linear regression model
+fit <- lm(gpa ~ ets)
+
+# Summary of the model
+summary(fit)
+
+# Coefficients
+intercept <- coef(fit)[1]
+slope <- coef(fit)[2]
+
+# Point estimate for ETS = 4.0
+ETS_value <- 4.0
+point_estimate <- intercept + slope * ETS_value
+cat("Point estimate for ETS = 4.0:", round(point_estimate, 3), "\n")
+
+# Predict with confidence interval
+conf_interval <- predict(fit, newdata = data.frame(ets = ETS_value), interval = "confidence", level = 0.90)
+cat("90% confidence interval for ETS = 4.0: (", round(conf_interval[1, 2], 3), ", ", round(conf_interval[1, 3], 4), ")\n")
+
+```
+```{r}
+# Point estimate for ETS = 4.0
+ETS_value <- 4.2
+point_estimate <- intercept + slope * ETS_value
+cat("Point estimate for ETS = 4.0:", round(point_estimate, 3), "\n")
+
+# Predict with confidence interval
+conf_interval <- predict(fit, newdata = data.frame(ets = ETS_value), interval = "confidence", level = 0.90)
+cat("90% confidence interval for ETS = 4.0: (", round(conf_interval[1, 2], 3), ", ", round(conf_interval[1, 3], 3), ")\n")
+```
+
+
+## Question 13
+```{r}
+dna<-c(0.148,0.276,0.156,0.3,0.108,0.214,0.112,0.116,0.18,0.33,0.28,0.12,0.218,0.24,0.308,0.064,0.152,0.1,0.238,0.228,0.589,0.463,0.461,0.333,0.357,0.382,0.414,0.241,0.458,0.396,0.307,0.236,0.076,0.001,0.009,0.099,0.187,0.104,0.088,0.072,0.192,0.152,0.152,0.272,0.288,0.232,0.368,0.216,0.248,0.28,0.336,0.32,0.896,0.2,0.408,0.472,0.648,0.384,0.44,0.592,0.392,0.312,0.312,0.208,0.128,0.264,0.264,0.328,0.264,0.376,0.288,0.208,0.224,0.376,0.6,0.168,0.264,0.152,0.184,0.312,0.344,0.184,0.36,0.264,0.464,0.328,0.296,1.056,0.538,0.09,0.13,0.207,0.153,0.206,0.172,0.131,0.095,0.307,0.171,0.822,0.901,0.552,0.391,0.172,0.116,0.168,0.074,0.1,0.132,0.112,0.121,0.162,0.302,0.179,0.369,0.213)
+phyto <-c(0.01,0.056,0.032,0.022,0.009,0.023,0.016,0.008,0.008,0.016,0.005,0.004,0.006,0.007,0.005,0.006,0.006,0.006,0.011,0.01,0.05,0.038,0.034,0.02,0.023,0.032,0.034,0.012,0.036,0.033,0.018,0.002,0.001,0.002,0,0,0.001,0.004,0.009,0.002,0.005,0.028,0.006,0.004,0.046,0.006,0.003,0.011,0.006,0.002,0.062,0.006,0.055,0.017,0.018,0.017,0.034,0.008,0.042,0.032,0.036,0.002,0.003,0.001,0.001,0.001,0.008,0.01,0.002,0.003,0.001,0.024,0.017,0.01,0.024,0.014,0.018,0.01,0.016,0.017,0.009,0.01,0.01,0.026,0.03,0.028,0.01,0.082,0.055,0.003,0.001,0.001,0.001,0.001,0.001,0.001,0,0.001,0.001,0.058,0.075,0.04,0.026,0.006,0.003,0.005,0,0.001,0.005,0.003,0.004,0.001,0.014,0.002,0.023,0.007)
+
+fitpy <- lm(dna ~ phyto)
+summary(fitpy)
+```
+```{r}
+# Calculate Cook's distances
+cooks_d <- cooks.distance(fitpy)
+
+# Sort Cook's distances in descending order to find the third largest
+sorted_cooks_d <- sort(cooks_d, decreasing = TRUE)
+sorted_cooks_d
+# Get the third largest Cook's distance
+third_largest_cooks_d <- sorted_cooks_d[3]
+cat("The third largest Cook's distance is:", round(third_largest_cooks_d, 3), "\n")
+```
+
+
+## Question 14
+```{r}
+sales=c(1843.01 ,134.48 ,469.66 ,467.65 ,2626.07 ,805.89 ,909.5 ,77.77 ,1793.48 ,217.96 ,453.84 ,938.11 ,1962.19 ,2579.76 ,198.14 ,303.88 ,2361.85 ,949.87 ,360.61 ,2016.32 ,113.4 ,292.88 ,1386.37 ,140.51 ,387.87 ,551.11 ,284.24 ,341.5 ,299.84 ,151.12 ,68.64 ,1471.59 ,535.11 ,1642.11 ,370.22 ,249.12 ,557.65 ,236.64 ,112.87 ,674.44 ,1490.8 ,131.47 ,458.77 ,489.61 ,1659.04 ,1033.81 ,719.45 ,398.82 ,211.93 ,279.49 ,340.24 ,1098.96 ,1095.93 ,518.03 ,215.41 ,335.44 ,261.72 ,567.37 ,1355.82 ,339.61 ,350.2 ,1046.59 ,1203.1 ,1228.47 ,2791.35 ,992.64 ,232.92 ,288.3 ,209.14 ,342.31 ,484.31 ,107.77 ,1323.47 ,850.19 ,372.22 ,906.26 ,575.31 ,317.53 ,2279.96 ,638.49 ,591.37 ,1676.22 ,398.68 ,1458.04 ,152.77 ,1369.59 ,104.65 ,188.18 ,705.16 ,962.18 ,262.06 ,374.37 ,2093.83 ,246.62 ,458.35 ,996.14 ,495.68 ,411.5 ,143.29 ,1542.81)
+adexp=c(950.1 ,231.1 ,606.8 ,486 ,891.3 ,762.1 ,456.5 ,18.5 ,821.4 ,444.7 ,615.4 ,791.9 ,921.8 ,738.2 ,176.3 ,405.7 ,935.5 ,916.9 ,410.3 ,893.6 ,57.9 ,352.9 ,813.2 ,9.9 ,138.9 ,202.8 ,198.7 ,603.8 ,272.2 ,198.8 ,15.3 ,746.8 ,445.1 ,931.8 ,466 ,418.6 ,846.2 ,525.2 ,202.6 ,672.1 ,838.1 ,19.6 ,681.3 ,379.5 ,831.8 ,502.8 ,709.5 ,428.9 ,304.6 ,189.7 ,193.4 ,682.2 ,302.8 ,541.7 ,150.9 ,697.9 ,378.4 ,860 ,853.7 ,593.6 ,496.6 ,899.8 ,821.6 ,644.9 ,818 ,660.2 ,342 ,289.7 ,341.2 ,534.1 ,727.1 ,309.3 ,838.5 ,568.1 ,370.4 ,702.7 ,546.6 ,444.9 ,694.6 ,621.3 ,794.8 ,956.8 ,522.6 ,880.1 ,173 ,979.7 ,271.4 ,252.3 ,875.7 ,737.3 ,136.5 ,11.8 ,893.9 ,199.1 ,298.7 ,661.4 ,284.4 ,469.2 ,64.8 ,988.3)
+
+fit1 <- lm(sales ~ adexp)
+fit2 <- lm(1/sales ~ adexp)
+summary(fit1)
+summary(fit2)
+```
+```{r}
+# Calculate Cook's distances
+cooks_d <- cooks.distance(fit2)
+
+# Sort Cook's distances in descending order to find the third largest
+sorted_cooks_d <- sort(cooks_d, decreasing = TRUE)
+sorted_cooks_d
+# Get the third largest Cook's distance
+third_largest_cooks_d <- sorted_cooks_d[2]
+cat("The third largest Cook's distance is:", round(third_largest_cooks_d, 3), "\n")
+
+# Calculate the cut-off for Cook's distance
+cut_off_cooks_d <- 4 / length(sales)
+cut_off_cooks_d
+```
+```{r}
+# Perform the transformation (1/sales) vs adexp
+inv_sales <- 1 / sales
+
+# Fit the linear regression model with transformed data
+fit_transformed <- lm(inv_sales ~ adexp)
+
+# Summary of the transformed model
+summary(fit_transformed)
+
+```
+
+
+## Question 15
+
+## Question 16
+```{r}
+age <- c(40,38,40,35,36,37,41,40,37,38,40,38,40,36,40,38,42,39,40,37,36,38,39,40)
+birthweight <- c(2968,2795,3163,2925,2625,2847,3292,3473,2628,3176,3421,2975,3317,2729,2935,2754,3210,2817,3126,2539,2412,2991,2875,3231)
+sex <- c(rep("m",12),rep("f",12))
+babies <- data.frame(age,birthweight,sex)
+
+lmmod <- lm(birthweight ~ age + sex, data = babies)
+summary(lmmod)
+```
+```{r}
+# Coefficient of determination (R^2)
+r_squared <- summary(lmmod)$r.squared
+cat("The coefficient of determination (R^2) is:", round(r_squared, 3), "\n")
+
+# Residual standard error (σ)
+sigma <- summary(lmmod)$sigma
+cat("The estimate of the residual standard error (σ) is:", round(sigma, 3), "\n")
+```
+
+## Question 17
+
+```{r}
+salary<-c(33.2,40.3,38.7,46.8,41.4,37.5,39,40.7,30.1,52.9,38.2,31.8,43.3,44.1,42.8,33.6,34.2,48)
+quality <-c(3.5,5.3,5.1,5.8,4.2,6,6.8,5.5,3.1,7.2,4.5,4.9,8,6.5,6.6,3.7,6.2,7)
+experience <- c(9,20,18,33,31,13,25,30,5,47,25,11,23,35,39,21,7,40)
+publish <-c(6.1,6.4,7.4,6.7,7.5,5.9,6,4,5.8,8.3,5,6.4,7.6,7,5,4.4,5.5,7)
+salary_data <- data.frame(salary, quality,experience,publish)
+head(salary_data)
+
+# Fit the full model
+full_model <- lm(salary ~ quality + experience + publish, data = salary_data)
+
+# Perform backward selection using step function with AIC criterion
+backward_model <- step(full_model, direction = "backward")
+summary(backward_model)
+
+# Diagnostics plots
+# Residuals vs Fitted plot
+plot(backward_model, which = 1)
+
+# Normal Q-Q plot
+plot(backward_model, which = 2)
+
+# Scale-Location plot
+plot(backward_model, which = 3)
+
+# Cook's distance
+plot(backward_model, which = 4)
+plot(backward_model)
+```
+```{r}
+# check help function first
+Inv.infl<-influence.measures(backward_model)
+Inv.infl
+Leverage.inv<-hatvalues(backward_model)
+Cooks.Dist.inv<-cooks.distance(backward_model)
+Inv <- salary_data$salary
+# plotting the influence measures against their x value - Invoices 
+n=24
+plot(Leverage.inv~Inv)
+abline(h=4/n, col=3)
+plot(Cooks.Dist.inv~Inv)
+abline(h=4/(n-2), col=2)
+plot(Cooks.Dist.inv~Inv)
+abline(h=4/(n-2), col=2)
+```
+
+
+## Question 18
+```{r}
+Time <-c(78.8,309.5,184.5,69.6,68.8,95.7,112.3,171.9,177.8,65.8,51.2,59.6,85.4,138.1,125.7,70.1,342.9,70.3,124.9,90,111.7,104.7,82.1,199.8,256.9,179.7,296.6,159.6,182.1,173,216,329.8,325.3,47.8,57,59.4,59.2,84.4,202.1,46.6,257.5,167.1,418.1,302.2,87.2)
+DArea <-c(3.6,5.33,6.29,2.2,1.44,5.4,6.6,7.9,4.88,0.85,1.45,4.1,3.89,5.48,5.48,3.78,19.58,1.5,4.83,1.89,3.43,33.18,4.22,7.43,9.98,22.53,45,10.36,10.36,22.5,23.07,42.67,30.67,1.01,2.52,2.16,2.14,7.74,13.65,4.22,20.73,7.48,7.21,10.89,3.24)
+CCost <-c(82.4,422.3,179.8,100,103,134.4,173.2,207.9,327.7,56.2,46.8,118.9,113.3,309,309,106.1,374.5,98.3,99.3,60,67.4,1123.6,123.6,222.9,498,563.3,749.1,187.3,187.3,500.5,701.7,1066.8,766.7,30,65.5,63.7,68.4,187.3,421.4,107.7,1264.1,220.1,336.2,641.4,70.2)
+Dwgs <-c(6,12,9,5,5,5,5,7,9,3,3,6,6,6,6,5,7,5,6,5,5,9,6,9,15,9,9,10,10,9,12,12,15,4,5,5,4,5,9,6,11,7,11,8,6)
+Length <-c(90,126,78,60,60,60,180,188,336,25,50,114,108,128,128,90,430,50,68,64,70,273,95,73,185,395,450,140,140,308,438,405,902,35,70,60,70,242,369,124,860,220,285,560,90)
+Spans <-c(1,2,1,1,1,1,3,2,2,1,1,2,2,2,2,1,6,1,1,1,1,2,1,1,3,6,5,3,3,3,4,4,7,1,1,1,1,5,1,1,5,3,3,5,1)
+bridge <-cbind(Time,DArea,CCost,Dwgs,Length,Spans)
+bridge=data.frame(bridge)
+head(bridge)
+
+# Log transform the variables
+bridge_log <- data.frame(
+  logTime = log(bridge$Time),
+  logDArea = log(bridge$DArea),
+  logCCost = log(bridge$CCost),
+  logDwgs = log(bridge$Dwgs),
+  logLength = log(bridge$Length),
+  logSpans = log(bridge$Spans)
+)
+
+# View the first few rows of the transformed data
+head(bridge_log)
+
+```
+```{r}
+library(leaps)
+
+# Perform All Subsets Regression
+all_subsets <- regsubsets(logTime ~ ., data = bridge_log, nvmax = 5,nbest = 2)
+
+# Summary of the best models
+summary(all_subsets)
+
+```
+
+```{r}
+# Modify some graphical parameters
+par(mfrow = c(1, 3))
+par(cex.axis = 1.5)
+par(cex.lab = 1.5)
+
+AllSubsets <- regsubsets(logTime ~ ., data = bridge_log, nvmax = 10, nbest = 1)
+AllSubsets.summary <- summary(AllSubsets)
+plot(1:10, AllSubsets.summary$adjr2, xlab = "subset size", ylab = "adjusted R-squared",
+    type = "b")
+plot(1:10, AllSubsets.summary$cp, xlab = "subset size", ylab = "Mallows' Cp", type = "b")
+abline(0, 1, col = 2)
+plot(1:10, AllSubsets.summary$bic, xlab = "subset size", ylab = "BIC", type = "b")
+```
+
+## Question 19
+
+```{r}
+price<-c(12688,11500,11650,10995,6200,9500,8700,12500,10488,5988,7288,3590,2800,6995,4900,2488,4200,12990,14500,10900,13500,12000,8500,4388,3000,3900,3350,10500,12988,6500,12900,9000,7000,5900,2500)
+sunroof<-c(0,0,0,1,0,0,0,0,1,0,1,0,0,1,0,0,1,1,1,1,1,0,0,0,0,0,0,0,0,0,1,0,0,0,0)
+age<-c(1,1,1,2,3,3,3,2,4,4,5,5,6,7,7,7,8,1,3,3,3,3,3,4,7,8,8,3,1,3,2,2,6,4,6)
+odometer<-c(8200,27000,3000,27000,55000,22000,25000,23800,20000,37000,84000,55000,62000,78000,60000,67000,65000,1300,31000,4000,23000,89000,34000,80000,95000,90000,91000,17000,21000,73000,19000,32000,56000,110000,92000)
+auto<-c(0,1,0,1,1,0,1,0,0,0,1,0,0,1,0,1,1,1,1,1,0,0,1,0,0,0,0,0,1,0,0,0,0,1,0)
+aircon<-c(1,1,1,1,1,0,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1)
+nocyl<-c(8,8,8,8,4,8,8,8,8,4,4,4,4,4,8,4,6,8,8,8,8,8,8,4,4,8,8,8,8,8,8,8,8,8,4)
+colour<-c(1,2,3,4,4,3,5,4,7,3,5,6,5,1,7,1,5,7,7,6,6,7,7,5,5,1,6,1,7,7,6,5,7,5,5)
+gtmodel<-c(1,0,1,0,0,0,0,1,1,0,0,0,0,0,1,0,0,0,1,0,1,1,0,0,0,1,1,1,1,0,0,0,1,0,0)
+cars=cbind.data.frame(price, sunroof,age,odometer,auto,aircon,nocyl,colour,gtmodel)
+cars$sunroof=as.factor(cars$sunroof)
+cars$auto=as.factor(cars$auto)
+cars$aircon=as.factor(cars$aircon)
+cars$colour=as.factor(cars$colour)
+cars$gtmodel=as.factor(cars$gtmodel)
+head(cars)
+```
+```{r}
+# Perform All Subsets Regression
+all_subsets <- regsubsets(price ~ ., data = cars, nvmax = 8, nbest = 2)
+
+# Summary of the best models
+summary(all_subsets)
+```
+
+
+```{r}
+# Modify some graphical parameters
+par(mfrow = c(1, 3))
+par(cex.axis = 1.5)
+par(cex.lab = 1.5)
+
+AllSubsets <- regsubsets(price ~ ., data = cars, nvmax = 8, nbest = 1)
+AllSubsets.summary <- summary(AllSubsets)
+plot(1:8, AllSubsets.summary$adjr2, xlab = "subset size", ylab = "adjusted R-squared",
+    type = "b")
+plot(1:8, AllSubsets.summary$cp, xlab = "subset size", ylab = "Mallows' Cp", type = "b")
+abline(0, 1, col = 2)
+plot(1:8, AllSubsets.summary$bic, xlab = "subset size", ylab = "BIC", type = "b")
+AllSubsets.summary$adjr2
+AllSubsets.summary$cp
+AllSubsets.summary$bic
+```
+
+
+## Question 20
+
+```{r}
+# Load necessary library
+data("attitude")
+
+# View the dataset
+View(attitude)
+
+# Define the full model including all explanatory variables
+full_model <- lm(rating ~ complaints + privileges + learning + raises + critical + advance, data = attitude)
+
+# Apply forward selection using step function with AIC criterion
+forward_selection <- step(lm(rating ~ 1, data = attitude), 
+                          scope = list(lower = lm(rating ~ 1, data = attitude), 
+                                       upper = full_model), 
+                          direction = "forward")
+
+# Print the AIC values and selected model at each step
+print(forward_selection)
+
+```
+
+## Question 21
+```{r}
+salary<-c(33.2,40.3,38.7,46.8,41.4,37.5,39,40.7,30.1,52.9,38.2,31.8,43.3,44.1,42.8,33.6,34.2,48)
+quality <-c(3.5,5.3,5.1,5.8,4.2,6,6.8,5.5,3.1,7.2,4.5,4.9,8,6.5,6.6,3.7,6.2,7)
+experience <- c(9,20,18,33,31,13,25,30,5,47,25,11,23,35,39,21,7,40)
+publish <-c(6.1,6.4,7.4,6.7,7.5,5.9,6,4,5.8,8.3,5,6.4,7.6,7,5,4.4,5.5,7)
+# Create data frame
+data <- data.frame(salary, quality, experience, publish)
+
+# View the first few rows of the data
+head(data)
+
+# Fit the full model
+full_model <- lm(salary ~ quality + experience + publish, data = data)
+
+# Apply backward selection using step function with AIC criterion
+backward_selection <- step(full_model, direction = "backward")
+
+# Summary of the selected model
+model_summary <- summary(backward_selection)
+model_summary
+# Print the final AIC value
+cat("The final AIC value is:", AIC(backward_selection), "\n")
+
+# Print the selected variables
+cat("The selected variables are:\n")
+print(names(coef(backward_selection))[-1]) # Exclude the intercept
+
+# Print the p-value for "publish"
+publish_p_value <- coef(summary(backward_selection))["publish", "Pr(>|t|)"]
+cat("The p-value for 'publish' is:", publish_p_value, "\n")
+
+# Print the estimated sample variance s squared
+s_squared <- sigma(backward_selection)^2
+cat("The estimated sample variance s squared is approximately:", s_squared, "\n")
+
+```
+```{r}
+# Predict with confidence intervals for a specific set of values without explicitly creating a new data frame
+predictions <- predict(full_model, newdata = data.frame(quality = 5, experience = 10, publish = 6), interval = "confidence")
+
+# Print predictions with confidence intervals
+print(predictions)
+```
+
+Independence check
+```{r}
+# Assuming prod.lm1 is your fitted linear model
+plot(residuals(prod.lm1) ~ seq_along(residuals(prod.lm1)),
+     xlab = "Observation Order",
+     ylab = "Residuals",
+     main = "Residuals vs Observation Order")
+abline(h = 0, col = "red")
+# Install the car package if not already installed
+install.packages("car")
+library(car)
+
+# Perform the Durbin-Watson test
+durbinWatsonTest(prod.lm1)
+# ACF plot for residuals
+acf(residuals(prod.lm1), main = "ACF of Residuals")
+
+```
+1. Plotting Residuals Against Time or Order
+If the data is time-ordered or has a specific sequence, you can plot the residuals against time or order of the observations. If there is no apparent pattern (like trends or cycles), the residuals are likely independent.
+2. Durbin-Watson Test
+The Durbin-Watson test is a statistical test used to detect the presence of autocorrelation (a specific type of correlation) in the residuals from a regression analysis.
+A Durbin-Watson statistic around 2 suggests that there is no autocorrelation.
+Values approaching 0 indicate positive autocorrelation.
+Values approaching 4 indicate negative autocorrelation.
+3. Autocorrelation Function (ACF) Plot
+An ACF plot of the residuals can help identify any autocorrelation in the residuals. Significant autocorrelation would indicate a violation of the independence assumption.
+
+Summary of Diagnostic Plots
+When you call plot(prod.lm1), it typically generates the following diagnostic plots:
+
+Residuals vs Fitted Values (Top Left): Checks for linearity and homoscedasticity (constant variance).
+Normal Q-Q Plot (Top Right): Checks for normality of residuals.
+Scale-Location Plot (Bottom Left): Checks for homoscedasticity (constant variance).
+Residuals vs Leverage Plot (Bottom Right): Identifies influential data points.

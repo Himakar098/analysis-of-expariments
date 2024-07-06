@@ -1,0 +1,556 @@
+---
+title: 'STAT2401 Analysis of Experiments'
+author: 'Practical Week 8: Solutions'
+output:
+  html_document:
+    highlight: haddock
+    theme: flatly
+  html_notebook:
+    theme: flatly
+  word_document: default
+  pdf_document: default
+---
+
+## Learning Check
+
+When you complete this session, you will be able to:
+
+1. understand how to perform ANOVA in the Multiple Linear Regression (MLR);
+2. understand how to perform Partial F-Test in the Multiple Linear Regression (MLR);
+3. understand how to perform diagnostics in Multiple Linear Regression modelling using R;
+4. understand how to perform regression modelling with categorical variables.
+
+
+```{r echo=FALSE}
+knitr::opts_chunk$set(prompt=FALSE, comment=NA, tidy=TRUE, error=TRUE, warning=FALSE, message=FALSE)
+```
+
+```{r}
+print(load("STAT1000_Data_Week8.RData"))
+```
+
+## Question 1 ANOVA - Concept
+
+Complete the ANOVA table below. There are $n = 26$ observations, and $p = 2$ explanatory variables have been fitted. What are the null and alternative hypotheses that are assessed by this ANOVA?
+
+A general ANOVA table for MLR:
+
+Source     |  df    | SS    |  MS              |  F
+:-----     | -----: | ----: | ----------------:| ---------:
+Regression |   p    | SSR   |  SSR/p=MSR       |  MSR/MSE 
+Residual   |  n-p-1 | SSE   |  SSE/(n-p-1)=MSE |
+Total      |  n-1   | SST   |                  |
+
+
+Source     |  df    | SS    |  MS   |  F
+:-----     | -----: | ----: | ----: | ------:
+Regression |   *2*  | *1200*| 600   | *14.1* 
+Residual   |  *23*  | *980* | *42.6*|
+Total      |  *25*  | 2180  |       |
+
+The F statistic seen in this ANOVA is used to assess the hypothesis that none of the considered explanatory variables are useful in explaining the mean response of the dependent variable. 
+
+The sampling distribution is: $F_df{2,23}$.
+
+The p-value is: $p-value=P(F_{2,23} > 14.1).$
+
+More formally:
+$$H_0: \beta_1=\beta_2=0 {\rm \ against \ H_A: \ at \ least \ one \ of} \ \beta_i \neq 0, i=1,2$$
+
+```{r}
+pval=pf(14.1,2,23,lower.tail=FALSE)
+pval
+```
+
+
+## Question 2 Property.csv 
+
+The dataset presents data for 27 houses sold in Erie, Pennsylvania. The data has the following variables
+
+     - y:  Sale price of the house/1000;
+     - x1: Taxes (local, school, county)/1000; 
+     - x2: Number of baths; 
+     - x3: & Lot size (sq ft $\times$ 1000); 
+     - x4: Living space (sq ft $\times$ 1000); 
+     - x5: Number of garage stalls; 
+     - x6: Number of rooms; 
+     - x7: Number of bedrooms; 
+     - x8: Age of the home (years);
+     - x9: Number of fireplaces.
+
+
+(a) Fit a multiple regression model relating selling price to all nine regressors.
+Present the fitted model.
+
+Read the data in and plot the data.
+
+```{r size="scriptsize"}
+Property = read.csv("Property.csv",header=TRUE)
+```
+
+Fit the regression model and present the output.
+
+```{r size="scriptsize"}
+M2 = lm(y~x1+x2+x3+x4+x5+x6+x7+x8+x9,data=Property)
+summary(M2)
+```
+
+$$
+\texttt{y} = \beta_0
++ \beta_1 \texttt{x1} 
++ \beta_2 \texttt{x2}
++ \beta_3 \texttt{x3}
++ \beta_4 \texttt{x4}
++ \beta_5 \texttt{x5}
++ \beta_6 \texttt{x6}
++ \beta_7 \texttt{x7}
++ \beta_8 \texttt{x8}
++ \beta_9 \texttt{x9}
++ \epsilon
+$$
+where $\epsilon$ is a normal random variable. 
+
+So the fitted line is 
+$$
+\widehat{\texttt{y}} =
+  14.92765
++ 1.92472 \texttt{x1} 
++ 7.00053 \texttt{x2}
++ 0.14918 \texttt{x3}
++ 2.72281 \texttt{x4}
++ 2.00668 \texttt{x5} 
+- 0.41012 \texttt{x6}
+- 1.40324 \texttt{x7}
+- 0.03715 \texttt{x8}
++ 1.55945 \texttt{x9}
+$$
+
+
+(b) Test for significance of regression at the level of 5\%. What conclusions can you draw?
+
+
+To test H$_0:\beta_1=\beta_2=\beta_3=\beta_4=\beta_5=\beta_6=\beta_7=\beta_8=\beta_9=0$ vs H$_1:$ Not H$_0$, we can look the $p$-value from the output. 
+the $p$-value is 0.000185 $<0.05=\alpha$, so 
+the model is statistically significant at the level 5\%.
+
+
+(c) What is the contribution of lot size (x3) and living space (x4) to the model given that all of the other regressors are included?
+
+We are interested in the test H$_0:\beta_3=\beta_4=0$ vs H$_1:$ Not H$_0$. We apply the R-code
+
+```{r size="scriptsize"}
+M2 = lm(y~x1+x2+x3+x4+x5+x6+x7+x8+x9,data=Property)
+M3 = lm(y~x1+x2+x5+x6+x7+x8+x9,data=Property)
+anova(M3,M2)
+```
+
+The $p$-value for this test is given by
+\texttt{0.7296} $>0.05=\alpha$, so 
+contribution of lot size (\texttt{x3}) and living space (\texttt{x4}) 
+is NOT statistically significant at the level 5\%. This also indicates that 
+there is no contribution of
+lot size (\texttt{x3}) and living space (\texttt{x4}) given that all the other regressors are in the model.
+
+
+
+## Question 3 Adapted from Sheather (2009) Chapter 5: Menu pricing in a new Italian restaurant in New York City 
+
+The aim of this scenario is to produce a regression model to predict the price 
+of dinner using data from surveys of customers of 168 Italian restaurants in the target area are available. 
+
+The data are in the form of the average of customer views on:
+
++ Y = Price = the price (in $US) of dinner (including 1 drink & a tip)
++ X1= Food = customer rating of the food (out of 30)
++ X2= Décor = customer rating of the decor (out of 30)
++ X3= Service = customer rating of the service (out of 30)
++ X4= East = dummy variable = 1 (0) if the restaurant is east (west) of Fifth Avenue
+
+The data are given on the book web site in the file *nyc.csv*. 
+
+(a) Recall the fitted model that being produced last week. Use all of the four variables.
+
+```{r}
+nyc=read.csv("nyc.csv")
+head(nyc)
+nyc1=nyc[,c(-1,-2,-7)]  ## nyc1 consists of all numerical data
+View(nyc1)
+```
+
+```{r}
+# Scatterplot
+pairs(nyc1)
+library(PerformanceAnalytics)  ## install this
+chart.Correlation(nyc1)
+```
+
+```{r}
+nyc2=nyc[,c(-1,-2)] # excluding case and restaurant columns
+ny.lm=lm(Price~.,data=nyc2)  ## full model
+summary(ny.lm)
+```
+
+The initial regression model is
+
+*Price = – 24.02 + 1.54 Food + 1.91 Decor – 0.003 Service + 2.07 East*
+
+At this point we shall leave the variable Service in the model even though its
+regression coefficient is not statistically significant.
+
+(b) Conduct the ANOVA F Test (6 steps) for the full model with all 4 variables. 
+
+```{r}
+anova(ny.lm)
+str(anova(ny.lm))
+```
+
+
+We would like to obtain *Regression* as part of the table.
+
+```{r}
+ny.lmm=lm(Price~1,data=nyc2)  ## model with intercept only
+anova(ny.lmm, ny.lm)
+```
+
+From the above, n=168, p=4; SSR= 9055; F=68.76; p-val < 2.2e-16. 
+
+(OPTIONAL) Another way to obtain the ANOVA table, using a different method, OLS (Ordinary Least Squares)
+
+```{r}
+library(rms)
+anova(rms::ols(Price~Food+Decor+Service+East,data=nyc2))
+```
+
+*6 steps ANOVA hypothesis testing:*
+
+Step 1. $H_0: \beta_1=\beta_2 =\beta_3 = \beta_4 =0, H_1: at \ least \ one \  \beta_j \not= 0, j=1,2,3,4.$
+
+Step 2. Test statistic: F=68.76
+
+Step 3. The sampling distribution is $F_{p,n-p-1}=F_{4,163},$ as $p=4, n=168.$
+
+Step 4. p-value < 2.2e-16.
+
+Steps 5 and 6. We reject the null hypothesis.There is a relationship between Price and at least one of the four variables.
+
+(c) Conduct the partial F Test for
+$$H_0: Price_i= \beta_0+\beta_1 Food_{i} +\beta_2 Decor_{i}+\beta_3 East_{i}$$
+
+against
+$$H_a: Price_i= \beta_0+\beta_1 Food_{i} +\beta_2 Decor_{i}+\beta_3 East_{i}+\beta_4 Service_i$$
+```{r}
+ny1.lm=lm(Price~Food+Decor+East,data=nyc2)
+anova(ny1.lm,ny.lm)  ##
+```
+
+*6 steps hypothesis testing: Partial F Test*
+
+Step 1. $H_0: Price_i= \beta_0+\beta_1 Food_{i} +\beta_2 Decor_{i}+\beta_3 East_{i}, H_a: Price_i= \beta_0+\beta_1 Food_{i} +\beta_2 Decor_{i}+\beta_3 East_{i}+\beta_4 Service_i$
+
+Step 2. Test statistic: F= 0
+
+Step 3. The sampling distribution is $F_{c, n-q-c}=F_{1,163},$ as $q=4,c=1, n=168.$
+
+Step 4. p-value=0.9945.
+
+Steps 5 and 6. We do not reject the null hypothesis. The variable Service should not be added in the model.
+
+(d) Perform diagnostics checking of the model in (a) using residual analysis.
+
+Recall from Week 9 Comp Lab.
+
+According to Sheather (2009):
+
++ for small to moderate sample sizes, points are considered as *outliers* if the standardized residual for the point falls outside the interval from –2 to 2 .
+
++ for very large data sets, this rule may change to –4 to 4 based on standardised residuals.
+
++ a *bad leverage point* is a leverage point (if leverage $h_{ii} > 2(p+1)/ n$) which is also an 
+outlier. Thus, a bad leverage point is a leverage point whose standardized residual falls outside 
+the interval from –2 to 2. 
+
++ On the other hand, a *good leverage point* is a leverage point whose standardized residual falls 
+inside the interval from –2 to 2 .
+
+Firstly, we calculate standardised residuals.
+
+```{r}
+res=ny.lm$residuals
+std.res=rstandard(ny.lm)  ## standardised residuals
+par(mfrow=c(2,2))  ## plotting 4 plots to check normality and constant variance
+hist(std.res)
+qqnorm(std.res)
+qqline(std.res)
+plot(std.res,xlab="Time", ylab="Standardised Residuals")
+plot(ny.lm$fitted.values,std.res, xlab="Fitted Values", ylab="Standardised Residuals")
+par(mfrow=c(1,1))
+```
+
+
+Plot of standardised residuals against each of explanatory variables.
+
+```{r}
+par(mfrow=c(2,2))
+plot(nyc$Food,std.res,xlab="Food", ylab="Standardised Residuals")
+plot(nyc$Service,std.res,xlab="Service", ylab="Standardised Residuals")
+plot(nyc$Decor,std.res,xlab="Decor", ylab="Standardised Residuals")
+plot(nyc$East,std.res,xlab="East", ylab="Standardised Residuals")
+```
+
+(e) Identify outliers if any.
+
+
+```{r}
+par(mfrow=c(2,2))
+plot(ny.lm)
+```
+
+The above 3 plots (2 at the top, and bottom left) have shown that normality, independence and constant variance assumptions are satisfied. Note that the QQ plot shows some large residuals at both ends (upper and lower).
+
+The only concern is about the plot of standardised residuals against Leverage.
+
+```{r}
+Leverage<-hatvalues(ny.lm)
+head(Leverage)
+```
+
+
+```{r}
+Cooks.Dist<-cooks.distance(ny.lm)
+head(Cooks.Dist)
+```
+
+The cut-off for Leverage is $2*(p+1)/n$ and for Cooks' Distance is $2*(p+1)/(n-(p+1)).$
+
+For p=4, n=168, 0.0595 and 0.0613 are the cut-off for Leverage and Cook respectively.
+
+```{r, fig3, fig.width = 5, fig.asp = .5}
+# plotting the std res against the influence measures 
+p=4
+n=168
+par(mfrow=c(1,2))
+par(mgp=c(1.75,0.75,0))
+par(mar=c(3,3,2,1))
+plot(std.res~Leverage)
+abline(v=2*(p+1)/n, lty=1,col=3)  ## add a vertical line for the cut-off Leverage
+plot(std.res~Cooks.Dist)
+abline(v=2*(p+1)/(n-(p+1)), lty=1, col=2)  ## add a vertical line for the cut-off Cooks
+```
+
+Leverage identifies a couple outliers.
+
+Definitely there are 2 influential points identified by Cook's Distance.
+
+```{r}
+plot(cooks.distance(ny.lm), xlab = "Restaurants", ylab = "Cook's distance")
+abline(h=2*(p+1)/(n-(p+1)), lty=1, col=2)
+with(nyc, text(cooks.distance(ny.lm), labels = row.names(nyc), pos = 4))
+# Can only do the next step interactively in the console
+# identify(1:168, cooks.distance(ny.lm),label=rownames(nyc))
+```
+
+```{r}
+# Detecting outliers in the dataset
+di=2*(p+1)/(n-(p+1))  ## cut-off 
+# Defining outliers based on 2*(p+1)/(n-(p+1)) criteria
+nyc$outlier <- ifelse(Cooks.Dist < di, "keep","delete")
+View(nyc)
+```
+
+- OPTIONAL (Added Variable Plot)
+
+```{r include=FALSE}
+#Figure 6.10 on page 166 Sheather
+##install.packages("car")
+library(car)
+```
+
+
+```{r fig.height=8, fig.width=8}
+nyc <- read.csv("nyc.csv", header=TRUE)
+avPlots(lm(Price~Food+Decor+Service+East, data=nyc))
+#avPlot(m1,variable=Food,ask=FALSE,identify.points=TRUE)
+# Click on the points you wish to identify. When you wish
+# to stop click the right mouse button and select "Stop"
+#avp(m1,variable=Decor,ask=FALSE,identify.points=FALSE)
+#avp(m1,variable=Service,ask=FALSE,identify.points=FALSE)
+#avp(m1,variable=East,ask=FALSE,identify.points=FALSE)
+
+```
+
+
+
+## Question 4 -  fitting linear models with a single categorical explanatory variable
+
+The data frame `ChangeoverTimes` contains data on two different methods for switching an industrial process over from one type of product to another. The two different methods are an existing one and a new one, and there are two additional variables (`Method` and `New`) in the data frame that designate the different methods.
+
+```{r}
+head(ChangeoverTimes)
+View(ChangeoverTimes)
+```
+
+Note that the column "New" is just a 0-1 indicator column corresponding to Method being "Existing" (0) or "New" (1).
+
+(a) Produce a boxplot of the changeover times for each of the methods.
+  
+```{r}
+# Boxplot
+boxplot(split(ChangeoverTimes$Changeover,ChangeoverTimes$Method), ylab="Changeover Time")
+
+```
+
+While we can use a t-test to assess if the mean changeover times differ according to method, we will first do this via linear regression.
+
+  (b) Write out and fit a linear regression model relating changeover time to changeover method. You can use either of the variables `Method` or `New` (look at them first). What is the mean for each of the different methods?
+  
+The model can be written as  
+ 
+$$y = \beta_0 + \beta_1 z + \epsilon\,$$ 
+ 
+where \(z\) is an indicator variable that takes on a value of zero for the existing method and one for the new method. The expected value for each methods is as follows:
+
+$$E(y | z = 0) = \beta_0, \quad E(y | z = 1) = \beta_0 + \beta_1$$
+
+```{r}
+ChangeoverTimes
+```
+
+
+```{r}
+# Linear model with categorical explanatory variable
+fit<-lm(Changeover~Method,data=ChangeoverTimes)
+summary(fit)
+```
+
+```{r}
+# Linear model with numerical indicator as explanatory variable
+fit<-lm(Changeover~New,data=ChangeoverTimes)
+summary(fit)
+```
+ 
+
+Answer: For the existing method the mean changeover time is estimated to be 17.86 seconds (?), ie just the model intercept, whereas the mean changeover time for the new method is the sum of the 2 coefficients: 17.86 - 3.17 =14.68 seconds.
+  
+(c) From the fitted model calculate a $95\%$ confidence interval for the coefficient relevant to the new method. (You can use `confint`.) How would you interpret this?
+  
+
+```{r}
+# confidence interval for the x variable
+confint(fit)["New",]
+
+```
+
+Answer: We are 95% confident that the difference in the 2 means lies between -5.96 and -0.39 seconds, or we could interpret this as: the mean changeover time of the new method is between 0.39 and 5.96 seconds less than that of the existing method.
+  
+(d) Using `t.test`, **and assuming equal variances**, conduct a two-sample $t$-test and calculate a $95\%$ confidence interval for the difference between the mean changeover times. What do you note?
+  
+
+```{r}
+# Two-sample test with equal variances
+t.test(Changeover~Method,data=ChangeoverTimes,var.equal=T)
+#
+```
+
+The $t$-test calculates the difference (existing - new), whereas the ‘slope’ in the regression model represents (new - old), which is why one is the negative of the other, but both give the same result (when we specify that both samples have equal variances).
+
+
+_NOTES._
+
+To create the _New_ column, you can do it this way:
+
+```{r}
+ChangeoverTimes$New<-ifelse(ChangeoverTimes$Method=="Existing","0","1")
+head(ChangeoverTimes)
+```
+
+
+To make _New_ as a factor:
+
+```{r}
+ChangeoverTimes$New<-factor(ChangeoverTimes$New)
+head(ChangeoverTimes)
+```
+
+## Question 5 UFC dataset - Outliers and Leverage
+
+The data file `ufc.txt` gives the diameter `Dbh` in millimeters at 137
+cm perpendicular to the bole, and the `Height` of the tree in
+decimeters for a sample of grand fir trees at Upper Flat Creek,
+Idaho, in 1991. 
+
+Also included in the file are the `Plot` number,
+the `Tree` number in a plot, and the 10 `Species` types.
+
+Consider the regression of `Height` and `Species` on {\tt
+Dbh} by the following \texttt{R} command:
+
+
+```{r eval=FALSE,size="scriptsize"}
+ufc = read.table("ufc.txt",header=T)
+lm(Dbh~Height+Species,data=ufc)
+```
+
+(a) Test for significance of regression using $\alpha = 0.05$.
+Find the $p$-value for this test. What is your conclusion?%
+
+Read the data in and perform the regression analysis
+
+```{r size="scriptsize"}
+ufc = read.table("ufc.txt",header=T)
+str(ufc)
+M1 = lm(Dbh~Height+Species,data=ufc)
+summary(M1)
+```
+
+According to the output, $p$-value for the $F$-test is less than $\alpha
+= 0.05$. The regression is statistically significant.
+
+
+(b) How many bad leverage points you can identify from the data?
+
+We need to identify the df of regression,
+$$
+\texttt{df of Total}=n-1=372-1=371; \quad
+\texttt{df of Residual}=361; \quad
+\texttt{df of Regression}=371-361=10
+$$
+So the cut off point for leverages is $2\times(10+1)/372=0.05913978$,
+see the plot of Standardized Residuals vs Leverages
+
+```{r size="scriptsize"}
+plot(rstandard(M1)~hatvalues(M1),pch=16,xlim=c(0,1),ylim=c(-3,3),
+     main="Standardized Residuals vs Leverage",
+     xlab="Hat values",ylab="Standard Residuals")
+abline(h=c(-2,2),col=c(2,2),lty=2)
+abline(v=2*(10+1)/372,col=2,lty=2)
+```
+
+Find the exact high leverage points and outliers
+```{r size="scriptsize"}
+p = 10 + 1
+n = 372
+index.highleverage = which(hatvalues(M1)>2*p/n)
+index.outlier = which(abs(rstandard(M1))>2)
+```
+
+
+          - High leverage points:
+
+```{r size="scriptsize"}
+data.frame(ufc,hatvalues=hatvalues(M1),stdres=rstandard(M1))[index.highleverage,]
+```
+
+
+          - Outliers:
+```{r size="scriptsize"}
+data.frame(ufc,hatvalues=hatvalues(M1),stdres=rstandard(M1))[index.outlier,]
+```
+
+
+          - Both:
+```{r size="scriptsize"}
+intersect(index.outlier,index.highleverage)
+```
+
+There is no "bad" leverage point
+

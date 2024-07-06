@@ -1,0 +1,413 @@
+---
+title: "STAT2401 Analysis of Experiments "
+author: "Final Examination Semester 1 2024"
+date: "Monday 10th June 2024"
+output:
+  pdf_document: default
+  html_notebook:
+    highlight: haddock
+    theme: flatly
+  html_document:
+    highlight: haddock
+    theme: flatly
+  word_document:
+    highlight: haddock
+---
+
+# STAT2401 Final Examination - Semester 1 2024 (60 marks)
+
+## Student name: Himakar Gadham
+
+## Student ID:23783777
+
+
+```{r echo=FALSE}
+knitr::opts_chunk$set(prompt=FALSE, comment=NA, message=FALSE, tidy=TRUE, error=TRUE, warning=FALSE)
+```
+
+# Instructions
+
+1. You are provided with Rmd template for your working that you are strongly recommended to submit under Question 1 File Response for partial marks. 
+
+2. Save the RMD template (within the LMS, *right click ON the file, then Save Link As*) to your working directory and rename it in the format of *studentID_Surname.Rmd*, eg, *123456_Nur.Rmd*.
+
+3. Marks for each question are shown. The total number of marks is 60.
+  
+    - This is a 2-hour examination.
+    
+    - You are provided with 15 minutes extra time for Rmarkdown template download, save and upload time.
+    
+    - There are 20 questions (Q2-Q21) set as multiple choice, multiple blanks, matching, calculated numeric. You must enter your answers on the LMS.
+    
+    - Include relevant R-output in your answers for some questions using R, if required.
+    
+         - You must provide your R code into the template provided here for full marks. 
+         
+         - Incorrect answers with R code attempt will be allocated some partial marks.
+         
+         - If you have any question or comment about the exam or would like to alert your Unit Coordinator to a perceived error, include a comment in your working in Rmd file, if appropriate, to indicate how you interpreted the question.
+               
+    - Carry out all of your work in this Rmarkdown file. 
+
+4. **Save your work frequently!**
+
+5. When you are finished, upload this *Rmarkdown file* back into *Question 1 File Response* on the LMS.
+
+    -  You only need to submit this RMD file.
+    
+    -  You don't need to knit this file. 
+    
+    - DO NOT BE LATE. You must submit within the examination time (the last 15 minutes of 135 minutes). 
+    
+    - **We do not accept any Rmd submission by email.**
+
+
+## Remarks
+
+- Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+
+- You can add your working in this file whenever applicable, eg theoretical question. Clearly indicates the question number before your answer. 
+
+- Make sure your program works for every chunk.
+
+- It is your responsibility to call the libraries of R packages.
+
+- The following chunk listed some R packages for the datasets that you may need to load as libraries.
+
+```{r include=FALSE}
+## Libraries from the computer labs
+# library(tidyverse)
+library(ggplot2)
+library(PerformanceAnalytics)
+library(leaps)
+```
+
+
+```{r}
+## R packages for the datasets
+library(HSAUR2)
+library(MASS)
+library(ISLR)
+```
+
+
+# Based on Questions 2-21 on the LMS. 
+
+## Question 3
+
+```{r}
+library(MASS)
+data(epil)
+head(epil)
+str(epil)
+```
+
+```{r}
+progabide_data <- subset(epil, trt == "progabide")
+
+kendall_result <- cor.test(progabide_data$y, progabide_data$age, method = "kendall")
+
+kendall_result
+test_statistic <- kendall_result$statistic
+test_statistic
+```
+
+
+
+## Question 5
+
+```{r}
+Score<-c(4.58,4.36,4.19,4.57,4.39,4.52,4.37,4.55,4.62,4.65,4.63,4.52,4.43,4.71,4.73,4.76,4.52,4.71,4.52,4.64,4.86,4.66,4.65,4.84,5.02,4.78,4.65,4.81,4.96,4.79,5.02,4.84,4.62,4.84,5.00,5.11,5.08)
+Years<-c(18,2,2,6,4,4,6,4,6,8,7,7,7,12,8,28,14,13,6,17,11,16,6,8,12,14,24,7,24,25,15,6,7,16,11,22,13)
+Sales<-c(3.81,4.70,4.44,5.08,4.79,4.94,5.01,4.79,5.91,5.99,6.46,4.94,6.06,6.46,6.52,5.83,5.16,6.15,5.89,6.71,6.71,5.94,6.49,6.46,6.62,7.38,7.24,6.63,6.75,5.89,7.09,7.17,6.87,7.02,7.17,7.86,8.07)
+Profit<-c(1.79,1.95,2.08,2.48,2.48,2.56,3.04,3.26,3.81,3.83,4.09,4.09,4.09,4.25,4.28,4.44,4.51,4.70,4.70,4.83,4.87,4.91,5.14,5.19,5.39,5.48,5.48,5.58,5.63,5.81,5.83,5.89,5.89,6.11,6.40,6.42,6.58)
+
+credit.df=data.frame(Score,Years,Sales, Profit)
+head(credit.df)
+
+model <- lm(Score ~ Profit, data = credit.df)
+summary(model)
+r = 0.8123^2
+r
+```
+
+
+## Question 6
+```{r}
+University<-c(1:33)
+Year2008<-c(7018,7002,6926,6333,5432,5136,4994,4877,4726,4715,4405,4383,4335,4072,4047,3970,3872,3848,3819,3791,3761,3698,3575,3450,3204,3188,3132,2768,2725,2348,2256,3308,3374)
+Year2014<-c(13706,13642,11738,11540,10690,8005,12106,10634,7386,6385,8231,8679,9300,9497,7656,8046,7750,8062,6435,7569,6802,8310,8532,6584,6544,7278,5524,5397,7042,5542,3256,6040,7844)
+tuition.df <-data.frame(University,Year2008,Year2014)
+head(tuition.df)
+model <- lm(Year2014 ~ Year2008, data = tuition.df)
+summary(model)
+```
+```{r}
+conf_interval <- confint(model, level = 0.99)
+conf_interval
+```
+```{r}
+prediction_interval <- predict(model, newdata = data.frame(Year2008 = 5500), interval = "prediction", level = 0.90)
+prediction_interval
+```
+
+
+## Question 8
+```{r}
+Score<-c(4.58,4.36,4.19,4.57,4.39,4.52,4.37,4.55,4.62,4.65,4.63,4.52,4.43,4.71,4.73,4.76,4.52,4.71,4.52,4.64,4.86,4.66,4.65,4.84,5.02,4.78,4.65,4.81,4.96,4.79,5.02,4.84,4.62,4.84,5.00,5.11,5.08)
+Years<-c(18,2,2,6,4,4,6,4,6,8,7,7,7,12,8,28,14,13,6,17,11,16,6,8,12,14,24,7,24,25,15,6,7,16,11,22,13)
+Sales<-c(3.81,4.70,4.44,5.08,4.79,4.94,5.01,4.79,5.91,5.99,6.46,4.94,6.06,6.46,6.52,5.83,5.16,6.15,5.89,6.71,6.71,5.94,6.49,6.46,6.62,7.38,7.24,6.63,6.75,5.89,7.09,7.17,6.87,7.02,7.17,7.86,8.07)
+Profit<-c(1.79,1.95,2.08,2.48,2.48,2.56,3.04,3.26,3.81,3.83,4.09,4.09,4.09,4.25,4.28,4.44,4.51,4.70,4.70,4.83,4.87,4.91,5.14,5.19,5.39,5.48,5.48,5.58,5.63,5.81,5.83,5.89,5.89,6.11,6.40,6.42,6.58)
+
+credit.df=data.frame(Score,Years,Sales, Profit)
+head(credit.df)
+
+model1 <- lm(Score ~ Sales, data = credit.df)
+summary(model1)
+anova(model1)
+```
+
+
+## Question 9
+```{r}
+Score<-c(4.58,4.36,4.19,4.57,4.39,4.52,4.37,4.55,4.62,4.65,4.63,4.52,4.43,4.71,4.73,4.76,4.52,4.71,4.52,4.64,4.86,4.66,4.65,4.84,5.02,4.78,4.65,4.81,4.96,4.79,5.02,4.84,4.62,4.84,5.00,5.11,5.08)
+Years<-c(18,2,2,6,4,4,6,4,6,8,7,7,7,12,8,28,14,13,6,17,11,16,6,8,12,14,24,7,24,25,15,6,7,16,11,22,13)
+Sales<-c(3.81,4.70,4.44,5.08,4.79,4.94,5.01,4.79,5.91,5.99,6.46,4.94,6.06,6.46,6.52,5.83,5.16,6.15,5.89,6.71,6.71,5.94,6.49,6.46,6.62,7.38,7.24,6.63,6.75,5.89,7.09,7.17,6.87,7.02,7.17,7.86,8.07)
+Profit<-c(1.79,1.95,2.08,2.48,2.48,2.56,3.04,3.26,3.81,3.83,4.09,4.09,4.09,4.25,4.28,4.44,4.51,4.70,4.70,4.83,4.87,4.91,5.14,5.19,5.39,5.48,5.48,5.58,5.63,5.81,5.83,5.89,5.89,6.11,6.40,6.42,6.58)
+
+credit.df=data.frame(Score,Years,Sales, Profit)
+head(credit.df)
+model <- lm(Score ~ Profit, data = credit.df)
+plot(model)
+
+```
+```{r}
+leverage_values <- hatvalues(model)
+n <- length(Score) 
+p <- 1 
+threshold <- 2 * (p + 1) / n
+leverage_points <- which(leverage_values > threshold)
+leverage_points
+```
+
+
+
+## Question 10
+
+```{r}
+Crews <-c(16,10,12,16,16,4,2,4,6,2,12,8,16,2,2,2,6,10,16,16,10,6,2,6,10,12,4,4,16,8,10,16,6,10,12,8,10,8,8,2,16,8,8,12,10,16,2,2,8,12,4,4,12)
+
+Rooms <-c(51,37,37,46,45,11,6,19,29,14,47,37,60,6,11,10,19,33,46,69,41,19,6,27,35,55,15,18,72,22,55,65,26,52,55,33,38,23,38,10,65,31,33,47,42,78,6,6,40,39,9,22,41)
+data <- data.frame(Crews, Rooms)
+
+model_original <- lm(Rooms ~ Crews, data = data)
+summary(model_original)
+data$sqrt_Crews <- sqrt(data$Crews)
+data$sqrt_Rooms <- sqrt(data$Rooms)
+
+model_trans <- lm(sqrt_Rooms ~ sqrt_Crews, data = data)
+summary(model_trans)
+
+s_transformed <- sqrt(sum(residuals(model_trans)^2) / df.residual(model_trans))
+s_transformed
+
+plot(model_original)
+```
+
+## Question 11
+```{r}
+data("airquality") # this data available in R base package, you don't need to install any R package
+View(airquality) # to view the dataset
+
+head(airquality) # to view the first 6 rows
+
+m1 <- lm(Ozone ~ Solar.R + Wind + Temp, data = airquality)
+summary(m1)
+anova_model <- anova(m1)
+anova_model
+```
+
+
+
+## Question 13
+```{r}
+library(HSAUR2)
+attach(USairpollution)
+
+pollution <- USairpollution
+#View(pollution) # 41 rows 
+head(pollution)
+
+correlation_matrix <- cor(pollution[, -1])
+correlation_matrix
+
+cor_max <- which(correlation_matrix == max(correlation_matrix[upper.tri(correlation_matrix)]), arr.ind = TRUE)
+colnames(correlation_matrix)[cor_max]
+```
+
+```{r}
+model <- lm(SO2 ~ temp + manu + popul + wind + precip + predays, data = pollution)
+summary(model)
+
+library(car)
+vif_values <- vif(model)
+vif_manu <- vif_values["manu"]
+vif_manu
+```
+
+## Question 14
+
+```{r}
+Score<-c(4.58,4.36,4.19,4.57,4.39,4.52,4.37,4.55,4.62,4.65,4.63,4.52,4.43,4.71,4.73,4.76,4.52,4.71,4.52,4.64,4.86,4.66,4.65,4.84,5.02,4.78,4.65,4.81,4.96,4.79,5.02,4.84,4.62,4.84,5.00,5.11,5.08)
+Years<-c(18,2,2,6,4,4,6,4,6,8,7,7,7,12,8,28,14,13,6,17,11,16,6,8,12,14,24,7,24,25,15,6,7,16,11,22,13)
+Sales<-c(3.81,4.70,4.44,5.08,4.79,4.94,5.01,4.79,5.91,5.99,6.46,4.94,6.06,6.46,6.52,5.83,5.16,6.15,5.89,6.71,6.71,5.94,6.49,6.46,6.62,7.38,7.24,6.63,6.75,5.89,7.09,7.17,6.87,7.02,7.17,7.86,8.07)
+Profit<-c(1.79,1.95,2.08,2.48,2.48,2.56,3.04,3.26,3.81,3.83,4.09,4.09,4.09,4.25,4.28,4.44,4.51,4.70,4.70,4.83,4.87,4.91,5.14,5.19,5.39,5.48,5.48,5.58,5.63,5.81,5.83,5.89,5.89,6.11,6.40,6.42,6.58)
+
+credit.df=data.frame(Score,Years,Sales, Profit)
+head(credit.df)
+model <- lm(Score ~ Years + Sales, data = credit.df)
+summary(model)
+
+n <- nrow(credit.df)
+p <- 2
+n
+p
+```
+
+
+## Question 15
+```{r}
+library(MASS) 
+attach(Boston)
+
+head(Boston) # to view the first 6 rows
+
+model_reduced <- lm(medv ~ lstat + rm + ptratio, data = Boston)
+model_full <- lm(medv ~ lstat + rm + ptratio + dis + nox + chas + black, data = Boston)
+anova(model_reduced, model_full)
+```
+
+
+## Question 16
+```{r}
+library(ISLR) 
+
+attach(Carseats)
+
+#head(Carseats) # to view the first 6 rows
+
+full <- regsubsets(Sales ~ ., data = Carseats, nvmax = 11)
+AllSubsets.summary <- summary(full)
+AllSubsets.summary
+
+modelf <- lm(Sales ~ CompPrice+Advertising + Price + ShelveLoc, data = Carseats)
+```
+
+```{r}
+par(mfrow = c(1, 3))
+par(cex.axis = 1.5)
+par(cex.lab = 1.5)
+
+plot(1:11, AllSubsets.summary$adjr2, xlab = "subset size", ylab = "adjusted R-squared",
+    type = "b")
+plot(1:11, AllSubsets.summary$cp, xlab = "subset size", ylab = "Mallows' Cp", type = "b")
+abline(0, 1, col = 2)
+plot(1:11, AllSubsets.summary$bic, xlab = "subset size", ylab = "BIC", type = "b")
+adj <-AllSubsets.summary$adjr2[7]
+adj
+```
+## Question 17
+```{r}
+library(ISLR) 
+
+attach(Carseats)
+
+#head(Carseats) # to view the first 6 rows
+
+full_model <- lm(Sales ~ ., data = Carseats)
+summary(full_model)
+AIC(full_model)
+```
+
+```{r}
+backward_model <- step(full_model, direction = "backward", trace = 0)
+summary_backward_model <- summary(backward_model)
+summary_backward_model
+sigma <- summary_backward_model$sigma
+sigma
+```
+
+
+## Question 18
+```{r}
+library(ISLR)
+
+data(College)
+head(College)
+str(College)
+
+null_model <- lm(Apps ~ 1, data = College)
+full_model <- lm(Apps ~ ., data = College)
+```
+```{r}
+forward_model <- step(null_model, scope = list(lower = null_model, upper = full_model), direction = "forward", trace = 0)
+summary_forward_model <- summary(forward_model)
+summary_forward_model
+r_squared <- summary_forward_model$r.squared
+r_squared
+```
+
+
+## Question 19
+
+```{r}
+library(ISLR) 
+
+attach(Carseats)
+
+head(Carseats) # to view the first 6 rows
+
+null_model <- lm(Sales ~ 1, data = Carseats)
+full_model <- lm(Sales ~ ., data = Carseats)
+
+forward_model <- step(null_model, scope = list(lower = null_model, upper = full_model), direction = "forward")
+summary_forward_model <- summary(forward_model)
+summary_forward_model
+
+library(DAAG)
+press(forward_model)
+```
+
+
+## Question 20
+```{r}
+plot(forward_model)
+```
+
+```{r}
+str(Carseats)
+standardized_residuals <- rstandard(forward_model)
+plot(standardized_residuals)
+abline(h = c(-3, 3), col = "red", lty = 2)
+
+outliers <- which(standardized_residuals < -3 | standardized_residuals > 3)
+outliers
+length(outliers)
+```
+
+
+## Question 21
+```{r}
+library(ISLR)
+
+data(College)
+head(College)
+str(College)
+
+M1 <- lm(Apps ~ Accept * Private, data = College)
+
+M2 <- lm(Apps ~ Accept + Private, data = College)
+
+anova(M2, M1)
+```
+

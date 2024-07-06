@@ -1,0 +1,507 @@
+---
+title: "STAT2401 Analysis of Experiments"
+author: '**Practical 3**'
+#date: "Practical 2"
+output:
+  html_document:
+    highlight: haddock
+    # number_sections: yes
+    theme: flatly
+    toc: yes
+  html_notebook:
+    highlight: haddock
+    # number_sections: yes
+    theme: flatly
+  pdf_document:
+    toc: yes
+  word_document:
+    highlight: tango
+    toc: yes
+---
+
+```{r echo=TRUE, include=FALSE}
+knitr::opts_chunk$set(prompt=FALSE, comment=NA, message=FALSE, tidy=TRUE, error=TRUE)
+```
+
+**Aims of this session**
+
+When you complete this session, you will be able to:
+
+1. understand the difference between response and explanatory variables;
+2. understand a few different types of bivariate relationships we will be considering in this unit;
+3. be able to create scatterplots to explore such bivariate relationships;
+4. be able to use correlation analysis to investigate a linear relationship between two (untransformed or transformed) continuous variables;
+5. be able to calculate the sample correlation coefficients using Pearson's, Spearman's and Kendall's;
+6. be able to perform hypothesis testing related to the population correlation coefficients of Pearson's, Spearman's and Kendall's.
+
+        - To create a new chunk: Ctrl+Alt+I (Windows), Cmd+Options+I (MacOs)
+      
+        - Attempt this practical using this Rmd file, then rename it as your own file (use File then Save As)
+
+Before you start, load the stored datasets from the LMS *emissions.csv* provided for exercises below as well as other datasets by running the following chunk (assuming the file  "Workshop5.Rdata" is saved in the same directory as the .Rmd  worksheet).
+
+
+```{r echo=F}
+print(load("Workshop5.RData"))
+```
+
+
+# Question 1 Correlation: Motor vehicle emissions
+
+Motor vehicles must comply with certain emission standards before they can be sold in
+Australia. The dataset *emissions.xls* contains the results of emissions testing of a
+sample of 46 vehicles of a particular model. 
+
+Columns *CO, HC, NOx* represent the emissions of carbon monoxide, hydrocarbons and oxides
+of nitrogen respectively, all in g/km. *VN* is a number identifying the particular vehicle being
+tested.
+
+(a). Use correlation analysis to investigate the relationships between emissions of carbon
+monoxide, hydrocarbons and oxides of nitrogen for this model vehicle. 
+
+
+```{r}
+emissions=read.csv("emissions.csv", header=TRUE)
+View(emissions)
+```
+
+There are 46 cars/cases, 3 variables.
+
+We would like to plot all three variables simultaneously.
+
+```{r}
+library(PerformanceAnalytics)
+chart.Correlation(emissions[,-1], histogram=TRUE, pch=19)
+```
+
+
+```{r}
+cor(emissions[,-1])  ## you exclude the first column (vehicles)
+```
+
+
+Selecting all 3 variables tells R to provide correlation coefficients for each possible pair: HC-CO, HC-NOx, CO-NOx.
+
+
+(b). Describe the relationships between the variables.
+
+The interpretations are as follows:
+
+1. [CO-HC] hydrocarbon emissions show a fairly strong positive correlation with carbon monoxide emissions with a (Pearson's) correlation coefficient of 0.90. The data points are close to a straight line relationship in the corresponding scatter plot.
+            
+2. [NOx-HC] emissions of hydrocarbons and emissions of oxides of nitrogen are negatively correlated. (Pearson's) correlation coefficient is -0.56. There is more variation including some possible outliers in the scatter plot compared to the CO-HC plot.
+            
+3. [NOx-CO] emissions of carbon monoxide and emissions of oxides of nitrogen are also negatively correlated. (Pearson's) correlation coefficient is -0.69. This correlation is stronger than the NOx-HC relationship but not as strong as the CO-HC relationship. NB In this context, stronger means less scatter, points are closer to lying on the same straight line. 
+
+There is also some suggestion of non-linearity in the NOx-HC and NOx-CO relationships. 
+
+
+(c). What difficulty do you think a vehicle manufacturer may have in achieving low emissions for all 3 variables?
+
+The positive correlation suggests that the underlying mechanisms which contribute to high hydrocarbon emissions may also contribute to high carbon monoxide emissions. Therefore many of the measures to reduce hydrocarbon emissions can also be expected to reduce carbon monoxide emissions and vice versa. (Such measures would probably be related to the promotion of complete combustion.)
+
+However, both of these variables are negatively correlated with emissions of oxides of nitrogen so any such measures 
+are likely to increase NOx emissions. Achieving low emissions for all 3 variables is likely to be difficult and require
+separate strategies.
+
+
+# Question 2 Scatterplot and Correlations
+
+A geyser is a hot spring in which water boils intermittently, sending a tall column of water and steam into the air. One of the best known geysers in the US is *Old Faithful in Yellowstone National Park, Wyoming.* It was so named when it was first discovered in 1870 because it was (and is) said to erupt regularly. But what does regularly mean?
+
+The data file for this computer lab contains the _R_ data frame `faithful`, which consists of sequential measurements of the duration of an eruption (*eruptions*, in minutes) and the time to the next eruption (*waiting*, also in minutes). They were obtained during October 1980 by volunteers. These data were collected so that park rangers could inform tourists when an eruption was likely to occur.
+
+As part of your work with the US National Park Service, you have been tasked with constructing a predictive model for waiting time as a linear function of eruption duration so that park rangers can inform tourists when an eruption is likely to occur.
+
+(a) Identify the explanatory and response variables in this case.
+
+Given the objective, to construct a predictive model for _waiting time_ as a linear function of _eruption duration_ then eruption duration will be used to explain waiting time.
+
+In this case, the variable `eruptions` is the explanatory (on x-axis) and `waiting` is the response (on y-axis).
+
+(b) Produce a scatterplot of the waiting time and length of eruptions. (Think about which variable to plot on the y axis and which one to plot on the x axis.)
+
+```{r}
+View(OldFaithful)
+head(OldFaithful)
+```
+
+n=272
+
+```{r}
+length(OldFaithful$eruptions)
+length(OldFaithful$waiting)
+```
+
+
+```{r}
+plot(waiting ~ eruptions, data = OldFaithful, xlab = "eruption duration (minutes)",
+ylab = "time to next eruption (minutes)", main = "Eruptions from Old Faithful (October 1980)")
+```
+
+(c) Comment on any patterns you see in the data and on the relationship between waiting time and eruption duration in such a way that a tourist to Old Faithful might understand. 
+
+1. (*Form, direction*). There is a positive linear relationship between eruption duration and the time till the next one. This means that the longer the eruption, the longer you have to wait till the next one. 
+
+2. (*Strength*) However, it appears this relationship is due to some extent to clustering of the eruptions into 2 main groups: those with duration time less than about 2.5 minutes with waiting time less than 70 minutes, and those lasting longer than 3.5 minutes with waiting time greater than 70 minutes. 
+
+3. After an eruption of a certain duration, there is a range of waiting times.
+
+(d) Calculate _Pearson’s, Spearman’s and Kendall's correlation coefficients_, and comment on the similarity/difference between the three coefficients. 
+
+```{r}
+Pearson.r<-cor(OldFaithful$eruptions,OldFaithful$waiting)
+Spearman.r<-cor(OldFaithful$eruptions,OldFaithful$waiting,method="spearman")
+Kendall.r<-cor(OldFaithful$eruptions,OldFaithful$waiting,method="kendall")
+print(c("Pearson=", Pearson.r, "Spearman=", Spearman.r, "Kendall=", Kendall.r))
+```
+
+Kendall’s rank correlation is substantially less than both Spearman’s rank and Pearson’s correlation.
+
+Spearman’s rank correlation is substantially less than Pearson’s correlation. This is due 
+to a relative lack of linearity within each of the 2 main data clusters. This becomes very 
+evident if you look here at a plot of the ranks, rather than the raw data:
+
+```{r}
+plot(rank(waiting) ~ rank(eruptions), data = OldFaithful, xlab = "Rank of duration",
+ylab = "Rank of time to next eruption")
+```
+
+
+(e) Perform hypothesis testing for _positive correlations_ using Pearson’s, Spearman’s and Kendall's correlation coefficients.
+
+```{r}
+cor.test(OldFaithful$eruptions,OldFaithful$waiting, alternative = "greater")
+cor.test(OldFaithful$eruptions,OldFaithful$waiting,method="spearman", exact=F, alternative="greater")
+cor.test(OldFaithful$eruptions,OldFaithful$waiting,method="kendall", alternative="greater")
+```
+
+(f) Summarise the 6 steps hypothesis testing for Pearson's correlation.
+
+1. $H_0: \rho = 0$ against $H_1:\rho > 0$
+
+2. Test statistic. $t=r(\sqrt{n-1)})=0.9008 \times \sqrt{271} = 34.089.$
+
+3. The sampling distribution is  $T$ with df=n-2=272-2=270.
+
+4. The p-value= P($ T_{df=270} > $ 34.089) < 2.2e-16 (R output)
+
+If we calculate it using the definition of p-value:
+
+```{r}
+pval=pt(34.089, df=270, lower.tail = F)
+pval
+```
+
+5. Decision. As p-value (=4.07e-100) is very small, p-value < 5%, then we reject Ho at 5% significance level
+
+6. We conclude that there is a positive correlation between eruption duration and the time till the next one.
+
+The 6 steps hypothesis testing for *Spearman's correlation.*
+
+1. $H_0: \rho_s = 0$ (eruption duration and the waiting time are independent) against $H_1:\rho_s > 0$ (eruption duration and the waiting time are dependent)
+
+2. Test statistic. $S=7\times 10^5$
+
+3. The sampling distribution is based on ranks.
+
+4. The p-value < 2.2e-16 (R output)
+
+5. Decision. As p-value  (<2e-16) is very small, p-value < 5%, then we reject Ho at 5% significance level
+
+6. We conclude that there is a positive correlation between between eruption duration and the time till the next one.
+
+The 6 steps hypothesis testing for *Kendall's correlation.*
+
+1. $H_0: \tau = 0$ (eruption duration and the waiting time are independent) against $H_1:\tau > 0$ (eruption duration and the waiting time are positively correlated)
+
+2. Test statistic. $z=14$
+
+3. The sampling distribution is  $Z \sim N(0,1)$ approximation.
+
+4. The p-value < 2.2e-16 (R output)
+
+5. Decision. As p-value  (<2e-16) is very small, p-value < 5%, then we reject Ho at 5% significance level
+
+6. We conclude that there is a positive correlation between between eruption duration and the time till the next one.
+
+# Question 3 Prostate Cancer data [Sheather, Ch 7.3]
+
+The data _Prostate Cancer_ (Stamey et al. (1989)) examined the correlation between the level of prostate specific antigen (PSA) and a number of clinical measures, in 97
+men who were about to receive a radical prostatectomy.  Hastie, Tibshirani and Friedman (2001, p. 48) “randomly split the dataset into a 
+training set of size 67 and a test set of size 30.” as provided in _prostate.txt_
+
+The goal is to predict the log of PSA _lpsa_  from a number of measurements including log cancer volume _lcavol_, log prostate weight _lweight_,
+age, log of benign prostatic hyperplasia amount _lbph_, seminal vesicle invasion
+_svi_, log of capsular penetration _lcp_, Gleason score _gleason_, and
+percent of Gleason scores 4 or 5 _pgg45_.
+
+(a) Identify the explanatory and response variables in this case.
+
+Given the objective, to construct a predictive model for _lpsa_ as a linear function of log cancer volume _lcavol_, log prostate weight _lweight_,
+age, log of benign prostatic hyperplasia amount _lbph_, seminal vesicle invasion
+_svi_, log of capsular penetration _lcp_, Gleason score _gleason_, and
+percent of Gleason scores 4 or 5 _pgg45_ then the variables ( _lcavol_, _lweight_, _lbph_, _svi_,  _lcp_, _gleason_, and _pgg45_) will be used to explain _lpsa_.
+
+In this case, the variables `lcavol, lweight, lbph, svi,  lcp, gleason, and pgg45` are the explanatories/predictors or dependent variables (on x-axis) and `lpsa` is the response (on y-axis).
+
+(b) Reproduce a scatter plot matrix of the variables as in Figure 7.2 (Sheather, Ch 7.3).
+
+STEP 1. Read the data set in R and assign an appropriate name to the data object.
+
+```{r, Echo=FALSE}
+Prostate=read.table("prostate.txt", header=TRUE)
+head(Prostate)
+str(Prostate)
+View(Prostate)
+```
+
+Observe the type of variables. 
+
+
+```{r, Echo=FALSE, warning=FALSE}
+pairs(Prostate[,2:10])
+# a more informatic graph
+library("PerformanceAnalytics")
+chart.Correlation(Prostate[,2:10],histogram=TRUE,pch=19)
+```
+
+We can also create the scatterplot matrix using _ggplot2_ and _GGally_ R packages.
+
+```{r, Echo=FALSE}
+library(dplyr)
+library(ggplot2)
+library(GGally)
+ggpairs(Prostate, columns=2:10)
+```
+
+
+(c) Use correlation analysis to investigate the relationships among _lpsa_ and the predictors or explanatory variables. 
+
+One can check from the above plots.
+
+To present a correlation matrix:
+
+```{r}
+cor(Prostate[,2:10])  ## 
+```
+
+
+    - Identify 3 predictors with the highest correlations (in magnitude) to the response.
+    
+The predictors are :lcavol (0.73); svi (0.57) and lcp (0.55)
+    
+    - Identify 3 predictors with the lowest correlations (in magnitude) to the response.
+    
+The predictors are :age (0.17); lbph (0.18) and gleason (0.37)
+    
+    - Identify 3 pairs of predictors with the highest correlations (in magnitude).
+
+The pairs of predictors are : (pgg45, gleason) (0.75); (lcavol, lcp) (0.68); (lvi, lcp) (0.67) 
+
+    - Perform hypothesis testing for positive correlation using Pearson’s between _lpsa_ and _age_. Use 5\% significance level.
+
+
+```{r}
+cor.test(Prostate$lpsa, Prostate$age, alternative = "greater")
+```
+
+The sample correlation is 0.1695928; n=97
+
+The 6 steps are:
+    
+1. $H_0: \rho = 0$ against $H_1:\rho > 0$
+
+2. Test statistic. $t=r(\sqrt{n-1)})= 1.6773.$
+
+3. The sampling distribution is  $T$ with df=n-2=97-2=95.
+
+4. The p-value= P($ T_{df=95} > $ 1.6773) = 0.04839 (R output)
+
+If we calculate it using the definition of p-value:
+
+```{r}
+pval1=pt(1.6773, df=95, lower.tail = F)
+pval1
+```
+
+5. Decision. As p-value (=4.84\%) is small, p-value < 5\%, then we reject Ho at 5\% significance level
+
+6. We conclude that there is a positive correlation between age and lpsa.
+
+
+# Question 4 Paper Quality dataset [Example 1.5 JW]
+
+Paper is manufactured in continuous sheets several feet wide. Because of the orientation of fibers within the paper, it has a different strength when measured in the direction produced by the machine than when measured across, or at right angles to, the machine direction.
+
+The dataset in *PaperQuality.txt* contains 41 measurements of $X_l$ = density (grams/cubic centimeter), $X_2$ = strength (pounds) in the machine direction and $X_3$ = strength (pounds) in the cross direction. 
+
+Use R to answer the following.
+
+(a) Report summary statistics (means and variances) of the three variables.
+
+
+```{r, Echo=FALSE}
+Paper=read.table("PaperQuality.txt", header=TRUE)
+head(Paper)
+View(Paper)
+str(Paper)
+```
+
+The sample means
+
+```{r, Echo=FALSE}
+MeanPaper=colMeans(Paper) # mean vector
+MeanPaper=matrix(MeanPaper,nrow=3)
+cat("Mean Vector of Paper, Density - StrengthMD - StrengthCD",sep="\n")
+MeanPaper
+```
+
+The variance-covariance matrix
+
+```{r, Echo=FALSE}
+cat("Covariance Matrix of Paper Quality",sep="\n")
+CovPaper=var(Paper)
+print(CovPaper)
+```
+
+The correlation matrix
+
+```{r, Echo=FALSE}
+cat("Correlation Matrix of Paper Quality",sep="\n")
+CorrPaper=cor(Paper)
+print(CorrPaper)
+```
+
+
+(b) Present a scatter plot matrix. Identify an outlier.
+
+
+```{r, Echo=FALSE}
+pairs(Paper)
+library("PerformanceAnalytics")
+chart.Correlation(Paper,histogram=TRUE,pch=19)
+```
+
+From the scatterplot matrix, the outlier problem seems to be more apparent in the scatterplots between Density and StrengthMD and Density and StrengthCD. We check that the outlier is at around 0.97 of Density, which corresponds to the observation no 25.
+
+```{r}
+Paper[25,]
+```
+
+
+# Question 5 Anscombe
+
+The datasets in the data.frame `Anscombe` demonstrate both the importance of graphing data before analyzing it and the effect of outliers and other influential observations on statistical properties. (Anscombe, F. J. (1973). "Graphs in Statistical Analysis". American Statistician. 27 (1): 17–21)
+
+
+(a). First of all have a look at the data by graphing each of the 4 column pairs (x1,y1) , (x2,y2), (x3,y3) and (x4,y4) in the `Anscombe` dataset. How would you describe each relationship?
+
+```{r}
+View(Anscombe)
+```
+
+```{r echo=F}
+# The code below will put the 4 graphs on the same plotting region
+par(mfrow=c(2,2))  # create 2 rows 2 columns of windows for 4 plots
+par(mar=c(3,3,3,1),mgp=c(2,0.75,0))
+plot(y1~x1,data=Anscombe,main="Anscombe dataset 1")
+plot(y2~x2,data=Anscombe,main="Anscombe dataset 2")
+plot(y3~x3,data=Anscombe,main="Anscombe dataset 3")
+plot(y4~x4,data=Anscombe,main="Anscombe dataset 4")
+```
+
+Clearly, we can see there is some sort of a positive relationship between the x and y variables for each dataset. For the top 2 plots we would particularly be asking the question “Is the modelling of a linear relationship appropriate?”. For the bottom 2 plots we would be wondering about the influence of the outliers.
+
+
+(b). Before confirming by calculation, estimate the Pearson's correlation coefficient for each pair. 
+
+Looking at the above scatterplots, the (Pearson) correlation which is a measure of linear relationship can be estimated as follows:
+
+    -  x1 and y1 might be a moderate (say r1=0.70); 
+
+    -  x2 and y2 might be weak (say 0.50) as it is a nonlinear form;
+
+    -  x3 and y3 might be strong (say 0.80) with one outlier:
+
+    -  x4 and y4 might be very weak (say 0.10) as it is a constant function.
+
+(c). Now calculate the (Pearson) correlation between $x$ and $y$ for each dataset. What surprising feature do you notice?
+
+```{r  echo=F}
+corr1=cor(Anscombe[,2:3])
+corr1
+corr2=cor(Anscombe[,4:5])
+corr2
+corr3=cor(Anscombe[,6:7])
+corr3
+corr4=cor(Anscombe[,8:9])
+corr4
+```
+
+Interestingly, the normal measure of correlation between x and y is almost identical for all 4 datasets, despite very different distributions of the variables!
+
+This example demonstrates both the importance of graphing data before analyzing it and the effect of outliers and other influential observations on statistical properties.
+
+(d). Calculate the rank correlation coefficient for each pair. How do you explain any differences?
+
+We calculate the Spearman rank correlations.
+
+```{r  echo=F}
+corr1S=cor(Anscombe[,2:3], method="spearman")
+corr1S
+corr2S=cor(Anscombe[,4:5], method="spearman")
+corr2S
+corr3S=cor(Anscombe[,6:7], method="spearman")
+corr3S
+corr4S=cor(Anscombe[,8:9], method="spearman")
+corr4S
+```
+
+OR you can do it this way.
+
+```{r}
+pearson.r<-c(cor(Anscombe$x1,Anscombe$y1),cor(Anscombe$x2,Anscombe$y2),cor(Anscombe$x3,Anscombe$y3),cor(Anscombe$x4,Anscombe$y4))
+spearman.r<-c(cor(Anscombe$x1,Anscombe$y1,method="spearman"),cor(Anscombe$x2,Anscombe$y2,method="spearman"),cor(Anscombe$x3,Anscombe$y3,method="spearman"),cor(Anscombe$x4,Anscombe$y4,method="spearman"))
+rbind(pearson.r,spearman.r)
+
+```
+
+
+For dataset 1, where the correlation can be reasonably described by a simple linear relationship, both measures of correlation are quite comparable. 
+
+In plot 2, the relationship is clearly not linear, although higher values of x are associated with higher values of y. But the relationship is not monotonic so the rank-based measure is less than that of the Pearson coefficient. 
+
+Plots 3 and 4 illustrate the influence of outliers. For dataset 3 where most points lie on a perfect line, the Pearson measure is more susceptible to the outlier than the Spearman measure. For dataset 4, the outlying point is a highly influential point (because the x value is far removed from the bulk of the other x values), and the Pearson coefficient is markedly inflated.
+
+[OPTIONAL} Another way to do the above plots and correlations on the plots is as follows.
+
+
+```{r echo=F}
+par(mfrow=c(2,2))  # graphs placed in 1 row and 4 columns
+par(mar=c(2,2,2,1))  # setting plot margins with reduced space around each graph
+
+r1<-cor(Anscombe$x1,Anscombe$y1)
+plot(y1~x1,data=Anscombe,main="Data 1"); 
+text(x=12,y=5,paste("r =",round(r1,2)))
+
+r2<-cor(Anscombe$x2,Anscombe$y2)
+plot(y2~x2,data=Anscombe,main="Data 2"); 
+text(x=12,y=3.8,paste("r =",round(r2,2)))
+
+r3<-cor(Anscombe$x3,Anscombe$y3)
+plot(y3~x3,data=Anscombe,main="Data 3"); 
+text(x=6,y=12,paste("r =",round(r2,2)))
+
+r4<-cor(Anscombe$x4,Anscombe$y4)
+plot(y4~x4,data=Anscombe,main="Data 4"); 
+text(x=10,y=12,paste("r =",round(r4,2)))
+
+```
+
+
+# Reference
+
+JW: Johnson, R. A.  and Wichern, D. W. (2007) Applied Multivariate Statistical Analysis. 6th ed. , Upper Saddle River, NJ: Prentice Hall. 
+
+
